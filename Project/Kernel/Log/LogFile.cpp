@@ -1,5 +1,5 @@
 #include "LogFile.h"
-#include "Tools.h"
+#include "Tools_time.h"
 
 
 bool LogFile::Open(const char *path, const char *name)

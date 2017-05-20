@@ -28,7 +28,7 @@ public:
 
 	bool LoadFile(const char *path) { return tinyxml2::XML_SUCCESS ==_doc.LoadFile(path)? true : false; };
 
-	const IXmlObject * Root();
+	IXmlObject * Root();
 
 protected:
 private:

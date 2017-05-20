@@ -1,3 +1,5 @@
+#ifndef __IConfigmgr_h__
+#define __IConfigmgr_h__
 #include "MultiSys.h"
 #include "MultiSys.h"
 #include "ICore.h"
@@ -6,21 +8,24 @@
 
 using namespace std;
 
-struct sCoreConfig{
+struct CoreConfigs{
 
 
 };
 
-struct sModuleConfig{
-	string strModulePath;
-	vector<string> vecModules;
+struct ModuleConfigs{
+    string strModulePath;
+    vector<string> vecModules;
 };
 
 class IConfigmgr : public core::ICore{
 public:
-	virtual const sCoreConfig * GetCoreConfig() = 0;
-	virtual const sModuleConfig *GetModuleConfig() = 0;
-	virtual const char* GetCoreFile() = 0;
-	virtual const char* GetConfigFile() = 0;
-	virtual const  char* GetEnvirPath() = 0;
+    virtual ~IConfigmgr(){};
+
+    virtual const CoreConfigs * GetCoreConfig() = 0;
+    virtual const ModuleConfigs *GetModuleConfig() = 0;
+    virtual const char* GetCoreFile() = 0;
+    virtual const char* GetConfigFile() = 0;
+    virtual const  char* GetEnvirPath() = 0;
 };
+#endif

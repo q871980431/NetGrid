@@ -1,5 +1,6 @@
 #include "Logger.h"
 #include "Tools.h"
+#include "Tools_time.h"
 template<  > Logger * Singleton<Logger>::_instance = nullptr;
 bool Logger::Ready()
 {

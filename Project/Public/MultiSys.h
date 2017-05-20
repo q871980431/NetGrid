@@ -2,12 +2,15 @@
 #define __Muliti_Sys_h__
 #include "WinSys.h"
 #include "LinSys.h"
+#include <functional>
 
-
-#define SAFE_DELETE(p) if((p)){delete p; p = nullptr;}
-#define SAFE_DELETE_ARRAY(p) if((p)){delete[] p; p = nullptr;}
+#define NEW     new
+#define DEL     delete
+#define SAFE_DELETE(p) if((p)){DEL p; p = nullptr;}
+#define SAFE_DELETE_ARRAY(p) if((p)){DEL[] p; p = nullptr;}
 #define MAKE_BOOL(p)    ((0 == (p)) ? false : true)
 #define DIR_DELIMITER   "/"
+#define MAX_PATH	260
 
 enum DATA_TYPE
 {

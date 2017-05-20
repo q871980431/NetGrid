@@ -1,8 +1,6 @@
-
-
 #include "CDumper.h"
 #ifdef WIN32
-//#pragma comment( lib,"DbgHelp.Lib")
+#pragma comment( lib,"DbgHelp.Lib")
 
 TCHAR m_acDumpName[256] = { _T("\0") };
 CDumper& CDumper::GetInstance(void){

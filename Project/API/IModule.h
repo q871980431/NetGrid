@@ -16,7 +16,7 @@ public:
 public:
     inline void SetNext(IModule *module){ _next = module; };
     inline IModule * GetNext(){ return _next; };
-    void SetName(const char *name){ memcpy(_name, name, MODULE_NAME_LENGTH - 1); }
+    void SetName(const char *name){ memcpy(_name, name, strlen(name)); }
     const char * GetName(){ return _name; };
 private:
     IModule *_next;
@@ -25,6 +25,7 @@ private:
 
 typedef IModule * (*GetModuleFun)(void);
 #define GET_LOGIC_FUN   GetLogicModule
+#define GET_LOGIC_FUN_NAME "GetLogicModule"
 
 #define CREATE_MODULE(name)\
     class factroy##name\
@@ -32,23 +33,23 @@ typedef IModule * (*GetModuleFun)(void);
         public:\
             factroy##name(IModule *&module)\
             {\
-                IModule *module = new name(); \
-                module->SetName(#name); \
-                module->SetNext(module); \
+                IModule *tmp = new name(); \
+                tmp->SetName(#name); \
+                tmp->SetNext(module); \
+                module = tmp;\
             }\
     }; \
     factroy##name factroy##name(g_module);
 
 #ifdef WIN32
 #define GET_DLL_ENTRANCE\
-    static IModule * g_module = null; \
+    static IModule * g_module = nullptr; \
     extern "C" __declspec(dllexport) IModule * __cdecl GET_LOGIC_FUN(){ return g_module; }\
     BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lovReserved){ return TRUE; }
 #elif defined LINUX
 #define GET_DLL_ENTRANCE\
-    static IModule * g_module = null; \
-    extern "C"  IModule * GET_LOGIC_FUN(){ return g_module; }\
-    BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lovReserved){ return TRUE; }
+    static IModule * g_module = nullptr; \
+    extern "C"  IModule * GET_LOGIC_FUN(){ return g_module; }
 
 #endif
 

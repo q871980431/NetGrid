@@ -8,6 +8,7 @@ struct TListNode
 	T _data;
 	TListNode	*_prev;
 	TListNode	*_next;
+    TListNode() :_prev(nullptr), _next(nullptr){};
 };
 
 template< class T >

@@ -1,36 +1,47 @@
 #ifndef  __Configmgr_h__
-#define __Configmgr_h__
+#define  __Configmgr_h__
 
 #include "IConfigmgr.h"
+#include "Singleton.h"
 #include "TString.h"
 
+namespace core
+{
+    static  const char *MODULE_PATH = "path";
+    static  const char *MODULE_NAME = "module";
+    static  const char *MODULE_NAME_ATTR = "name";
+}
 
-class Configmgr : public IConfigmgr{
+class Configmgr : public IConfigmgr
+{
+    typedef tlib::TString<MAX_PATH> FilePath;
+
 public:
-	static IConfigmgr * getInstance();
+    CREATE_INSTANCE(Configmgr);
 
 	virtual bool Ready();
-	virtual bool Inititalize();
-	virtual bool Destory();
+    virtual bool Initialize();
+    virtual bool Destroy();
 
-	virtual inline const sCoreConfig * GetCoreConfig();
-	virtual inline const sModuleConfig * GetModuleConfig();
+    virtual inline const CoreConfigs * GetCoreConfig(){ return &_coreConfig; };
+    virtual inline const ModuleConfigs * GetModuleConfig(){ return &_moduleConfig; };
 
-	virtual const char* GetCoreFile() { return _coreFile.c_str();  }
-	virtual const char* GetConfigFile(){ return _configFile.c_str();  }
+	virtual const char* GetCoreFile() { return _coreFile.GetString();  }
+	virtual const char* GetConfigFile(){ return _configFile.GetString();  }
 	virtual const char* GetEnvirPath() { return _envirPath.GetString(); }
+
 private:
 	bool LoadCoreConfig();
 	bool LoadModuleConfig();
 private:
-	Configmgr();
-	virtual ~Configmgr();
+    Configmgr(){};
+    virtual ~Configmgr(){};
 private:
-	sCoreConfig m_oCoreConfig;
-	sModuleConfig m_oModuleConfig;
-	string _coreFile;
-	string _configFile;
-	TString<128> _envirPath;
+	CoreConfigs         _coreConfig;
+	ModuleConfigs       _moduleConfig;
+    FilePath            _coreFile;
+    FilePath            _configFile;
+    FilePath            _envirPath;
 };
 
 #endif

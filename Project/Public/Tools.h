@@ -1,7 +1,6 @@
 #ifndef __TOOLS_H__
 #define __TOOLS_H__
 #include "MultiSys.h"
-#include <chrono>
 #ifdef WIN32
 #include <shlwapi.h>
 #endif
@@ -12,17 +11,6 @@
 
 unsigned int  Radnom();
 namespace tools{
-    int GetRandom(int nA, int nB);
-    inline s64 GetTimeMillisecond(){
-        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    }
-
-    s32 HashKey(const char *content){
-        s32 hash = 131;
-        while (*content != '\0')
-            hash += hash * 33 + *(content++);
-        return hash;
-    }
 
     inline void Mkdir(const char *path)
     {
@@ -33,19 +21,109 @@ namespace tools{
 #endif
     }
     //format = "%4d-%02d-%02d %02d:%02d:%02d"
-    extern const char *format;
 #ifdef __cplusplus
     extern "C"{
 #endif
-        const char * GetCurrentTimeString();
         const char * GetAppPath();
-        bool UpdateLocalTime(time_t time);
-
+        s32 HashKey(const char *content);
+        int GetRandom(int nA, int nB);
 #ifdef __cplusplus
     }
 #endif
+    
+    template<class InputIterator1, class InputIterator2, class OutputIterator1, class OutputIterator2 >
+    void Difference(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2, OutputIterator1 out1, OutputIterator2 out2)
+    {
+        while (first1 != last1 || first2 != last2)
+        {
+            if (first1 == last1)
+            {
+                while (first2 != last2){
+                    *out2 = *first2; ++out2; ++first2;
+                }
+                return;
+            }
+            if (first2 == last2)
+            {
+                while (first1 != last1){
+                    *out1 = *first1; ++out1; ++first1;
+                }
+                return;
+            }
+            if (*first1 < *first2) {
+                    *out1 = *first1; ++out1; ++first1;
+            }else if (*first2 < *first1) {
+                    *out2 = *first2; ++out2; ++first2;
+            }else { ++first1; ++first2; }
+        }
+    }
 
 
+    template<class InputIterator1, class InputIterator2, class OutputIterator1, class OutputIterator2, class InterIterator>
+    void DifferenceAndInter(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2, OutputIterator1 out1, OutputIterator2 out2, InterIterator inter)
+    {
+        while (first1 != last1 || first2 != last2)
+        {
+            if (first1 == last1)
+            {
+                while (first2 != last2){
+                    *out2 = *first2; ++out2; ++first2;
+                }
+                return;
+            }
+            if (first2 == last2)
+            {
+                while (first1 != last1){
+                    *out1 = *first1; ++out1; ++first1;
+                }
+                return;
+            }
+            if (*first1 < *first2) {
+                *out1 = *first1; ++out1; ++first1;
+            }
+            else if (*first2 < *first1) {
+                *out2 = *first2; ++out2; ++first2;
+            }
+            else { *inter = *first1; ++first1;  ++first2; }
+        }
+    }
+    template<typename FUN>
+    FUN LoadDynamicFun(const char *path, const char *funName, bool global = false)
+    {
+        FUN fun = nullptr;
+        char filePath[MAX_PATH];
+
+#ifdef LINUX
+        SafeSprintf(filePath, sizeof(filePath), "%s.so", path);
+        void *handle = dlopen( filePath, global ? RTLD_LAZY | RTLD_GLOBAL :  RTLD_LAZY);
+        ASSERT(handle, "open %s error %d", filePath, errno);
+        fun = (FUN)dlsym(handle, funName);
+        ASSERT(fun, "get function error");
+#endif
+
+#ifdef WIN32
+        SafeSprintf(filePath, sizeof(filePath), "%s.dll", path);
+        HINSTANCE instance = ::LoadLibrary(filePath);
+        ASSERT(instance != NULL, "open %s error %d", filePath, errno);
+        fun = (FUN)::GetProcAddress(instance, funName);
+        ASSERT(fun, "get function error");
+#endif
+        return fun;
+    }
+
+    template<typename T>
+    struct HashFun{
+        size_t operator()(const T &val) const{
+            return (size_t)val;
+        }
+    };
+
+    template<typename T>
+    struct CompFun{
+        bool operator()(const T &src, const T &dst) const{
+            return src == dst;
+        }
+    };
 
 }
 

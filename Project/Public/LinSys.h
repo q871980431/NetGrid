@@ -26,7 +26,6 @@ typedef int64_t s64;
 #define LOG_BUFF_SIZE   4096
 #define SafeSprintf snprintf
 #define MSLEEP(n)	usleep(n*1000)
-#define MAX_PATH	260
 
 
 #define ECHO(format, ...)\

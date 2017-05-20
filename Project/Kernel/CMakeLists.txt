@@ -15,6 +15,7 @@ SET(KERNEL_INTERFACE
 	"${KERNEL_INTERFACE_DIR}/ICore.h"
 	"${KERNEL_INTERFACE_DIR}/ILogger.h"
 	"${KERNEL_INTERFACE_DIR}/IConfigmgr.h"
+	"${KERNEL_INTERFACE_DIR}/IModulemgr.h"
 )
 SET(KERNEL_LOG_DIR	"${KERNEL_DIR}/Log")
 SET(KERNEL_LOG
@@ -30,10 +31,10 @@ SET(KERNEL_CONFIG
 	"${KERNEL_CONFIG_DIR}/Configmgr.h"
 )
 
-SET(TEST_DIR "${KERNEL_DIR}/Test")
-SET(TEST
-	"${TEST_DIR}/Test.cpp"
-	"${TEST_DIR}/Test.h"
+SET(KERNEL_MODULE_DIR	"${KERNEL_DIR}/Module")
+SET(KERNEL_MODULE
+	"${KERNEL_MODULE_DIR}/Modulemgr.cpp"
+	"${KERNEL_MODULE_DIR}/Modulemgr.h"
 )
 
 IF(WIN32)
@@ -47,6 +48,7 @@ IF(WIN32)
         ${2D_DIR}
 		${COMMON_TIME_DIR}
 		${TINYXML_DIR}
+        ${KERNEL_MODULE_DIR}
 	)
 ENDIF(WIN32)
 
@@ -57,6 +59,7 @@ IF(LINUX)
                 ${KERNEL_INTERFACE_DIR}
                 ${KERNEL_LOG_DIR}
                 ${KERNEL_CONFIG_DIR}
+				${KERNEL_MODULE_DIR}
         )
 ENDIF(LINUX)
 MESSAGE("test")
@@ -69,7 +72,7 @@ SOURCE_GROUP( Public FILES ${PUBLIC})
 SOURCE_GROUP( Src\\Interface FILES ${KERNEL_INTERFACE})
 SOURCE_GROUP( Src\\Log FILES ${KERNEL_LOG})
 SOURCE_GROUP( Src\\Config FILES ${KERNEL_CONFIG})
-SOURCE_GROUP( Src\\Test FILES ${TEST})
+SOURCE_GROUP( Src\\Module FILES ${KERNEL_MODULE})
 SOURCE_GROUP( Src FILES ${KERNEL})
 
 
@@ -90,12 +93,12 @@ ADD_EXECUTABLE( NetGrid
 				${API}
 				${KERNEL_INTERFACE}
 				${KERNEL_LOG}
+                ${KERNEL_CONFIG}
+				${KERNEL_MODULE}
 				${KERNEL}
 				${TINYXML}
                 ${2D}
 				${COMMON_TIME}
-				${KERNEL_CONFIG}
-				${TEST}
 )
 
 IF(WIN32)

@@ -21,6 +21,7 @@ public:
 public:
     virtual void SyncLog(const char *contens);
     virtual void AsyncLog(const char *contens);
+    virtual IModule * FindModule(const char *name);
 
 protected:
 private:
@@ -31,6 +32,6 @@ private:
     Logger                                          _logger;
 };
 
-#define KERNEL (Kernel * )(Kernel::GetInstancePtr())
-
+#define KERNEL ((Kernel * )(Kernel::GetInstancePtr()))
+//#define KERNEL Kernel::GetInstancePtr()
 #endif
