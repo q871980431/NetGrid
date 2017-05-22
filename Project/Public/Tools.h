@@ -17,7 +17,7 @@ namespace tools{
         return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     }
 
-    s32 HashKey(const char *content){
+    inline  s32 HashKey(const char *content){
         s32 hash = 131;
         while (*content != '\0')
             hash += hash * 33 + *(content++);
