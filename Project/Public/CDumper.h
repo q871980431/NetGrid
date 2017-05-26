@@ -3,7 +3,7 @@
 
 #ifdef WIN32
 #include "windows.h"
-#include "DbgHelp.h"
+#include <DbgHelp.h>
 #include "stdio.h"
 #include <tchar.h>
 

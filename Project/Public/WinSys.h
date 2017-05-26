@@ -40,6 +40,13 @@ typedef int64_t s64;
     SafeSprintf(log, sizeof(log), "%s:%d:%s"#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
     printf("%s\n", log); \
 }
+#define PTF(pszFmt,...)\
+{\
+	char buff[4096]; \
+    	sprintf_s(buff, sizeof(buff), "%s", ""##pszFmt"\n"); \
+       	printf(buff, __VA_ARGS__); \
+}
+
 
  #define PTF_INFO(pszFmt,...)\
 {\

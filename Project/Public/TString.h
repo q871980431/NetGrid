@@ -1,6 +1,7 @@
 #ifndef __X_TString_h__
 #define __X_TString_h__
 #include "MultiSys.h"
+//#include "Tools.h"
 namespace tlib{
     template< s16 _size = 64>
     class TString

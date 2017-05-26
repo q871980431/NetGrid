@@ -1,46 +1,50 @@
 #ifndef __Zone_h__
 #define __Zone_h__
 #include "MultiSys.h"
-#include <set>
-#include "IKernel.h"
-
-#define TASSERT ASSERT
+#include <unordered_set>
 typedef s32 GridID_T;
-struct WORLD_POS
+
+struct WORLD_POS2D
 {
     s32	 x;
     s32	 z;
+    WORLD_POS2D(s32 _x = 0, s32 _z = 0) :x(_x), z(_z){};
 };
-struct VRECT
-{
-    s32 startX;
-    s32 startZ;
-    s32 endX;
-    s32 endZ;
-    VRECT()
-    {
-        startX = 0;
-        startZ = 0;
-        endX = 0;
-        endZ = 0;
-    };
-    bool IsContain(s32 x, s32 z)const
-    {
-        return !(x < startX || x > endX || z < startZ || z > endZ);
-    }
-};
-
 template< typename T >
 class Zone
 {
+    struct Rect
+    {
+        s32 startX;
+        s32 startZ;
+        s32 endX;
+        s32 endZ;
+        Rect()
+        {
+            startX = 0;
+            startZ = 0;
+            endX = 0;
+            endZ = 0;
+        };
+        bool IsContain(s32 x, s32 z)const
+        {
+            return !(x < startX || x > endX || z < startZ || z > endZ);
+        }
+        inline bool Valied(){ return (startX != endX && startZ != endZ); };
+    };
+
 public:
     typedef std::function< bool( const T &data)>ElementCallBackFun;
+    enum
+    {
+        INVALID_ID = -1,
+    };
 private:
     class Grid
     {
     public:
         Grid(){};
-        ~Grid(){};
+        ~Grid(){ _data.clear(); };
 
         void EnterGrid(const T &data){ _data.insert(data); };
         void LeaveGrid(const T &data){
@@ -55,17 +59,29 @@ private:
             return false;
         };
     private:
-        std::set<T> _data;
-    };
-    enum 
-    {
-        INVALID_ID = -1,
+        std::unordered_set<T> _data;
     };
 public:
-    Zone(const WORLD_POS &leftUpPos, const WORLD_POS &rightDownPos, s32 gridLen)
+    Zone() :_grids(nullptr)
     {
-        TASSERT(leftUpPos.x < rightDownPos.x, "x error");
-        TASSERT(leftUpPos.z < rightDownPos.z, "z error");
+
+    };
+    ~Zone()
+    {
+        Clean();
+    }
+
+public:
+
+    bool Init(const WORLD_POS2D &leftUpPos, const WORLD_POS2D &rightDownPos, s32 gridLen)
+    {
+
+        if ( !(leftUpPos.x < rightDownPos.x && leftUpPos.z < rightDownPos.z) )
+        {
+            ASSERT(false, "x error");
+            ASSERT(false, "z error");
+            return false;
+        }
         _leftUpPos = leftUpPos;
         _gridLen = gridLen;
         s32 lenX = rightDownPos.x - leftUpPos.x;
@@ -76,21 +92,27 @@ public:
             ++_w;
         if (lenZ % gridLen > 0)
             ++_h;
+        s64 count = _w * _h;
+        ECHO("*******W=%d, H=%d***********", _w, _h);
+        ASSERT(count <= 0xFFFF, "count is big = %lld, w = %d, h = %d", count, _w, _h);
         _size = _w * _h;
-        _grids = new Grid[_size];
-        TASSERT(_grids, "grids is null");
-    };
-    ~Zone()
+        _grids = NEW Grid[_size];
+        ASSERT(_grids, "grids is null");
+        return true;
+    }
+    void Clean()
     {
-        SAFE_DELETE_ARRAY(_grids);
+        if (nullptr != _grids)
+        {
+            DEL[] _grids;
+            _grids = nullptr;
+        }
     }
 
-public:
-    GridID_T CalcZoneID(WORLD_POS pos)
+    GridID_T CalcZoneID(WORLD_POS2D pos)
     {
         if (pos.x < _leftUpPos.x || pos.z < _leftUpPos.z)
         {
-            TASSERT(false, "pos error, pos.x = %d, pos.z = %d", pos.x, pos.z);
             return INVALID_ID;
         }
         pos.x -= _leftUpPos.x;
@@ -99,7 +121,8 @@ public:
         s32 nZ = pos.z / _gridLen;
 
         GridID_T ret = (nX + nZ*_w);
-        TASSERT(ret < _size, "grid id error");
+		if (ret >= _size)
+			return INVALID_ID;
         return ret;
     };
     s32 CalcGridSize(s32 distance){ return distance / _gridLen + 1; };
@@ -110,6 +133,7 @@ public:
             (_grids + gridid)->EnterGrid(id);
             return true;
         }
+        ASSERT(false, "error");
         return false;
     };
 
@@ -120,6 +144,7 @@ public:
             (_grids + gridid)->LeaveGrid(id);
             return true;
         }
+        ASSERT(false, "error");
         return false;
     };
 
@@ -127,12 +152,12 @@ public:
     {
         if ( fun == nullptr )
         {
-            TASSERT(false, "fun is null");
+            ASSERT(false, "fun is null");
             return;
         }
         if (!CheckGridID(gridID))
         {
-            TASSERT(false, "gridid error, gridid = %d", gridID);
+            ASSERT(false, "gridid error, gridid = %d", gridID);
             return;
         }
         s32 x = gridID % _w;
@@ -151,7 +176,7 @@ public:
             for (x = startX; x <= endX; x++)
             {
                 GridID_T temp = x + z * _w;
-                TASSERT(temp < _size && temp >= 0, "temp error, temp = %d", temp);
+                ASSERT(temp < _size && temp >= 0, "temp error, temp = %d", temp);
                 if((_grids + temp)->TraversingCallAll( fun)) return;
             }
         }
@@ -160,12 +185,12 @@ public:
     {
         if ( fun == nullptr)
         {
-            TASSERT(false, "fun is null");
+            ASSERT(false, "fun is null");
             return;
         }
         if (!CheckGridID(gridID))
         {
-            TASSERT(false, "gridid error, gridid = %d", gridID);
+            ASSERT(false, "gridid error, gridid = %d", gridID);
             return;
         }
         s32 x = gridID % _w;
@@ -191,7 +216,7 @@ public:
                             if (CheckX(tempX))
                             {
                                 GridID_T temp = tempX + tempZ * _w;
-                                TASSERT(temp < _size && temp >= 0, "temp error, temp = %d", temp);
+                                ASSERT(temp < _size && temp >= 0, "temp error, temp = %d", temp);
                                 if ((_grids + temp)->TraversingCallAll(fun)) return;
                             }
                         }
@@ -201,13 +226,13 @@ public:
                         if (CheckX(startX))
                         {
                             GridID_T temp = startX + tempZ * _w;
-                            TASSERT(temp < _size && temp >= 0, "temp error, temp = %d", temp);
+                            ASSERT(temp < _size && temp >= 0, "temp error, temp = %d", temp);
                             if ((_grids + temp)->TraversingCallAll(fun)) return;
                         }
                         if (CheckX(endX))
                         {
                             GridID_T temp = endX + tempZ * _w;
-                            TASSERT(temp < _size && temp >= 0, "temp error, temp = %d", temp);
+                            ASSERT(temp < _size && temp >= 0, "temp error, temp = %d", temp);
                             if ((_grids + temp)->TraversingCallAll(fun)) return;
                         }
                     }
@@ -220,16 +245,16 @@ public:
     {
         if ( fun == nullptr )
         {
-            TASSERT(false, "fun is null");
+            ASSERT(false, "fun is null");
             return;
         }
         if (!(CheckGridID(gridA) && CheckGridID(gridB)))
         {
-            TASSERT(false, "GetZoneByRadius_Sub idzoneA or idzoneB error, A = %d, B = %d", gridA, gridB);
+            ASSERT(false, "GetZoneByRadius_Sub idzoneA or idzoneB error, A = %d, B = %d", gridA, gridB);
             return;
         }
-        VRECT vectA;
-        VRECT vectB;
+        Rect vectA;
+        Rect vectB;
         GetRectInRadius(&vectA, gridA, radius);
         GetRectInRadius(&vectB, gridB, radius);
         for (int nz = vectA.startZ; nz <= vectA.endZ; nz++)
@@ -239,18 +264,49 @@ public:
                 if (!vectB.IsContain(nx, nz))
                 {
                     GridID_T zoneid = nx + nz * _w;
-                    TASSERT(zoneid < _size && zoneid >= 0, "temp error, zoneid = %d", zoneid);
+                    ASSERT(zoneid < _size && zoneid >= 0, "temp error, zoneid = %d", zoneid);
                     if ((_grids + zoneid)->TraversingCallAll(fun))return;
                 }
             }
         }
     };
+
+    void GetAIntersectionBIds(GridID_T gridA, GridID_T gridB, s32 radius, const ElementCallBackFun &fun)
+    {
+        if (fun == nullptr)
+        {
+            ASSERT(false, "fun is null");
+            return;
+        }
+        if (!(CheckGridID(gridA) && CheckGridID(gridB)))
+        {
+            ASSERT(false, "GetZoneByRadius_Sub idzoneA or idzoneB error, A = %d, B = %d", gridA, gridB);
+            return;
+        }
+        Rect vectA;
+        Rect vectB;
+        GetRectInRadius(&vectA, gridA, radius);
+        GetRectInRadius(&vectB, gridB, radius);
+        for (int nz = vectA.startZ; nz <= vectA.endZ; nz++)
+        {
+            for (int nx = vectA.startX; nx <= vectA.endX; nx++)
+            {
+                if (vectB.IsContain(nx, nz))
+                {
+                    GridID_T zoneid = nx + nz * _w;
+                    ASSERT(zoneid < _size && zoneid >= 0, "temp error, zoneid = %d", zoneid);
+                    if ((_grids + zoneid)->TraversingCallAll(fun))return;
+                }
+            }
+        }
+    };
+
 protected:
 private:
     inline bool CheckGridID(GridID_T gridid){ return (gridid >= 0) && (gridid < _size); };
     inline bool CheckX(s32 x){ return x >= 0 && x < _w; };
     inline bool CheckZ(s32 z){ return z >= 0 && z < _h; };
-    void GetRectInRadius(VRECT *rect, GridID_T gridId, s32 nRadius)
+    void GetRectInRadius(Rect *rect, GridID_T gridId, s32 nRadius)
     {
         s32 x = gridId % _w;
         s32 z = gridId / _w;
@@ -260,7 +316,7 @@ private:
         rect->endZ = (z + nRadius >= _h) ? _h - 1 : z + nRadius;
     };
 private:
-    WORLD_POS _leftUpPos;
+    WORLD_POS2D _leftUpPos;
     s32 _w;
     s32 _h;
     s16 _size;

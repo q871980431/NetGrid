@@ -8,9 +8,16 @@ public:
     StopWatch(){Reset();}
     inline void Reset(){ _tick = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();}
     inline s64  Interval(){ return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - _tick;}
-    void Printf(){
+    void Printf( const char * content = nullptr){
         s64 time = Interval();
-        ECHO("interval time = %lld ms", time);
+        if (nullptr != content)
+        {
+            ECHO("%s interval time = %lld ms", content, time);
+        }
+        else
+        {
+            ECHO("interval time = %lld ms", time);
+        }
     }
 protected:
 private:

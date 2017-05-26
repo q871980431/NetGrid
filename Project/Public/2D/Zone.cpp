@@ -2,7 +2,7 @@
 
 
 template< typename T >
-Zone::Zone( const WORLD_POS &leftUpPos, const WORLD_POS &rightDownPos, s32 gridLen)
+Zone::Zone( const WORLD_POS2D &leftUpPos, const WORLD_POS2D &rightDownPos, s32 gridLen)
 {
     TASSERT(leftUpPos.x < rightDownPos.x, "x error");
     TASSERT(leftUpPos.z < rightDownPos.z, "z error");
@@ -21,7 +21,7 @@ Zone::Zone( const WORLD_POS &leftUpPos, const WORLD_POS &rightDownPos, s32 gridL
     TASSERT(_grids, "grids is null");
 }
 template< typename T >
-GridID_T Zone::CalcZoneID( WORLD_POS pos)
+GridID_T Zone::CalcZoneID( WORLD_POS2D pos)
 {
     if (pos.x < _leftUpPos.x || pos.z < _leftUpPos.z)
     {

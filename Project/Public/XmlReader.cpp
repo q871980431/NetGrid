@@ -86,7 +86,7 @@ private:
 	V_XMLOBJ	_childes;
 };
 
-const IXmlObject * XmlReader::Root()
+IXmlObject * XmlReader::Root()
 {
 	_obj = new XmlObject(_doc.RootElement(), nullptr);
 

@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.4)
 PROJECT(NetGrid)
 IF(WIN32)
-	LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/build/windows)
+	LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/windows)
 	SET(CMAKE_C_FLAGS_DEBUG_INIT "/D_DEBUG /Zm8192000 /MTd /Zi /Ob0 /Od /RTC1")
 	SET(CMAKE_C_FLAGS_MINSIZEREL_INIT "/MT /Zm8192000 /O1 /Ob1 /D NDEBUG")
 	SET(CMAKE_C_FLAGS_RELEASE_INIT "/MT /Zm8192000 /O2 /Ob2 /D NDEBUG")
 	SET(CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "MT / Zm8192000 /Zi /O2 /Ob1 /D NDEBUG")
-	SET(LIBRARY_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/windows}")
+	SET(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/windows/")
 	MESSAGE(STATUS "WINDOWS")
 	IF(CMAKE_CL_64)
 		MESSAGE(STATUS "x64")
@@ -16,9 +16,9 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(LINUX)
-	SET(LIBRARY_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build/linux")
+	SET(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/linux")
 	#SET(CMAKE_BUILD_TYPE "Debug")
-	LINK_DIRECTORIES("${PROJECT_SOURCE_DIR}/build/linux")
+	LINK_DIRECTORIES("${PROJECT_BINARY_DIR}/linux")
 	#SET(CMAKE_C_FLAGS	"-std=c++0x -Wall -lpthread -rdynamic -ldl -Dlinux -lcurl -lmysqlclient -lTNavigation")
         SET(CMAKE_CXX_FLAGS " -std=c++11 -Wall -DLINUX -pthread -rdynamic -ldl")
 	#SET(CMAKE_C_FLAGS_DEBUG	"-g -D_DEBUG -o0 -pg -L${PROJECT_SOURCE_DIR}/Thridlibrary/debug/linux")
@@ -60,6 +60,9 @@ SET(PUBLIC
 	"${PUBLIC_DIR}/TDynPool.h"
 	"${PUBLIC_DIR}/XmlReader.cpp"
 	"${PUBLIC_DIR}/XmlReader.h"
+    "${PUBLIC_DIR}/Convert.h"
+    "${PUBLIC_DIR}/Tools_time.h"
+    "${PUBLIC_DIR}/Tools_time.cpp"
 )
 SET(TINYXML_DIR
 	"${PUBLIC_DIR}/tinyxml2"
@@ -73,6 +76,16 @@ SET(2D_DIR
 )
 SET(2D
 	"${2D_DIR}/Zone.h"
+	"${2D_DIR}/ZoneAOI.h"
+    "${2D_DIR}/TZoneAOI.h"
+	"${2D_DIR}/ZoneAOI.cpp"
+	"${2D_DIR}/Vector.h"
+    "${2D_DIR}/RectTree.h"
+	"${2D_DIR}/RectTree.cpp"
+    "${2D_DIR}/RTree.h"
+    "${2D_DIR}/TRectTree.h"
+    "${2D_DIR}/SearchTree.cpp"
+    "${2D_DIR}/SearchTree.h"
 )
 
 SET(COMMON_TIME_DIR
@@ -81,6 +94,7 @@ SET(COMMON_TIME_DIR
 SET(COMMON_TIME
 	"${PUBLIC_DIR}/time/StopWatch.h"
 )
+
 
 MESSAGE(STATUS ${PUBLIC})
 IF(WIN32)
@@ -96,3 +110,4 @@ SET(THIRD_LIBRARIES_INCLUDE_DIR
 	"${PROJECT_SOURCE_DIR}/Thridlibrary/include"
 )
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/Kernel/)
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/logic/)
