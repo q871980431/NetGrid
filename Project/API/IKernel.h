@@ -71,6 +71,25 @@
 class IModule;
 namespace core
 {
+    class ITcpConnection
+    {
+    public:
+        virtual bool  IsConnected(void) = 0;
+        virtual void  Send(const char *buff, s32 len) = 0;      //
+        virtual void  Close() = 0;                              //πÿ±’¡¨Ω”
+        virtual void  Release() = 0;                            
+    };
+
+    class ITcpSession
+    {
+    public:
+        virtual void  SetConnection(ITcpConnection *connection) = 0;
+        virtual void  OnEstablish() = 0;
+        virtual void  OnTerminate() = 0;
+        virtual void  OnError(s32 moduleErr, s32 sysErr) = 0;
+        virtual void  OnRecv(const char *buff, s32 len) = 0;
+    };
+
     class IKernel
     {
     public:
