@@ -52,7 +52,7 @@ void Kernel::ParseCommand(s32 argc, char **argv)
             ASSERT(false, "argv[%i]=[%s], illegal", i, argv[i]);
             continue;
         }
-        std::string name(start + 1, equal);
+        std::string name(start + 2, equal);
         std::string value(equal + 1);
         if (!_cmdArgs.insert(std::make_pair(name, value)).second)
         {

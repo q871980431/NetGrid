@@ -77,7 +77,6 @@ namespace core
         virtual bool  IsConnected(void) = 0;
         virtual void  Send(const char *buff, s32 len) = 0;      //
         virtual void  Close() = 0;                              //πÿ±’¡¨Ω”
-        virtual void  Release() = 0;                            
     };
 
     class ITcpSession
