@@ -7,16 +7,28 @@ bool NetConnection::IsConnected()
 
 void NetConnection::Send(const char *buff, s32 len)
 {
-
+    bufferevent_write(_buffEvent, buff, len);
 }
 
 void NetConnection::Close()
 {
-
+    _doClose = true;
 }
 
 NetConnection * NetConnectionMgr::CreateNetConnection()
 {
-	
-	return nullptr;
+    NetConnection *connetion = NEW NetConnection(++_connectionId);
+    _indexMap.insert(std::make_pair(_connectionId, connetion));
+
+	return connetion;
+}
+
+void NetConnectionMgr::RealseConnection(NetConnection *connection)
+{
+    auto iter = _indexMap.find(connection->GetConnetionID());
+    if (iter != _indexMap.end())
+    {
+        _indexMap.erase(iter);
+        DEL connection;
+    }
 }

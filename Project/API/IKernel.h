@@ -89,6 +89,13 @@ namespace core
         virtual void  OnRecv(const char *buff, s32 len) = 0;
     };
 
+    class ITcpListener
+    {
+    public:
+        virtual ITcpSession * CreateSession() = 0;
+    };
+
+
     class IKernel
     {
     public:
