@@ -4,12 +4,14 @@
 #include "StopWatch.h"
 #include "Configmgr.h"
 #include "Modulemgr.h"
+#include "NetEngine.h"
 template<  > Kernel * Singleton<Kernel>::_instance = nullptr;
 
 bool Kernel::Ready()
 {
     return _logger.Ready()&&
-           Configmgr::GetInstance()->Ready();
+           Configmgr::GetInstance()->Ready()&&
+           NetEngine::GetInstance()->Ready();
 }
 bool Kernel::Initialize(s32 argc, char **argv)
 {
@@ -17,12 +19,17 @@ bool Kernel::Initialize(s32 argc, char **argv)
 
     return _logger.Initialize() 
         && Configmgr::GetInstance()->Initialize()
-        && Modulemgr::GetInstance()->Initialize();
+        && Modulemgr::GetInstance()->Initialize()
+        && NetEngine::GetInstance()->Initialize();
 }
 
 void Kernel::Loop()
 {
-    system("pause");
+    while (true)
+    {
+        NetEngine::GetInstance()->Process(10);
+        Sleep(200);
+    }
 }
 void Kernel::Destroy()
 {
@@ -73,4 +80,14 @@ IModule * Kernel::FindModule(const char *name)
 {
     ASSERT(name != nullptr, "errpr");
     return Modulemgr::GetInstance()->FindModule(name);
+}
+
+void Kernel::CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener)
+{
+    NetEngine::GetInstance()->CreateNetListener(ip, port, listener);
+}
+
+void Kernel::CreateNetSession(const char *ip, s16 port, core::ITcpSession *session)
+{
+    NetEngine::GetInstance()->CreateNetSession(ip, port, session);
 }

@@ -16,13 +16,12 @@ public:
     virtual void Destroy();
     virtual const char * GetCmdArg(const char *name);
 
-    static bool ExecZone(s64 id, s64 objId){ return false; };
-
 public:
     virtual void SyncLog(const char *contens);
     virtual void AsyncLog(const char *contens);
     virtual IModule * FindModule(const char *name);
-
+    virtual void CreateNetSession(const char *ip, s16 port, core::ITcpSession *session);
+    virtual void CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener);
 protected:
 private:
     void ParseCommand(s32 argc, char **argv);

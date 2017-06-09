@@ -45,7 +45,7 @@ public:
             Vector3D one(1);
             _left - boundary;
             _right + boundary;
-            _posR + one;
+            _posR + boundary;
         }
 
         void Update(Vector3D &pos, Vector3D& boundary)
@@ -64,8 +64,6 @@ public:
     typedef tlib::TDynPool<VectorNode>              ObjPool;
     typedef std::unordered_map<s64, VectorNode *>   ObjMap;
     typedef RTree<VectorNode *, s32, 2, s32, 16>    SearchTree;
-    //typedef void(*EachBack)(Identity &objA, IdLists *add, IdLists *remove);
-    //typedef bool(*SearchCallBack)(Identity &objA, s32 num, Identity &objB);
 
 public:
     TRectTree(){};

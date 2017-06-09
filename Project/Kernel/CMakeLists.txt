@@ -96,6 +96,8 @@ IF(WIN32)
 	"${THIRD_LIBRARIES_DEBUG_DIR}/libevent.lib"
 	"${THIRD_LIBRARIES_DEBUG_DIR}/libevent_core.lib"
 	"${THIRD_LIBRARIES_DEBUG_DIR}/libevent_extras.lib"
+	"ws2_32.lib"
+	"wsock32.lib"
 	)
 	SET(THIRD_LIB_RELEASE
 	)

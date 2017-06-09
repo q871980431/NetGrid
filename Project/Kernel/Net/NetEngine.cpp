@@ -40,7 +40,7 @@ bool NetEngine::Destroy()
 
 void NetEngine::Process(s32 tick)
 {
-
+    int rt = event_base_loop(s_eventBase, EVLOOP_ONCE | EVLOOP_NONBLOCK);
 }
 
 void NetEngine::CreateNetSession(const char *ip, s16 port, core::ITcpSession *session)
@@ -55,13 +55,15 @@ void NetEngine::CreateNetSession(const char *ip, s16 port, core::ITcpSession *se
 
     NetConnection *connction = s_connectionMgr.CreateNetConnection();
     struct bufferevent* bev = bufferevent_socket_new(s_eventBase, -1, BEV_OPT_CLOSE_ON_FREE);
-    
     bufferevent_socket_connect(bev, (struct sockaddr *)&stAddr, sizeof(stAddr));
-    bufferevent_setcb(bev, OnReadEvent, NULL, OnErrorEvent, connction);
-    bufferevent_enable(bev, EV_READ | EV_PERSIST);
-
     connction->SetBuffEvent(bev);
+
+    bufferevent_setcb(bev, OnReadEvent, NULL, OnErrorEvent, connction);
+    bufferevent_enable(bev, EV_READ | EV_PERSIST | EV_WRITE);
+
     connction->SetSession(session);
+    session->SetConnection(connction);
+    session->OnEstablish();
 }
 
 void NetEngine::CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener)
@@ -94,10 +96,12 @@ void NetEngine::OnListener(struct evconnlistener *listener, evutil_socket_t fd, 
     struct bufferevent* bev;
     evutil_make_socket_nonblocking(fd);
     bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
-    bufferevent_setcb(bev, OnReadEvent, NULL, OnErrorEvent, connction);
-    bufferevent_setwatermark(bev, EV_READ, 0, s_config.revBuffSize);
+    connction->SetBuffEvent(bev);
+
+    bufferevent_setcb(bev, OnReadEvent, OnWriteEvent, OnErrorEvent, connction);
     bufferevent_enable(bev, EV_READ | EV_WRITE);
 
+    connction->SetSession(session);
     session->SetConnection(connction);
     session->OnEstablish();
 }
@@ -112,10 +116,19 @@ void NetEngine::OnReadEvent(struct bufferevent* bev, void * ctx)
     char msg[1024];
 
     NetConnection *connetion = (NetConnection *)ctx;
-    size_t len = bufferevent_read(bev, msg, sizeof(msg));
-    msg[len] = 0;
+    struct evbuffer *eb = bufferevent_get_input(bev);
+    s32 len = evbuffer_remove(eb, msg, 1024);
+    //size_t len = bufferevent_read(bev, msg, sizeof(msg));
+    //msg[len] = 0;
 
-    printf("\nrecv %s from server", msg);
+    printf("\nrecv %s, len = %d", msg, len);
+    bufferevent_write(bev, msg, len + 1);
+}
+
+void NetEngine::OnWriteEvent(struct bufferevent* bev, void * ctx)
+{
+    NetConnection *connetion = (NetConnection *)ctx;
+    connetion->OnSend();
 }
 
 void NetEngine::OnErrorEvent(struct bufferevent* bev, short error, void * ctx)

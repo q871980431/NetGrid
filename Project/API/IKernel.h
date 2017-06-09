@@ -102,6 +102,8 @@ namespace core
         virtual void SyncLog(const char *contens) = 0;
         virtual void AsyncLog(const char *contens) = 0;
         virtual IModule * FindModule(const char *name) = 0;
+        virtual void CreateNetSession(const char *ip, s16 port, core::ITcpSession *session) = 0;
+        virtual void CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener) = 0;
     };
 }
 #endif

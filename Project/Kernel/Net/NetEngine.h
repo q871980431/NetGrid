@@ -42,8 +42,10 @@ public:
 private:
     static void OnListener(struct evconnlistener *listener, evutil_socket_t fd, struct sockaddr *addr, int socklen, void *arg);
     static void OnReadEvent(struct bufferevent* bev, void * ctx);
+    static void OnWriteEvent(struct bufferevent* bev, void * ctx);
     static void OnErrorEvent(struct bufferevent* bev, short error, void * ctx);
 
+    
     static void OnCreateSession(EventBase *eventBase, core::ITcpSession *session, evutil_socket_t fd);
 private:
     static void LinkSession(core::ITcpConnection *connection, core::ITcpSession *session);

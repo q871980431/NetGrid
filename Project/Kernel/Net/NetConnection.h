@@ -11,15 +11,16 @@
 class NetConnection : public core::ITcpConnection
 {
 public:
-	NetConnection(s32 connectionId) :_connectionId(connectionId) {};
+    NetConnection(s32 connectionId);
 	virtual ~NetConnection(){};
 
 	virtual bool  IsConnected(void);
 	virtual void  Send(const char *buff, s32 len);      
     virtual void  Close();
 
+    void OnSend();
 public:
-    inline void SetBuffEvent(struct bufferevent *buffEvent){ _buffEvent = buffEvent; };
+    inline void SetBuffEvent(struct bufferevent *buffEvent);
     inline void SetSession(core::ITcpSession *session){ _session = session; };
     inline core::ITcpSession * GetSession(){ return _session; };
     inline s32  GetConnetionID(){ return _connectionId; };
@@ -29,6 +30,8 @@ private:
     struct bufferevent    * _buffEvent;
     core::ITcpSession     * _session;
     bool                    _doClose;
+    s32                     _reciveSize;
+    s32                     _sendSize;
 };
 
 typedef std::unordered_map<s32, NetConnection *>	ConnectionMap;
