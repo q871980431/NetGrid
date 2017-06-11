@@ -1,0 +1,6 @@
+<root path="./">
+	<module	name="CacheDB"/>
+	<module name="Test"/>
+	<module name="AoiTest"/>
+	<module name="NetServer"/>
+</root>

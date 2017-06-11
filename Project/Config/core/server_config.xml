@@ -1,0 +1,4 @@
+<root>
+	<env path="./env"></env>
+	<net no_delay="true" rev_buff="65536" send_buff="65536"></net>
+</root>
