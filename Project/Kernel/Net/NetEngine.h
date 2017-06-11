@@ -20,11 +20,6 @@ class NetEngine : public INetEngine
         s32 sendBuffSize;
     };
 
-    struct MessageHead 
-    {
-        s32 messageId;
-        s32 len;
-    };
 
 
     typedef struct event_base       EventBase;

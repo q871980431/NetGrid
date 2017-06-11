@@ -1,5 +1,9 @@
 #include "NetConnection.h"
-NetConnection::NetConnection(s32 connectionId) :_connectionId(connectionId)
+#include "NetEngine.h"
+#include "../Kernel.h"
+
+NetConnection::NetConnection(NetConnectionMgr *connectionMgr, s32 connectionId) :_connectionId(connectionId),
+_connetionMgr(connectionMgr)
 {
     _buffEvent = nullptr;
     _session = nullptr;
@@ -14,20 +18,47 @@ bool NetConnection::IsConnected()
 	return true;
 }
 
-void NetConnection::Send(const char *buff, s32 len)
+void NetConnection::Send(s32 messageId, const char *buff, s32 len)
 {
-    bufferevent_write(_buffEvent, buff, len);
+    MessageHead head;
+    head.messageId = messageId;
+    head.len = len + sizeof(head);
+
+    struct evbuffer *eb = bufferevent_get_output(_buffEvent);
+    size_t num = evbuffer_get_length(eb);
+    if (num + head.len > _sendSize)
+    {
+        ForceClose();
+        return;
+    }
+    evbuffer_add(eb, &head, sizeof(head));
+    evbuffer_add(eb, buff, len);
 }
 
 void NetConnection::OnSend()
 {
     struct evbuffer *eb = bufferevent_get_output(_buffEvent);
     size_t num = evbuffer_get_length(eb);
-    if ( num == 0 && _doClose)
+    if (num == 0 && _doClose)
+        ForceClose();
+}
+
+void NetConnection::OnReceive(s32 messageId, void *content, s32 size)
+{
+    if (_session != nullptr)
+        _session->OnRecv(messageId, (const char *)content, size);
+}
+
+
+void NetConnection::ForceClose()
+{
+    bufferevent_free(_buffEvent);
+    if (nullptr != _session)
     {
-        bufferevent_free(_buffEvent);
-        _buffEvent = nullptr;
+        _session->SetConnection(nullptr);
+        _session->OnTerminate();
     }
+    _connetionMgr->RealseConnection(this);
 }
 void NetConnection::Close()
 {
@@ -47,7 +78,7 @@ void NetConnection::SetBuffEvent(struct bufferevent *buffEvent)
 
 NetConnection * NetConnectionMgr::CreateNetConnection()
 {
-    NetConnection *connetion = NEW NetConnection(++_connectionId);
+    NetConnection *connetion = NEW NetConnection(this, ++_connectionId);
     _indexMap.insert(std::make_pair(_connectionId, connetion));
 
 	return connetion;

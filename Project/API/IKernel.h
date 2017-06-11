@@ -75,7 +75,7 @@ namespace core
     {
     public:
         virtual bool  IsConnected(void) = 0;
-        virtual void  Send(const char *buff, s32 len) = 0;      //
+        virtual void  Send(s32 messageId, const char *buff, s32 len) = 0;      //
         virtual void  Close() = 0;                              //πÿ±’¡¨Ω”
     };
 
@@ -86,7 +86,7 @@ namespace core
         virtual void  OnEstablish() = 0;
         virtual void  OnTerminate() = 0;
         virtual void  OnError(s32 moduleErr, s32 sysErr) = 0;
-        virtual void  OnRecv(const char *buff, s32 len) = 0;
+        virtual void  OnRecv(s32 messageId, const char *buff, s32 len) = 0;
     };
 
     class ITcpListener

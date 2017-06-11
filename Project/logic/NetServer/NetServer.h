@@ -14,13 +14,14 @@ class GameSession : public core::ITcpSession
     virtual void  OnEstablish(){
         if (_connection)
         {
-            char *msg = "Hello Client";
-            _connection->Send(msg, strlen(msg) + 1);
+            s32 messageId = 1;
+            char *msg = "HelloClient";
+            _connection->Send(messageId, msg, strlen(msg) + 1);
         }
     };
     virtual void  OnTerminate(){};
     virtual void  OnError(s32 moduleErr, s32 sysErr){};
-    virtual void  OnRecv(const char *buff, s32 len){};
+    virtual void  OnRecv(s32 messageId, const char *buff, s32 len);
 private:
     core::ITcpConnection *_connection;
 };
@@ -43,5 +44,7 @@ private:
     static NetServer     * s_self;
     static IKernel  * s_kernel;
     static NetListener  s_netListener;
+    static GameSession s_session;
+    static s32
 };
 #endif

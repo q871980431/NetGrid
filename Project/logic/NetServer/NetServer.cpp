@@ -9,6 +9,16 @@
 NetServer * NetServer::s_self = nullptr;
 IKernel * NetServer::s_kernel = nullptr;
 NetListener NetServer::s_netListener;
+GameSession NetServer::s_session;
+
+
+void GameSession::OnRecv(s32 messageId, const char *buff, s32 len)
+{
+    if (messageId == 1)
+        ECHO("%s", buff);
+    _connection->Send(messageId, buff, len);
+}
+
 
 bool NetServer::Initialize(IKernel *kernel)
 {
@@ -21,6 +31,7 @@ bool NetServer::Initialize(IKernel *kernel)
 bool NetServer::Launched(IKernel *kernel)
 {
     s_kernel->CreateNetListener("0", 11401, &s_netListener);
+    s_kernel->CreateNetSession("127.0.0.1", 11401, &s_session);
 
     return true;
 }

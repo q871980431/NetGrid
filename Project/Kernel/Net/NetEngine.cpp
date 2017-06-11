@@ -1,5 +1,5 @@
 #include "NetEngine.h"
-
+#include "../Kernel.h"
 #ifdef WIN32
 #include <winsock2.h>
 #endif
@@ -28,6 +28,8 @@ bool NetEngine::Ready()
 
 bool NetEngine::Initialize()
 {
+    core::IKernel *kernel = KERNEL;
+    s_connectionMgr.SetKernel(kernel);
     return true;
 }
 
@@ -113,16 +115,28 @@ void NetEngine::OnCreateSession( EventBase *eventBase, core::ITcpSession *sessio
 
 void NetEngine::OnReadEvent(struct bufferevent* bev, void * ctx)
 {
-    char msg[1024];
-
     NetConnection *connetion = (NetConnection *)ctx;
     struct evbuffer *eb = bufferevent_get_input(bev);
-    s32 len = evbuffer_remove(eb, msg, 1024);
-    //size_t len = bufferevent_read(bev, msg, sizeof(msg));
-    //msg[len] = 0;
-
-    printf("\nrecv %s, len = %d", msg, len);
-    bufferevent_write(bev, msg, len + 1);
+    s32 len = evbuffer_get_length(eb);
+    while (len > sizeof(MessageHead))
+    {
+        MessageHead head;
+        evbuffer_copyout(eb, &head, sizeof(MessageHead));
+        if (head.len > len)
+            break;
+        s32 continuous = evbuffer_get_contiguous_space(eb);
+        void *buff = nullptr;
+        if (continuous > head.len)
+            buff =  evbuffer_pullup(eb, head.len);
+        else
+        {
+            buff = alloca(head.len);
+            evbuffer_copyout(eb, buff, head.len);
+        }
+        connetion->OnReceive(head.messageId, (char *)buff + sizeof(MessageHead), head.len - sizeof(MessageHead));
+        evbuffer_drain(eb, head.len);
+        len -= head.len;
+    }
 }
 
 void NetEngine::OnWriteEvent(struct bufferevent* bev, void * ctx)
