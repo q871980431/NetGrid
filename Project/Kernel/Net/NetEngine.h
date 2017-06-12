@@ -32,7 +32,7 @@ public:
     virtual bool Destroy();
 public:
     virtual void Process(s32 tick);
-    virtual void CreateNetSession(const char *ip, s16 port, core::ITcpSession *session);
+    virtual void CreateNetSession(const char *ip, s16 port, core::IMsgSession *session);
     virtual void CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener);
 private:
     static void OnListener(struct evconnlistener *listener, evutil_socket_t fd, struct sockaddr *addr, int socklen, void *arg);
@@ -41,9 +41,9 @@ private:
     static void OnErrorEvent(struct bufferevent* bev, short error, void * ctx);
 
     
-    static void OnCreateSession(EventBase *eventBase, core::ITcpSession *session, evutil_socket_t fd);
+    static void OnCreateSession(EventBase *eventBase, core::IMsgSession *session, evutil_socket_t fd);
 private:
-    static void LinkSession(core::ITcpConnection *connection, core::ITcpSession *session);
+    static void LinkSession(core::IMsgConnection *connection, core::IMsgSession *session);
 
 private:
     static EventBase        * s_eventBase;

@@ -71,7 +71,7 @@
 class IModule;
 namespace core
 {
-    class ITcpConnection
+    class IMsgConnection
     {
     public:
         virtual bool  IsConnected(void) = 0;
@@ -79,10 +79,10 @@ namespace core
         virtual void  Close() = 0;                              //πÿ±’¡¨Ω”
     };
 
-    class ITcpSession
+    class IMsgSession
     {
     public:
-        virtual void  SetConnection(ITcpConnection *connection) = 0;
+        virtual void  SetConnection(IMsgConnection *connection) = 0;
         virtual void  OnEstablish() = 0;
         virtual void  OnTerminate() = 0;
         virtual void  OnError(s32 moduleErr, s32 sysErr) = 0;
@@ -92,7 +92,7 @@ namespace core
     class ITcpListener
     {
     public:
-        virtual ITcpSession * CreateSession() = 0;
+        virtual IMsgSession * CreateSession() = 0;
     };
 
 
@@ -102,7 +102,7 @@ namespace core
         virtual void SyncLog(const char *contens) = 0;
         virtual void AsyncLog(const char *contens) = 0;
         virtual IModule * FindModule(const char *name) = 0;
-        virtual void CreateNetSession(const char *ip, s16 port, core::ITcpSession *session) = 0;
+        virtual void CreateNetSession(const char *ip, s16 port, core::IMsgSession *session) = 0;
         virtual void CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener) = 0;
     };
 }

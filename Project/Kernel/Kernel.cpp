@@ -28,7 +28,7 @@ void Kernel::Loop()
     while (true)
     {
         NetEngine::GetInstance()->Process(10);
-        Sleep(200);
+        Sleep(0);
     }
 }
 void Kernel::Destroy()
@@ -87,7 +87,7 @@ void Kernel::CreateNetListener(const char *ip, s16 port, core::ITcpListener *lis
     NetEngine::GetInstance()->CreateNetListener(ip, port, listener);
 }
 
-void Kernel::CreateNetSession(const char *ip, s16 port, core::ITcpSession *session)
+void Kernel::CreateNetSession(const char *ip, s16 port, core::IMsgSession *session)
 {
     NetEngine::GetInstance()->CreateNetSession(ip, port, session);
 }

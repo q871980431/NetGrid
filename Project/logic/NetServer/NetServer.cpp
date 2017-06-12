@@ -6,6 +6,7 @@
  */
 
 #include "NetServer.h"
+#include "Tools_time.h"
 NetServer * NetServer::s_self = nullptr;
 IKernel * NetServer::s_kernel = nullptr;
 NetListener NetServer::s_netListener;
@@ -14,9 +15,16 @@ GameSession NetServer::s_session;
 
 void GameSession::OnRecv(s32 messageId, const char *buff, s32 len)
 {
-    if (messageId == 1)
-        ECHO("%s", buff);
+	s64 now = tools::GetTimeMillisecond();
     _connection->Send(messageId, buff, len);
+	if (_count == 0)
+		_first = now;
+	++_count;
+	if (_count % 100000 == 0)
+	{
+		ECHO("%lld ms", now - _first);
+		_first = now;
+	}
 }
 
 

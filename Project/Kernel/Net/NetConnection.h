@@ -14,7 +14,7 @@ struct MessageHead
     s32 len;
 };
 class NetConnectionMgr;
-class NetConnection : public core::ITcpConnection
+class NetConnection : public core::IMsgConnection
 {
 public:
     NetConnection(NetConnectionMgr *connectionMgr, s32 connectionId);
@@ -30,15 +30,15 @@ public:
     void ForceClose();
 
     void SetBuffEvent(struct bufferevent *buffEvent);
-    inline void SetSession(core::ITcpSession *session){ _session = session; };
-    inline core::ITcpSession * GetSession(){ return _session; };
+    inline void SetSession(core::IMsgSession *session){ _session = session; };
+    inline core::IMsgSession * GetSession(){ return _session; };
     inline s32  GetConnetionID(){ return _connectionId; };
 protected:
 private:
     NetConnectionMgr        *_connetionMgr;
 	s32	                    _connectionId;
     struct bufferevent    * _buffEvent;
-    core::ITcpSession     * _session;
+    core::IMsgSession     * _session;
     bool                    _doClose;
     s32                     _reciveSize;
     s32                     _sendSize;

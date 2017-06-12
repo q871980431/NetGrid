@@ -45,7 +45,7 @@ void NetEngine::Process(s32 tick)
     int rt = event_base_loop(s_eventBase, EVLOOP_ONCE | EVLOOP_NONBLOCK);
 }
 
-void NetEngine::CreateNetSession(const char *ip, s16 port, core::ITcpSession *session)
+void NetEngine::CreateNetSession(const char *ip, s16 port, core::IMsgSession *session)
 {
     sockaddr_in stAddr;
     stAddr.sin_family = AF_INET;
@@ -92,7 +92,7 @@ void NetEngine::OnListener(struct evconnlistener *listener, evutil_socket_t fd, 
     core::ITcpListener *tcpListener = (core::ITcpListener *)arg;
     event_base *base = s_eventBase;
 
-    core::ITcpSession   *session = tcpListener->CreateSession();
+    core::IMsgSession   *session = tcpListener->CreateSession();
     NetConnection *connction = s_connectionMgr.CreateNetConnection();
 
     struct bufferevent* bev;
@@ -108,7 +108,7 @@ void NetEngine::OnListener(struct evconnlistener *listener, evutil_socket_t fd, 
     session->OnEstablish();
 }
 
-void NetEngine::OnCreateSession( EventBase *eventBase, core::ITcpSession *session, evutil_socket_t fd)
+void NetEngine::OnCreateSession( EventBase *eventBase, core::IMsgSession *session, evutil_socket_t fd)
 {
 
 }
@@ -148,7 +148,7 @@ void NetEngine::OnWriteEvent(struct bufferevent* bev, void * ctx)
 void NetEngine::OnErrorEvent(struct bufferevent* bev, short error, void * ctx)
 {
     NetConnection *connetion = (NetConnection *)ctx;
-    core::ITcpSession *session = connetion->GetSession();
+    core::IMsgSession *session = connetion->GetSession();
 
     if (error & BEV_EVENT_EOF)
     {

@@ -1,5 +1,5 @@
 # Prerequisites
 
-Project\Thridlibrary\windows\debug\libevent.lib
-Project\Thridlibrary\windows\debug\libevent_core.lib
-Project\Thridlibrary\windows\debug\libevent_extras.lib
+Project/Thridlibrary/windows/debug/libevent.lib
+Project/Thridlibrary/windows/debug/libevent_core.lib
+Project/Thridlibrary/windows/debug/libevent_extras.lib
