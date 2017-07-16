@@ -71,6 +71,7 @@
 class IModule;
 namespace core
 {
+    class IKernel;
     class IMsgConnection
     {
     public:
@@ -93,6 +94,27 @@ namespace core
     {
     public:
         virtual IMsgSession * CreateSession() = 0;
+    };
+
+    class ITrace
+    {
+    public:
+        ITrace(){};
+        virtual const char * GetTraceInfo() = 0;
+    };
+
+    class ITimer
+    {
+    public:
+        ITimer() :_base(nullptr){};
+        inline void SetBase(ITrace *base){ _base = base; };
+        inline ITrace * GetBase(){ return _base; };
+    public:
+        virtual void OnStart(IKernel *kernel, s64 tick) = 0;
+        virtual void OnTime(IKernel *kernel, s64 tick) = 0;
+        virtual void OnTerminate(IKernel *kernel, s64 tick) = 0;
+    private:
+        ITrace  *_base;
     };
 
 

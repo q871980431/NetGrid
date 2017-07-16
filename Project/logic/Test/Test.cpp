@@ -1,4 +1,5 @@
 #include "Test.h"
+#include "TDynPool.h"
 Test * Test::s_self = nullptr;
 IKernel * Test::s_kernel = nullptr;
 bool Test::Initialize(IKernel *kernel)
@@ -11,20 +12,7 @@ bool Test::Initialize(IKernel *kernel)
 
 bool Test::Launched(IKernel *kernel)
 {
-    ATTR attr;
-    s32 id = attr("xuping");
-    s16 val = attr.GetDataT<s16>(16);
-    bool vb = attr.GetDataT<bool>(16);
-    s32 tmp = 16;
-    float vf = attr.GetDataT<float>(tmp);
-    float vf2 = *reinterpret_cast<float *>(&tmp);
-    char buff[8];
-    memcpy(buff, &vf2, sizeof(vf2));
-    buff[sizeof(vf2)] = 0;
-    float vf1 = (float)tmp;
-    memcpy(buff, &vf1, sizeof(vf1));
-    buff[sizeof(vf1)] = 0;
-
+    TestLinkList();
     return true;
 }
 
@@ -32,4 +20,48 @@ bool Test::Destroy(IKernel *kernel)
 {
     DEL this;
     return true;
+}
+
+void Test::TestLinkList()
+{
+    tlib::TDynPool<Player> playerPool;
+    tlib::linear::LinkList players;
+    tlib::linear::LinkList player1;
+    Player *tmp1 = nullptr;
+
+    for (s32 i = 0; i < 10; i++)
+    {
+        Player *tmp = CREAT_FROM_POOL(playerPool, i);
+        if (i % 2 == 0)
+            players.HeadInsert(tmp);
+        else
+            players.TailInsert(tmp);
+        if (i == 4)
+            tmp1 = tmp;
+    }
+    for (s32 i = 0; i < 5; i++)
+    {
+        players.TailRemove();
+    }
+    players.Remove(tmp1);
+    for (s32 i = 0; i < 10; i++)
+    {
+        Player *tmp = CREAT_FROM_POOL(playerPool, i);
+        player1.TailInsert(tmp);
+    }
+
+    tlib::linear::ILinkNode *node = players.Head();
+    while (node)
+    {
+        Player *tmp = (Player *)node;
+        tmp->Printf();
+        node = node->_next;
+    }
+    node = player1.Head();
+    while (node)
+    {
+        Player *tmp = (Player *)node;
+        //tmp->Printf();
+        node = node->_next;
+    }
 }

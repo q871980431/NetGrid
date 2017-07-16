@@ -11,6 +11,7 @@
 #define MAKE_BOOL(p)    ((0 == (p)) ? false : true)
 #define DIR_DELIMITER   "/"
 #define MAX_PATH	260
+#define TRACE_LEN   512
 
 enum DATA_TYPE
 {

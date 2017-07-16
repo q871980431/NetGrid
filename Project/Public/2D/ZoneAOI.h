@@ -2,7 +2,6 @@
 #define __Zone_AOI_h__
 #include "Vector.h"
 #include <list>
-#include "TList.h"
 #include "TDynPool.h"
 #include <unordered_map>
 #include <set>
@@ -141,7 +140,6 @@ class ZoneAoi
     };
 
 
-    typedef TListNode<ObjNode>              ObjNodeList;
     typedef tlib::TDynPool<ObjNode>         ObjPool;
     typedef std::list<BoundaryVector *>     BoundaryList;
     typedef tlib::TDynPool<BoundaryVector>  BoundaryListPool;

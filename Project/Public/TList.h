@@ -1,106 +1,123 @@
 ﻿#ifndef __T_List_h__
 #define __T_List_h__
 #include "MultiSys.h"
-
-template< class T >
-struct TListNode
+namespace tlib
 {
-	T _data;
-	TListNode	*_prev;
-	TListNode	*_next;
-    TListNode() :_prev(nullptr), _next(nullptr){};
-};
+    namespace linear{
+        class LinkList;
+        class ILinkNode
+        {
+        public:
+            ILinkNode():_prev(nullptr), _next(nullptr), _host(nullptr){};
+            ILinkNode *_prev;
+            ILinkNode *_next;
+            LinkList  *_host;
+        };
+        class LinkList
+        {
+        public:
+            LinkList() :_head(nullptr), _tail(nullptr), _size(0) {};
+        public:
+            ILinkNode * HeadRemove()
+            {
+                if (_size == 0) return nullptr;
 
-template< class T >
-void InsertHead(T *&head, T *newNode)
-{
-    ASSERT(newNode, "new node is null");
-    newNode->_next = head;
-    if (head)
-        head->_prev = newNode;
-    head = newNode;
+                ILinkNode *tmp = _head;
+                _head = _head->_next;
+                if (_head == nullptr)
+                    _tail = nullptr;
+                else
+                    _head->_prev = nullptr;
+                CleanNodeIndex(tmp);
+                --_size;
+                return tmp;
+            }
+
+            ILinkNode * TailRemove()
+            {
+                if (_size == 0) return nullptr;
+                ILinkNode *tmp = _tail;
+                _tail = _tail->_prev;
+                if (_tail == nullptr)
+                    _head = nullptr;
+                else
+                    _tail->_next = nullptr;
+                --_size;
+
+                CleanNodeIndex(tmp);
+                return tmp;
+            }
+
+            bool Remove(ILinkNode *node)
+            {
+                ASSERT(node && node->_host == this, "error");
+                if (node && node->_host)
+                {
+                    if (node->_prev != nullptr)
+                        node->_prev->_next = node->_next;
+                    if (node->_next != nullptr)
+                        node->_next->_prev = node->_prev;
+                    if (_head == node)
+                        _head = node->_next;
+                    if (_tail == node)
+                        _tail = node->_prev;
+                    CleanNodeIndex(node);
+                    --_size;
+
+                    return true;
+                }
+                return false;
+            }
+
+            void HeadInsert(ILinkNode *node)
+            {
+                ASSERT(node && node->_host == nullptr, "error");
+                if (node && node->_host == nullptr)
+                {
+                    node->_next = _head;
+                    node->_host = this;
+
+                    if (_head == nullptr)
+                        _tail = node;
+                    else
+                        _head->_prev = node;
+                    _head = node;
+                    ++_size;
+                }
+            }
+
+            void TailInsert(ILinkNode *node)
+            {
+                ASSERT(node && node->_host == nullptr, "error");
+                if (node && node->_host == nullptr)
+                {
+                    node->_prev = _tail;
+                    node->_host = this;
+
+                    if (_tail == nullptr)
+                        _head = node;
+                    else
+                        _tail->_next = node;
+                    _tail = node;
+                    ++_size;
+                }
+            }
+
+            inline ILinkNode * Head(){ return _head; };
+            inline ILinkNode * Tail(){ return _tail; };
+        protected:
+            inline void CleanNodeIndex(ILinkNode *node)
+            {
+                node->_host = nullptr;
+                node->_prev = nullptr;
+                node->_next = nullptr;
+            }
+        private:
+            ILinkNode *_head;
+            ILinkNode *_tail;
+            s32        _size;
+        };
+
+    }
 }
-
-template< class T >
-inline void InsertTail(T *tail, T *newNode)
-{
-    ASSERT(tail, "head is null");
-    ASSERT(newNode, "new node is null");
-    tail->_next = newNode;
-    newNode->_prev = tail;
-}
-
-template< class T >
-void RemoveNode( T *node)
-{
-    ASSERT(node, "node is null ptr");
-    if (node->_next != nullptr)
-        node->_next->_prev = node->_prev;
-    if (node->_prev != nullptr)
-        node->_prev->_next = node->_next;
-    node->_prev = nullptr;
-    node->_next = nullptr;
-}
-
-
-template< class T >
-class List
-{
-public:
-	List()
-	{
-		_size = 0;
-
-		_head._next = &_tail;
-		_head._prev = &_head;	
-		_tail._next = &_tail;
-		_tail._prev = &_head;
-	}
-
-	void Insert( T *pNode )
-	{
-		pNode->_next = &_tail;
-		pNode->_prev = _tail._prev;
-		_tail._prev->_next = pNode;
-		_tail._prev = pNode;
-		_size++;
-	}
-
-	bool Delete( T *pNode )
-	{
-		T *pPoints = _head->_next;
-		while( pPoints != &_tail )
-		{
-			if ( pPoints == pNode)
-			{
-				pPoints->m_pRrev->_next = pPoints->_next;
-				pPoints->_next->m_pRrev = pPoints->m_pRrev;
-				pPoints->m_pRrev = NULL;
-				pPoints->_next = NULL;
-				_size--;
-				return true;
-			}else
-			{
-				pPoints = pPoints->_next;
-			}
-		}
-		return false;
-	}
-	
-	void SafeDelete()
-	{
-		T *pPoint = _head._next;
-		_head._next = NULL;
-		while( pPoint != &_tail )
-		{
-			SAFE_DELETE( pPoint->m_pNode );
-			pPoint = pPoint->_next;
-			SAFE_DELETE( pPoint->_prev );
-		}
-	}
-private:
-    TListNode<T>    *_head;
-    TListNode<T>	*_tail;
-	s32			    _size;
-};
 #endif

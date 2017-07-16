@@ -1,10 +1,50 @@
 #ifndef __T_Pool_h__
 #define __T_Pool_h__
 #include "MultiSys.h"
-#include "TList.h"
 #include "TDynArray.h"
 namespace tlib
 {
+
+    template< class T >
+    struct TListNode
+    {
+        T _data;
+        TListNode	*_prev;
+        TListNode	*_next;
+        TListNode() :_prev(nullptr), _next(nullptr){};
+    };
+
+    template< class T >
+    void InsertHead(T *&head, T *newNode)
+    {
+        ASSERT(newNode, "new node is null");
+        newNode->_next = head;
+        if (head)
+            head->_prev = newNode;
+        head = newNode;
+    }
+
+    template< class T >
+    inline void InsertTail(T *tail, T *newNode)
+    {
+        ASSERT(tail, "head is null");
+        ASSERT(newNode, "new node is null");
+        tail->_next = newNode;
+        newNode->_prev = tail;
+    }
+
+    template< class T >
+    void RemoveNode(T *node)
+    {
+        ASSERT(node, "node is null ptr");
+        if (node->_next != nullptr)
+            node->_next->_prev = node->_prev;
+        if (node->_prev != nullptr)
+            node->_prev->_next = node->_next;
+        node->_prev = nullptr;
+        node->_next = nullptr;
+    }
+
     template< typename T, s32 block_count = 1>
     class TDynPool
     {
