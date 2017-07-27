@@ -1,5 +1,5 @@
-#ifndef __INetEngine_h__
-#define __INetEngine_h__
+#ifndef __ITimerMgr_h__
+#define __ITimerMgr_h__
 #include "MultiSys.h"
 #include "ICore.h"
 #include "IKernel.h"

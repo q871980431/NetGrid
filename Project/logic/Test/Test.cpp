@@ -1,7 +1,24 @@
 #include "Test.h"
 #include "TDynPool.h"
+#include "Tools_time.h"
 Test * Test::s_self = nullptr;
 IKernel * Test::s_kernel = nullptr;
+
+void MyTimer::OnStart(IKernel *kernel, s64 tick)
+{
+	ECHO("Call Start, time = %dms", (tick - _tick));
+}
+
+void MyTimer::OnTime(IKernel *kernel, s64 tick)
+{
+	ECHO("Call Time, time = %dms", (tick - _tick));
+}
+
+void MyTimer::OnTerminate(IKernel *kernel, s64 tick)
+{
+	ECHO("Call Terminate, time = %dms", tick - _tick);
+	kernel->StartTimer(this, 274, 10, 995, "on Terminate");
+}
 bool Test::Initialize(IKernel *kernel)
 {
     s_self = this;
@@ -12,7 +29,10 @@ bool Test::Initialize(IKernel *kernel)
 
 bool Test::Launched(IKernel *kernel)
 {
-    TestLinkList();
+    //TestLinkList();
+	s64 now = tools::GetTimeMillisecond();
+	MyTimer *timer = NEW MyTimer(1, now);
+	s_kernel->StartTimer(timer, 3000, FOREVER, 2000, "my timer");
     return true;
 }
 

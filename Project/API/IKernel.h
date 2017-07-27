@@ -5,6 +5,7 @@
 #define  FIND_MODULE(module, name) {\
     module = (I##name * )(s_kernel->FindModule(#name));\
 }
+#define FOREVER	-1
 
 #ifdef WIN32
 
@@ -117,6 +118,18 @@ namespace core
         ITrace  *_base;
     };
 
+	class IFrame
+	{
+	public:
+		IFrame() :_base(nullptr) {};
+
+		inline void SetBase(ITrace *base) { _base = base; };
+		inline ITrace * GetBase() { return _base; };
+	public:
+		virtual void OnLoop(IKernel *kernel, s64 tick) = 0;
+	private:
+		ITrace  *_base;
+	};
 
     class IKernel
     {
@@ -126,6 +139,10 @@ namespace core
         virtual IModule * FindModule(const char *name) = 0;
         virtual void CreateNetSession(const char *ip, s16 port, core::IMsgSession *session) = 0;
         virtual void CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener) = 0;
+		virtual void StartTimer(core::ITimer *timer, s32 delay, s32 count, s32 interval, const char *trace) = 0;
+		virtual void KillTimer(core::ITimer *timer) = 0;
+		virtual void AddFrame(core::IFrame *frame, u8 runLvl) = 0;
+		virtual void RemoveFrame(core::IFrame *frame) = 0;
     };
 }
 #endif

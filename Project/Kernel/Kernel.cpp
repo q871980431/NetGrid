@@ -5,13 +5,16 @@
 #include "Configmgr.h"
 #include "Modulemgr.h"
 #include "NetEngine.h"
-template<  > Kernel * Singleton<Kernel>::_instance = nullptr;
+#include "TimerMgr.h"
+
+template<> Kernel * Singleton<Kernel>::_instance = nullptr;
 
 bool Kernel::Ready()
 {
     return _logger.Ready()&&
            Configmgr::GetInstance()->Ready()&&
-           NetEngine::GetInstance()->Ready();
+           NetEngine::GetInstance()->Ready()&&
+		   TimerMgr::GetInstance()->Ready();
 }
 bool Kernel::Initialize(s32 argc, char **argv)
 {
@@ -20,7 +23,8 @@ bool Kernel::Initialize(s32 argc, char **argv)
     return _logger.Initialize() 
         && Configmgr::GetInstance()->Initialize()
         && Modulemgr::GetInstance()->Initialize()
-        && NetEngine::GetInstance()->Initialize();
+        && NetEngine::GetInstance()->Initialize()
+		&& TimerMgr::GetInstance()->Initialize();
 }
 
 void Kernel::Loop()
@@ -28,11 +32,14 @@ void Kernel::Loop()
     while (true)
     {
         NetEngine::GetInstance()->Process(10);
+		TimerMgr::GetInstance()->Process(10);
         Sleep(0);
     }
 }
 void Kernel::Destroy()
 {
+	TimerMgr::GetInstance()->Destroy();
+	NetEngine::GetInstance()->Destroy();
     Modulemgr::GetInstance()->Destroy();
     Configmgr::GetInstance()->Destroy();
     _logger.Destroy(); 
@@ -90,4 +97,24 @@ void Kernel::CreateNetListener(const char *ip, s16 port, core::ITcpListener *lis
 void Kernel::CreateNetSession(const char *ip, s16 port, core::IMsgSession *session)
 {
     NetEngine::GetInstance()->CreateNetSession(ip, port, session);
+}
+
+void Kernel::StartTimer(core::ITimer *timer, s32 delay, s32 count, s32 interval, const char *trace)
+{
+	TimerMgr::GetInstance()->StartTimer(timer, delay, count, interval, trace);
+}
+
+void Kernel::KillTimer(core::ITimer *timer)
+{
+	TimerMgr::GetInstance()->KillTimer(timer);
+}
+
+void Kernel::AddFrame(core::IFrame *frame, u8 runLvl)
+{
+
+}
+
+void Kernel::RemoveFrame(core::IFrame *frame)
+{
+
 }

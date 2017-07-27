@@ -105,6 +105,25 @@ namespace tlib
 
             inline ILinkNode * Head(){ return _head; };
             inline ILinkNode * Tail(){ return _tail; };
+			inline void Swap(LinkList *lists)
+			{
+				std::swap(_size, lists->_size);
+				ILinkNode *tmp = _head;
+				while (tmp != nullptr)
+				{
+					tmp->_host = lists;
+					tmp = tmp->_next;
+				}
+
+				std::swap(_head, lists->_head);
+				std::swap(_tail, lists->_tail);
+				tmp = _head;
+				while (tmp != nullptr)
+				{
+					tmp->_host = this;
+					tmp = tmp->_next;
+				}
+			}
         protected:
             inline void CleanNodeIndex(ILinkNode *node)
             {

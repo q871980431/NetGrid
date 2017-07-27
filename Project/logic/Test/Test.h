@@ -33,6 +33,19 @@ private:
     s32 _id;
 };
 
+class MyTimer : public core::ITimer
+{
+public:
+	MyTimer(s64 id, s64 tick) :_id(id),_tick(tick) {};
+	virtual void OnStart(IKernel *kernel, s64 tick);
+	virtual void OnTime(IKernel *kernel, s64 tick);
+	virtual void OnTerminate(IKernel *kernel, s64 tick);
+protected:
+private:
+	s64 _id;
+	s64 _tick;
+};
+
 class Test : public ITest
 {
 public:
