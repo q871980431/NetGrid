@@ -7,6 +7,7 @@ unsigned int  Radnom()
 	return sRandom;
 }
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif

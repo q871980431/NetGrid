@@ -30,6 +30,7 @@ bool Test::Initialize(IKernel *kernel)
 bool Test::Launched(IKernel *kernel)
 {
     //TestLinkList();
+    TestBitMark();
 	s64 now = tools::GetTimeMillisecond();
 	MyTimer *timer = NEW MyTimer(1, now);
 	s_kernel->StartTimer(timer, 3000, FOREVER, 2000, "my timer");
@@ -84,4 +85,16 @@ void Test::TestLinkList()
         //tmp->Printf();
         node = node->_next;
     }
+}
+
+void Test::TestBitMark()
+{
+    BitMark mark;
+    mark.SetMark(5);
+    mark.SetMark(6);
+    bool marked = mark.Marked(5);
+    bool marke1 = mark.Marked(8);
+    mark.CancelMark(5);
+    bool marke2 = mark.Marked(5);
+    bool marke3 = mark.Marked(6);
 }

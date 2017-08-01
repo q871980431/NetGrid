@@ -23,6 +23,35 @@ struct ATTR
     }
 };
 
+struct BitMark  
+{
+    s32 bits;
+    
+    BitMark() :bits(0){};
+    inline void SetMark(u8 index)
+    {
+        if (index >= 0 && index < 32)
+            bits |= (1 << index);
+    }
+    inline void CancelMark(u8 index)
+    {
+        if (index >= 0 && index < 32)
+        {
+            s32 tmp = ~bits;
+            tmp |= (1 << index);
+            bits &= (~tmp);
+        }
+    }
+    inline bool Marked(u8 index)
+    {
+        if (index >= 0 && index < 32)
+            return (bits & (1 << index)) == 0 ? false : true;
+
+        return false;
+    }
+    
+};
+
 class Player : public tlib::linear::ILinkNode
 {
 public:
@@ -58,7 +87,7 @@ public:
 protected:
 
     void TestLinkList();
-
+    void TestBitMark();
 private:
     static Test     * s_self;
     static IKernel  * s_kernel;

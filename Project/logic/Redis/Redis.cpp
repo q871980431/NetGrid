@@ -18,7 +18,6 @@ bool Redis::Initialize(IKernel *kernel)
 
 bool Redis::Launched(IKernel *kernel)
 {
-
     return true;
 }
 
