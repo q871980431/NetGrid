@@ -118,3 +118,18 @@ void Kernel::RemoveFrame(core::IFrame *frame)
 {
 
 }
+
+const char * Kernel::GetCoreFile()
+{
+    return Configmgr::GetInstance()->GetCoreFile();
+}
+
+const char * Kernel::GetConfigFile()
+{
+    return Configmgr::GetInstance()->GetConfigFile();
+}
+
+const char * Kernel::GetEnvirPath()
+{
+    return Configmgr::GetInstance()->GetEnvirPath();
+}

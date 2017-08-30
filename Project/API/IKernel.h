@@ -91,6 +91,16 @@ namespace core
         virtual void  OnRecv(s32 messageId, const char *buff, s32 len) = 0;
     };
 
+    class IMsgPipe
+    {
+    public:
+        virtual void OnOpen() = 0;
+        virtual void OnClose() = 0;
+        virtual void OnRecv(s32 messageId, const char *buff, s32 len) = 0;
+        virtual void  Send(s32 messageId, const char *buff, s32 len) = 0;      //
+        virtual void  Close() = 0;                                              //πÿ±’¡¨Ω”
+    };
+
     class ITcpListener
     {
     public:
@@ -143,6 +153,9 @@ namespace core
 		virtual void KillTimer(core::ITimer *timer) = 0;
 		virtual void AddFrame(core::IFrame *frame, u8 runLvl) = 0;
 		virtual void RemoveFrame(core::IFrame *frame) = 0;
+        virtual const char* GetCoreFile() = 0;
+        virtual const char* GetConfigFile() = 0;
+        virtual const  char* GetEnvirPath() = 0;
     };
 }
 #endif

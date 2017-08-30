@@ -52,7 +52,15 @@ namespace tlib
         {
             IN_USE = 0,
             IS_FREE,
-            CHUNK_SIZE = (16 * 1024) / (64 + 16),
+#ifdef WIN32
+#if(_MSC_VER <= 1800)
+            CHUNK_SIZE = (16 * 1024) / (128),
+#elif
+            CHUNK_SIZE = sizeof(T),
+#endif
+#elif
+            CHUNK_SIZE = (16 * 1024) / (128),
+#endif // WIN32
         };
         struct Chunk;
         struct Block

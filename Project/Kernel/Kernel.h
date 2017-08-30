@@ -26,6 +26,9 @@ public:
 	virtual void KillTimer(core::ITimer *timer);
 	virtual void AddFrame(core::IFrame *frame, u8 runLvl);
 	virtual void RemoveFrame(core::IFrame *frame);
+    virtual const char* GetCoreFile();
+    virtual const char* GetConfigFile();
+    virtual const  char* GetEnvirPath();
 protected:
 private:
     void ParseCommand(s32 argc, char **argv);
