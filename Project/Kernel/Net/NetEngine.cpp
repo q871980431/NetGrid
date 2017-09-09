@@ -64,6 +64,7 @@ void NetEngine::CreateNetSession(const char *ip, s16 port, core::IMsgSession *se
     bufferevent_enable(bev, EV_READ | EV_PERSIST | EV_WRITE);
 
     connction->SetSession(session);
+    connction->SetRomoteAddr(&stAddr);
     session->SetConnection(connction);
     session->OnEstablish();
 }
@@ -103,9 +104,10 @@ void NetEngine::OnListener(struct evconnlistener *listener, evutil_socket_t fd, 
     bufferevent_setcb(bev, OnReadEvent, OnWriteEvent, OnErrorEvent, connction);
     bufferevent_enable(bev, EV_READ | EV_WRITE);
 
+    connction->SetRomoteAddr((struct sockaddr_in *)addr);
     connction->SetSession(session);
     session->SetConnection(connction);
-    session->OnEstablish();
+    //session->OnEstablish();
 }
 
 void NetEngine::OnCreateSession( EventBase *eventBase, core::IMsgSession *session, evutil_socket_t fd)
@@ -118,10 +120,10 @@ void NetEngine::OnReadEvent(struct bufferevent* bev, void * ctx)
     NetConnection *connetion = (NetConnection *)ctx;
     struct evbuffer *eb = bufferevent_get_input(bev);
     s32 len = evbuffer_get_length(eb);
-    while (len > sizeof(MessageHead))
+    while (len > sizeof(core::MessageHead))
     {
-        MessageHead head;
-        evbuffer_copyout(eb, &head, sizeof(MessageHead));
+        core::MessageHead head;
+        evbuffer_copyout(eb, &head, sizeof(core::MessageHead));
         if (head.len > len)
             break;
         s32 continuous = evbuffer_get_contiguous_space(eb);
@@ -133,7 +135,7 @@ void NetEngine::OnReadEvent(struct bufferevent* bev, void * ctx)
             buff = alloca(head.len);
             evbuffer_copyout(eb, buff, head.len);
         }
-        connetion->OnReceive(head.messageId, (char *)buff + sizeof(MessageHead), head.len - sizeof(MessageHead));
+        connetion->OnReceive(head.messageId, (char *)buff + sizeof(core::MessageHead), head.len - sizeof(core::MessageHead));
         evbuffer_drain(eb, head.len);
         len -= head.len;
     }

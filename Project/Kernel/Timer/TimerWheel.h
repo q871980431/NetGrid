@@ -81,10 +81,11 @@ public:
 
 	void AddTimer(TimerBase *timer, s32 expires);
 	void Process( core::IKernel *kernel, s32 tick);
+    inline u32 GetJiffies(){ return _jiffies; };
 private:
 	void AddTimer(TimerBase *timer);
 	s32 Cascade(TVEC_NODE *tvec, s32 index);
-	inline u32 GetJiffies(s64 tick) { return (tick - _tick) / JIFFIES_TIME; };
+	inline u32 GetJiffies(s64 tick) { return (u32)(tick - _tick) / JIFFIES_TIME; };
 protected:
 private:
     s64 _tick;

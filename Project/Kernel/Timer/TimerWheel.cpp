@@ -20,8 +20,9 @@ void TimerBase::Exec(core::IKernel *kernel, s64 tick)
 			if (_count != FOREVER)
 				--_count;
 			TimerWheel *tmp = _wheel;
+            s32 expires = (_expires - _wheel->GetJiffies()) + _interval;
 			_wheel = nullptr;
-			tmp->AddTimer(this, _interval - TimerWheel::JIFFIES_TIME);
+            tmp->AddTimer(this, expires);
 		}
 		else
 		{

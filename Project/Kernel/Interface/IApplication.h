@@ -11,7 +11,6 @@ namespace core
         virtual bool Initialize(s32 argc, char **argv) = 0;
         virtual void Loop() = 0;
         virtual void Destroy() = 0;
-        virtual const char * GetCmdArg(const char *name) = 0;
     };
 }
 

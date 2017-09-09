@@ -12,6 +12,7 @@ void MyTimer::OnStart(IKernel *kernel, s64 tick)
 void MyTimer::OnTime(IKernel *kernel, s64 tick)
 {
 	ECHO("Call Time, time = %dms", (tick - _tick));
+    _tick = tick;
 }
 
 void MyTimer::OnTerminate(IKernel *kernel, s64 tick)
@@ -32,8 +33,8 @@ bool Test::Launched(IKernel *kernel)
     //TestLinkList();
     TestBitMark();
 	s64 now = tools::GetTimeMillisecond();
-	//MyTimer *timer = NEW MyTimer(1, now);
-	//s_kernel->StartTimer(timer, 3000, FOREVER, 2000, "my timer");
+    MyTimer *timer = NEW MyTimer(1, now);
+    s_kernel->StartTimer(timer, 3000, FOREVER, 1000, "my timer");
     return true;
 }
 

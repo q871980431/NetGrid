@@ -12,6 +12,7 @@
 #define DIR_DELIMITER   "/"
 #define MAX_PATH	260
 #define TRACE_LEN   512
+#define IP_LEN      32
 
 enum DATA_TYPE
 {

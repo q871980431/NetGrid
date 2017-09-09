@@ -20,7 +20,7 @@ bool NetConnection::IsConnected()
 
 void NetConnection::Send(s32 messageId, const char *buff, s32 len)
 {
-    MessageHead head;
+    core::MessageHead head;
     head.messageId = messageId;
     head.len = len + sizeof(head);
 
@@ -32,6 +32,19 @@ void NetConnection::Send(s32 messageId, const char *buff, s32 len)
         return;
     }
     evbuffer_add(eb, &head, sizeof(head));
+    evbuffer_add(eb, buff, len);
+}
+
+void NetConnection::SendBuff(const char *buff, s32 len)
+{
+    struct evbuffer *eb = bufferevent_get_output(_buffEvent);
+    size_t num = evbuffer_get_length(eb);
+    if (num + len > _sendSize)
+    {
+        ForceClose();
+        return;
+    }
+
     evbuffer_add(eb, buff, len);
 }
 
@@ -63,6 +76,27 @@ void NetConnection::ForceClose()
 void NetConnection::Close()
 {
     _doClose = true;
+}
+
+const char * NetConnection::GetRemoteIP()
+{
+    return inet_ntoa(_romoteAddr.sin_addr);
+}
+
+s32 NetConnection::GetRemoteIpAddr()
+{
+    return _romoteAddr.sin_addr.S_un.S_addr;
+}
+
+void NetConnection::SettingBuffSize(s32 recvSize, s32 sendSize)
+{
+    _reciveSize = recvSize;
+    _sendSize = sendSize;
+    if (_buffEvent != nullptr)
+    {
+        bufferevent_setwatermark(_buffEvent, EV_READ, 0, _reciveSize);
+        bufferevent_setwatermark(_buffEvent, EV_WRITE, 0, _sendSize);
+    }
 }
 
 void NetConnection::SetBuffEvent(struct bufferevent *buffEvent)

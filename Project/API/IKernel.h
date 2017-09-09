@@ -73,12 +73,21 @@ class IModule;
 namespace core
 {
     class IKernel;
+    struct MessageHead
+    {
+        s32 messageId;
+        s32 len;
+    };
     class IMsgConnection
     {
     public:
         virtual bool  IsConnected(void) = 0;
         virtual void  Send(s32 messageId, const char *buff, s32 len) = 0;      //
+        virtual void  SendBuff(const char *buff, s32 len) = 0;      //
         virtual void  Close() = 0;                              //πÿ±’¡¨Ω”
+        virtual const char * GetRemoteIP() = 0;
+        virtual s32   GetRemoteIpAddr() = 0;
+        virtual void SettingBuffSize(s32 recvSize, s32 sendSize) = 0;
     };
 
     class IMsgSession
@@ -156,6 +165,7 @@ namespace core
         virtual const char* GetCoreFile() = 0;
         virtual const char* GetConfigFile() = 0;
         virtual const  char* GetEnvirPath() = 0;
+        virtual const char * GetCmdArg(const char *name) = 0;
     };
 }
 #endif

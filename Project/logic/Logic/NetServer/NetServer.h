@@ -14,6 +14,8 @@ class GameSession : public core::IMsgSession
     virtual void  OnEstablish(){
         if (_connection)
         {
+            const char *ip = _connection->GetRemoteIP();
+            ECHO("\n*************OOnEstablish IP=%s******************", ip);
             s32 messageId = 1;
             char *msg = "HelloClient";
             _connection->Send(messageId, msg, strlen(msg) + 1);

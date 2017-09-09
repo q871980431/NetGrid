@@ -39,7 +39,7 @@ bool NetServer::Initialize(IKernel *kernel)
 bool NetServer::Launched(IKernel *kernel)
 {
     s_kernel->CreateNetListener("0", 11401, &s_netListener);
-    s_kernel->CreateNetSession("127.0.0.1", 11401, &s_session);
+    s_kernel->CreateNetSession("192.168.124.1", 11401, &s_session);
 
     return true;
 }

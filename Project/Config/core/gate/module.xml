@@ -3,4 +3,5 @@
 	<module name="Test"/>
 	<module name="AoiTest"/>
 	<module name="NetServer"/>
+	<module name="ScriptEngine"/>
 </root>

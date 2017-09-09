@@ -1,6 +1,15 @@
 SET(LOGIC_INTERFACE_DIR
 	"${PROJECT_SOURCE_DIR}/logic/Interface"
 )
+
+SET(LOGIC_DEFINE_DIR
+	"${PROJECT_SOURCE_DIR}/logic/Define"
+)
+
+SET(LOGIC_DEFINE
+	"${LOGIC_DEFINE_DIR}/FrameworkDefine.h"
+)
+
 #SET(LOGIC_INTERFACE
 #	"${LOGIC_INTERFACE_DIR}/IDataInterchange.h"
 #	"${LOGIC_INTERFACE_DIR}/ITest.h"

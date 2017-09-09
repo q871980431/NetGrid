@@ -7,11 +7,9 @@
 
 #include "CacheDB.h"
 #include "ITest.h"
-#include "IRedis.h"
 CacheDB * CacheDB::s_self = nullptr;
 IKernel * CacheDB::s_kernel = nullptr;
 ITest   * CacheDB::s_test = nullptr;
-IRedis  * CacheDB::s_redis = nullptr;
 bool CacheDB::Initialize(IKernel *kernel)
 {
     s_self = this;
@@ -23,7 +21,6 @@ bool CacheDB::Initialize(IKernel *kernel)
 bool CacheDB::Launched(IKernel *kernel)
 {
     FIND_MODULE(s_test, Test);
-    FIND_MODULE(s_redis, Redis);
     s32 add = s_test->Add(2, 3);
     ECHO("num = %d", add);
     return true;

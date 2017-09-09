@@ -24,6 +24,5 @@ private:
     static IKernel     * s_kernel;
 
     static ITest        * s_test;
-    static IRedis       * s_redis;
 };
 #endif
