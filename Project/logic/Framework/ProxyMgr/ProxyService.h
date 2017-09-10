@@ -10,7 +10,27 @@
 #include "IProxyMgr.h"
 #include "TDynPool.h"
 #include <unordered_map>
-class ProxySession;
+class ProxyService;
+class ProxySession : public core::IMsgSession
+{
+public:
+	ProxySession(ProxyService *service, s32 id) :_service(service), _id(id), _connection(nullptr), _connected(false) {};
+	virtual ~ProxySession() {};
+	virtual void  SetConnection(IMsgConnection *connection) { _connection = connection; };
+	virtual void  OnEstablish();
+	virtual void  OnTerminate();
+	virtual void  OnError(s32 moduleErr, s32 sysErr) {};
+	virtual void  OnRecv(s32 messageId, const char *buff, s32 len);
+public:
+	inline bool  SendMsg(s32 messageId, const char *buff, s32 len) { _connection->Send(messageId, buff, len); return true; };
+	inline bool  IsConnect() { return _connected; };
+	inline void  Close() { _connection->Close(); _connected = false; _connection = nullptr; };
+private:
+	IMsgConnection  *_connection;
+	bool             _connected;
+	s32              _id;
+	ProxyService    *_service;
+};
 typedef tlib::TDynPool<ProxySession> ProxySessionPool;
 typedef std::unordered_map<s32, ProxySession *> ProxySessionMap;
 class ProxyService : public IProxyService, public core::ITcpListener
@@ -36,24 +56,5 @@ private:
     ProxySessionMap        _sessionMap;
 };
 
-class ProxySession : public core::IMsgSession
-{
-public:
-    ProxySession(ProxyService *service, s32 id) :_service(service), _id(id),_connection(nullptr),_connected(false){};
-    virtual ~ProxySession(){};
-    virtual void  SetConnection(IMsgConnection *connection){ _connection = connection; };
-    virtual void  OnEstablish(){ _connected = true; _service->OnOpen(_id); };
-    virtual void  OnTerminate(){ _connected = false; _service->OnClose(_id); };
-    virtual void  OnError(s32 moduleErr, s32 sysErr){};
-    virtual void  OnRecv(s32 messageId, const char *buff, s32 len){ _service->OnRecv(_id, messageId, buff, len); };
-public:
-    inline bool  SendMsg(s32 messageId, const char *buff, s32 len){ _connection->Send(messageId, buff, len); return true; };
-    inline bool  IsConnect(){ return _connected; };
-    inline void  Close(){ _connection->Close(); _connected = false; _connection = nullptr; };
-private:
-    IMsgConnection  *_connection;
-    bool             _connected;
-    s32              _id;
-    ProxyService    *_service;
-};
+
 #endif

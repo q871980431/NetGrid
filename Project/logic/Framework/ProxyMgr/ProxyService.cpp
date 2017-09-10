@@ -1,5 +1,11 @@
 #include "ProxyService.h"
 #include "Proxy.h"
+
+void  ProxySession::OnEstablish() { _connected = true; _service->OnOpen(_id); };
+void  ProxySession::OnTerminate() { _connected = false; _service->OnClose(_id); };
+void  ProxySession::OnRecv(s32 messageId, const char *buff, s32 len) { _service->OnRecv(_id, messageId, buff, len); };
+
+
 IMsgSession * ProxyService::CreateSession()
 {
     ProxySession *session = CREAT_FROM_POOL(_pool, this, ++_id);

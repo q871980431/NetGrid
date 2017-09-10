@@ -55,7 +55,7 @@ namespace tlib
 #ifdef WIN32
 #if(_MSC_VER <= 1800)
             CHUNK_SIZE = (16 * 1024) / (128),
-#elif
+#else
             CHUNK_SIZE = sizeof(T),
 #endif
 #elif
