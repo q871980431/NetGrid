@@ -33,7 +33,7 @@ void Kernel::Loop()
     {
         NetEngine::GetInstance()->Process(10);
 		TimerMgr::GetInstance()->Process(10);
-        Sleep(0);
+        Sleep(10);
     }
 }
 void Kernel::Destroy()

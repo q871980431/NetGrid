@@ -98,6 +98,7 @@ void Harbor::OnRecv(HarborSession *session, s32 messageId, const char *buff, s32
             session->SetNodeInfo(msg->nodeType, msg->nodeId);
             const char *ip = session->GetRemoteIP();
             auto endIter = s_listeners.end();
+			IKernel *kernel = s_kernel;
             DEBUG_LOG("Node OnOpen, type = %d, id = %d, ip = %s, port = %d", msg->nodeType, msg->nodeId, ip, msg->port);
             for (auto iter = s_listeners.begin(); iter != endIter; iter++)
                 (*iter)->OnOpen(msg->nodeType, msg->nodeId, ip, msg->port);

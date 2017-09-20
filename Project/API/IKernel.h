@@ -13,7 +13,7 @@
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[DEBUG]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-    s_kernel->AsyncLog(log);\
+    kernel->AsyncLog(log);\
 }
 
 #define TRACE_LOG(format, ...)\
@@ -44,7 +44,7 @@
 {\
     	char log[LOG_BUFF_SIZE] = { 0 }; \
         SafeSprintf(log, sizeof(log), "[DEBUG]: %s:%d:%s | " format, __FILE__, __LINE__, __FUNCTION__, ##a); \
-	_kernel->AsyncLog(log);\
+	    kernel->AsyncLog(log);\
 }
 
 #define TRACE_LOG(format, a...)\
