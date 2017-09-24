@@ -23,7 +23,7 @@ bool Configmgr::LoadCoreConfig()
 {
     const char *moduleName = KERNEL->GetCmdArg("name");
     char path[MAX_PATH];
-    SafeSprintf(path, sizeof(path), "%s/core/%s", tools::GetAppPath());
+    SafeSprintf(path, sizeof(path), "%s/core/%s/config.xml", tools::GetAppPath(), moduleName);
     _configFile = path;
 
     SafeSprintf(path, sizeof(path), "%s/core/server_config.xml", tools::GetAppPath());

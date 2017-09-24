@@ -1,6 +1,8 @@
 #include "Test.h"
 #include "TDynPool.h"
 #include "Tools_time.h"
+#include "hmac.h"
+#include <map>
 Test * Test::s_self = nullptr;
 IKernel * Test::s_kernel = nullptr;
 
@@ -11,7 +13,7 @@ void MyTimer::OnStart(IKernel *kernel, s64 tick)
 
 void MyTimer::OnTime(IKernel *kernel, s64 tick)
 {
-	ECHO("Call Time, time = %dms", (tick - _tick));
+	//ECHO("Call Time, time = %dms", (tick - _tick));
     _tick = tick;
 }
 
@@ -24,6 +26,12 @@ bool Test::Initialize(IKernel *kernel)
 {
     s_self = this;
     s_kernel = kernel;
+    char buff[] = "xuping";
+    buff[2] = 0;
+    std::string name = "sadgsagas";
+    name[3] = '\0';
+    s32 size = name.size();
+    ECHO("%s", name.c_str());
     
     return true;
 }
@@ -35,6 +43,7 @@ bool Test::Launched(IKernel *kernel)
 	s64 now = tools::GetTimeMillisecond();
     MyTimer *timer = NEW MyTimer(1, now);
     s_kernel->StartTimer(timer, 3000, FOREVER, 1000, "my timer");
+
     return true;
 }
 
@@ -98,4 +107,27 @@ void Test::TestBitMark()
     mark.CancelMark(5);
     bool marke2 = mark.Marked(5);
     bool marke3 = mark.Marked(6);
+    
+}
+inline u8 ToHexL(u8 x){ return x > 9 ? x + 87 : x + 48; }
+inline u8 ToHexH(u8 x){ return x > 9 ? x + 55 : x + 48; }
+void Test::CreateStr(char *buff, s32 len, std::string &str)
+{
+    for (s32 i = 0; i < len; i++)
+    {
+        str += ToHexL((u8)buff[i] >> 4);
+        str += ToHexL((u8)buff[i] % 16);
+    }
+}
+
+void Test::TestHmacSha1()
+{
+    char buff[MAX_PATH] = { 0 };
+    const char *key = "123456";
+    const char *data = "testest";
+    size_t size = 256;
+    hmac_sha1((const unsigned char *)key, strlen(key), (const unsigned char *)data, strlen(data), (unsigned char *)buff, &size);
+    std::string tmp("");
+    CreateStr(buff, size, tmp);
+    ECHO("%s,%d", tmp.c_str(), tmp.length());
 }

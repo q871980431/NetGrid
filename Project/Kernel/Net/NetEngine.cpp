@@ -66,7 +66,7 @@ void NetEngine::CreateNetSession(const char *ip, s16 port, core::IMsgSession *se
     connction->SetSession(session);
     connction->SetRomoteAddr(&stAddr);
     session->SetConnection(connction);
-    session->OnEstablish();
+    //session->OnEstablish();
 }
 
 void NetEngine::CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener)
@@ -107,7 +107,7 @@ void NetEngine::OnListener(struct evconnlistener *listener, evutil_socket_t fd, 
     connction->SetRomoteAddr((struct sockaddr_in *)addr);
     connction->SetSession(session);
     session->SetConnection(connction);
-    //session->OnEstablish();
+    session->OnEstablish();
 }
 
 void NetEngine::OnCreateSession( EventBase *eventBase, core::IMsgSession *session, evutil_socket_t fd)

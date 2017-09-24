@@ -7,7 +7,13 @@ namespace core
     const static s32 NODE_NAME_LEN = 32;
     enum NODE_MSG_ID
     {
-        NODE_MSG_LOGIN_MASTER = 1,
+        NODE_MSG_LOGIN_MASTER   =  1,
+        NODE_MSG_CONNECT_HARBOR = 2,
+    };
+    enum NODE_TYPE
+    {
+        NODE_TYPE_SLAVE = -1,
+        NODE_TYPE_MASTER = 0,
     };
 
     struct NODE_MSG_HANDSHAKE

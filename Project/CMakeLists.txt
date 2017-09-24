@@ -103,7 +103,7 @@ SET(THIRD_LIBRARIES_DEBUG_DIR
 	"${PROJECT_SOURCE_DIR}/Thridlibrary/windows/debug"
 )
 SET(THIRD_LIBRARIES_RELEASE_DIR
-	"${PROJECT_SOURCE_DIR}/Thridlibrary/windows/debug"
+	"${PROJECT_SOURCE_DIR}/Thridlibrary/windows/release"
 )
 ENDIF(WIN32)
 

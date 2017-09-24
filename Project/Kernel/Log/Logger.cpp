@@ -81,6 +81,7 @@ void Logger::ThreadRun()
 {
     LogNode *logNode = nullptr;
     s32 mark = 0;
+    s32 delay = 0;
     while (true)
     {
         logNode = _syncLogs->Pop();
@@ -88,7 +89,14 @@ void Logger::ThreadRun()
         {
             if (_terminate)
                 return;
+            delay += 10;
             MSLEEP(10);
+            if (delay > 30000)
+            {
+                _asyncFile.Flush();
+                mark = 0;
+                delay = 0;
+            }
             continue;
         }
         if (!_asyncFile.IsOpen())

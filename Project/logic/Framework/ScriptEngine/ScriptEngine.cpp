@@ -25,12 +25,12 @@ bool ScriptEngine::Initialize(IKernel *kernel)
     char scriptPath[MAX_PATH];
     const char *envi = s_kernel->GetEnvirPath();
     SafeSprintf(scriptPath, sizeof(scriptPath), "%s/script", envi);
-
     SetSearchPath(scriptPath);
     s32 topIndex = lua_gettop(s_luaState);
     ExecScriptFile(LINK_FILE_NAME);
     topIndex = lua_gettop(s_luaState);
 
+    ReplacePrint();
     lua_getglobal(s_luaState, LUA_TRACE_NAME);
 
 
@@ -136,6 +136,32 @@ int ScriptEngine::LuaCall(lua_State *state)
     return output.Count();
 }
 
+int ScriptEngine::Log(lua_State *state)
+{
+    tlib::TString<4096> content;
+    luaL_where(state, 1);
+    content << lua_tostring(state, -1);
+    lua_pop(state, 1);
+    switch (lua_type(state, 1))
+    {
+    case LUA_TNIL: content << "nil"; break;
+    case LUA_TNUMBER:
+    {
+        if (lua_isinteger(state, 1))
+            content << (s64)lua_tointeger(state, 1);
+        else
+            content << (float)lua_tonumber(state, 1);
+    }
+        break;
+    case LUA_TBOOLEAN:content << ((lua_toboolean(state, 1) ? "true" : "false")); break;
+    case LUA_TSTRING: content << lua_tostring(state, 1); break;
+    default:content << luaL_typename(state, 1) << ":" << (s64)lua_topointer(state, 1);break;
+    }
+    core::IKernel *_kernel = s_kernel;
+    LUA_LOG(content.GetString());
+    return 0;
+}
+
 bool ScriptEngine::ExecGlobalFunction(const char *func, s8 argc, const IDataCallBackFuncType callback)
 {
     lua_getglobal(s_luaState, func);
@@ -152,6 +178,7 @@ bool ScriptEngine::ExecGlobalFunction(const char *func, s8 argc, const IDataCall
 
 bool ScriptEngine::ExecFunction(s8 argc, const IDataCallBackFuncType callback)
 {
+    core::IKernel *_kernel = s_kernel;
     s8 findex = -(argc + 1);
     if (!lua_isfunction(s_luaState, findex))
     {
@@ -189,6 +216,13 @@ bool ScriptEngine::ExecFunction(s8 argc, const IDataCallBackFuncType callback)
         lua_pop(s_luaState, 1);
 
     return true;
+}
+
+void ScriptEngine::ReplacePrint()
+{
+    lua_register(s_luaState, "print", Log);
+    //lua_pushcclosure(s_luaState, Log, 0);
+    //lua_setglobal(s_luaState,)
 }
 
 void ScriptEngine::TestAdd(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out)

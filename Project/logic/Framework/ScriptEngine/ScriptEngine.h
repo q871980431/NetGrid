@@ -34,8 +34,10 @@ private:
     void SetSearchPath(const char *path);
     bool ExecScriptFile(const char *file);
     bool ExecFunction(s8 argc, const IDataCallBackFuncType callback);
+    void ReplacePrint();
 private:
     static int LuaCall(lua_State *state);
+    static int Log(lua_State *state);
     static void TestAdd(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out);
 private:
     static ScriptEngine     * s_self;

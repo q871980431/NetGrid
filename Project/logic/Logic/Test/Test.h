@@ -28,6 +28,12 @@ struct BitMark
     s32 bits;
     
     BitMark() :bits(0){};
+    BitMark(const BitMark &val)
+    {
+
+        ECHO("&&&&&&&&&&&&&&&&&&&&");
+        bits = val.bits;
+    }
     inline void SetMark(u8 index)
     {
         if (index >= 0 && index < 32)
@@ -88,6 +94,9 @@ protected:
 
     void TestLinkList();
     void TestBitMark();
+    void CreateStr(char *buff, s32 len, std::string &str);
+    void TestHmacSha1();
+
 private:
     static Test     * s_self;
     static IKernel  * s_kernel;

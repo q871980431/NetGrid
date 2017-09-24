@@ -1,7 +1,7 @@
 <root>
 	<env path="./envir"></env>
 	<net no_delay="true" rev_buff="65536" send_buff="65536"></net>
-	<master ip="127.0.0.1" port="11000">
+	<master ip="127.0.0.1" port="7001">
 	</master>
 	<harbor default_size="10240">
 		<node name="gate" type="1">

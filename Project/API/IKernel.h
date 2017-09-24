@@ -9,6 +9,13 @@
 
 #ifdef WIN32
 
+#define LUA_LOG(content)\
+{\
+    char log[LOG_BUFF_SIZE] = { 0 }; \
+    SafeSprintf(log, sizeof(log), "[LUA]: %s", (content)); \
+    _kernel->AsyncLog(log);\
+}
+
 #define DEBUG_LOG(format, ...)\
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
@@ -20,21 +27,21 @@
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[TRACE]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-    s_kernel->AsyncLog(log); \
+    _kernel->AsyncLog(log); \
 }
 
 #define ERROR_LOG(format, ...)\
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[ERROR]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-    s_kernel->AsyncLog(log); \
+    _kernel->AsyncLog(log); \
 }
 
 #define IMPORTANT_LOG(format, ...)\
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[IMPORTANT]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-    s_kernel->SyncLog(log); \
+    _kernel->SyncLog(log); \
 }
 
 

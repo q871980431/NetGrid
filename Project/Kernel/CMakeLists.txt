@@ -113,14 +113,19 @@ SOURCE_GROUP( Src FILES ${KERNEL})
 
 IF(WIN32)
 	SET(THIRD_LIB_DEBUG
-	"${THIRD_LIBRARIES_DEBUG_DIR}/DbgHelp.Lib"
-	"${THIRD_LIBRARIES_DEBUG_DIR}/libevent.lib"
-	"${THIRD_LIBRARIES_DEBUG_DIR}/libevent_core.lib"
-	"${THIRD_LIBRARIES_DEBUG_DIR}/libevent_extras.lib"
+	debug "${THIRD_LIBRARIES_DEBUG_DIR}/DbgHelp.Lib"
+	debug "${THIRD_LIBRARIES_DEBUG_DIR}/libevent.lib"
+	debug "${THIRD_LIBRARIES_DEBUG_DIR}/libevent_core.lib"
+	debug "${THIRD_LIBRARIES_DEBUG_DIR}/libevent_extras.lib"
 	"ws2_32.lib"
 	"wsock32.lib"
 	)
 	SET(THIRD_LIB_RELEASE
+	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent.lib"
+	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent_core.lib"
+	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent_extras.lib"
+	    optimized "ws2_32.lib"
+	    optimized "wsock32.lib"
 	)
 ENDIF(WIN32)
 
