@@ -64,6 +64,7 @@ SET(PUBLIC
     "${PUBLIC_DIR}/Convert.h"
     "${PUBLIC_DIR}/Tools_time.h"
     "${PUBLIC_DIR}/Tools_time.cpp"
+    "${PUBLIC_DIR}/BitMark.h"	
 )
 SET(TINYXML_DIR
 	"${PUBLIC_DIR}/tinyxml2"

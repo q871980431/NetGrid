@@ -1,0 +1,4 @@
+<root path="./">
+	<module name="Harbor"/>
+	<module name="Master"/>
+</root>

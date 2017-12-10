@@ -9,22 +9,27 @@
 #define __Master_h__
 #include "IMaster.h"
 #include "IHarbor.h"
+#include "TString.h"
+#include "FrameworkDefine.h"
 #include <unordered_map>
+#include <map>
+#include <set>
 
-enum NODE_TYPE
+struct SlaveInfo 
 {
-    NODE_TYPE_NONE = 0,
-    NODE_TYPE_CONNECT = 1,
-    NODE_TYPE_READY = 2,
-    NODE_TYPE_RUNNING = 3,
-};
+	s8 state;
 
+};
 struct  NodeInfo
 {
-    s8  state;
+	s32 nodeId;
+	s8  state;
 };
 
-typedef std::unordered_map<s64, NodeInfo> NodeMap;
+
+typedef std::set<s64> NodeMap;
+typedef std::map<s32, NodeInfo> SlaveMap;
+class ServiceGroup;
 class Master : public IMaster, public INodeListener
 {
 public:
@@ -36,11 +41,21 @@ public:
 
     virtual void OnOpen(s32 type, s32 nodeId, const char *ip, s16 port);
     virtual void OnClose(s32 type, s32 nodeId);
+
+private:
+	void OnRecvNodeHasReadyMsg(s32 type, s32 nodeId, const char *buff, s32 len);
+
+private:
+	bool LoadConfigFile(const char *path);
 protected:
 private:
     static Master     * s_self;
     static IKernel    * s_kernel;
     static IHarbor    * s_harbor;
+	static ServiceGroup *s_serviceGroup;
+
     static NodeMap      s_nodeMap;
+	static SlaveMap		s_slaves;
+
 };
 #endif

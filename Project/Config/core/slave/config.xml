@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<service_group>
+		<!-- slave =-1, 标记着不需要由特定的slave进行启动, 否则由具体指定的salve进行启动该service-->
+		<outport begin="11101" end="11116"/>
+		<innerport begin="20001" end="29999"/>
+	</service_group>
+</root>

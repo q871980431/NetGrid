@@ -161,6 +161,7 @@ void Harbor::OnRecv(HarborSession *session, s32 messageId, const char *buff, s32
             auto endIter = s_listeners.end();
 			IKernel *kernel = s_kernel;
             DEBUG_LOG("Node OnOpen, type = %d, id = %d, ip = %s, port = %d", msg->nodeType, msg->nodeId, ip, msg->port);
+			ECHO("Node OnOpen, type = %d, id = %d, ip = %s, port = %d", msg->nodeType, msg->nodeId, ip, msg->port);
 
 
             s32 sendBuffSize = 0;
