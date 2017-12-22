@@ -4,11 +4,18 @@
 #include "Tools.h"
 #include "TList.h"
 
+namespace obj1
+{
+    const static s8 obj2;
+    namespace Obj2{
+        const static s8 obj3;
+    }
+}
 struct ATTR 
 {
-    s32 operator ()(const char *name)
+    s64 operator ()(const char *name)
     {
-        static s32 id = 0;
+        static s64 id = 0;
         if (id == 0)
             id = tools::HashKey(name);
         return id;
@@ -96,6 +103,10 @@ protected:
     void TestBitMark();
     void CreateStr(char *buff, s32 len, std::string &str);
     void TestHmacSha1();
+    void TestKey();
+    void TestFiles();
+    void TestPtr();
+    void TestCallBack();
 
 private:
     static Test     * s_self;

@@ -1,0 +1,20 @@
+提供异步的AOI服务
+
+异步Handler
+
+接口
+	1, 创建一个AOI区域
+	2, 释放一个AOI区域
+	
+	1, OBJ进入AOI区域
+	bool EnterArea( IObject *, Pos);
+	2, OBJ离开AOI区域
+	bool LeaveArea( IObject *, Pos);	
+	3, OBJ更新AOI区域
+	bool UpdateArea( IObject *, Pos);
+	4, 刷新AOI区域信息	异步
+	Handler handler;
+	typedef void(*search_call_back)(IObject *my, IObject *other);
+	typedef void(*end_call_back)();
+	
+	void Flush( handler *);

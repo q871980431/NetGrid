@@ -1,0 +1,192 @@
+/*
+ * File:	ObjectDes.h
+ * Author:	xuping
+ * 
+ * Created On 2017/9/28 16:21:23
+ */
+
+#ifndef __ObjectDes_h__
+#define __ObjectDes_h__
+#include "MultiSys.h"
+#include "TString.h"
+#include "IObjectMgr.h"
+#include "TCallBack.h"
+#include <vector>
+#include <unordered_map>
+
+const static s16 MEMBERNAME_LENGTH = 256;
+const static char *bool_name = "bool";
+const static char *s8_name = "s8";
+const static char *s16_name = "s16";
+const static char *s32_name = "s32";
+const static char *s64_name = "s64";
+const static char *float_name = "float";
+const static char *str_name = "str";
+const static char *binary_name = "blob";
+const static char *table_name = "array";
+const static char *space_split_name = "::";
+const static char *mem_split_name = "::";
+const static char *des_extension_name = "xml";
+const static char *init_namespace = "";
+
+typedef tlib::TString<MEMBERNAME_LENGTH> MemberName;
+typedef MemberName  TableName;
+typedef MemberName MemeoryName;
+class MemeoryDes;
+struct MemberDes 
+{
+    MemberName name;
+    s32 index;
+    s16 type;
+    s32 size;
+    MemeoryDes *memeoryDes;
+};
+
+struct MemberProperty  : public IMember
+{
+    MemeoryDes *host;
+    MemberName name;
+    s32 offset;
+    s32 size;
+    s16 type;
+    MemberDes *des;
+};
+
+struct MemeoryMemberInfo
+{
+    MemberDes des;
+    s32 offset;
+};
+
+struct MemeoryTrace 
+{
+    const char *name;
+    s32 size;
+};
+
+struct Memeroy 
+{
+    void *addr;
+    s32 size;
+};
+
+struct TableMember 
+{
+    std::vector<Memeroy> members;
+    std::unordered_map<s64, Memeroy *> index;
+    MemberDes   *des;
+};
+
+typedef std::vector<MemberProperty> PropertyLists;
+class MemeoryDes
+{
+public:
+    typedef void(*MEMBER_ONCHANGE_CB)(void *object, const MemberProperty *member, void *context, s32 size);
+    typedef tlib::TCallBack<const MemberProperty *, MEMBER_ONCHANGE_CB, void *, const MemberProperty *, void *, s32> MemberChangeCallPool;
+
+    typedef std::vector<MemeoryMemberInfo> MemberSlots;
+    MemeoryDes(const char *name, const MemeoryDes *des, bool common);
+    ~MemeoryDes();
+
+    void AddMember(MemberDes &des);
+    void Fix();
+    void GetProperty(PropertyLists &propertys);
+    const char * GetMemeoryName() const { return _name.GetString(); };
+public:
+    void *  CreateMemeory(s32 &size);
+    void    DestoryMemeory(void *memeory) const;
+    s32 GetMemorySize() const { ASSERT(_fix, "error"); return _allSize; };
+public:
+    void RegisterMemberChangeCallBack(void *object, const MemberProperty *member, MEMBER_ONCHANGE_CB callBack, const char *debug);
+    void UnRegisterMemberChangeCallBack(void *object, const MemberProperty *member, MEMBER_ONCHANGE_CB callBack);
+public:
+    template <typename T>
+    void SetAttrT(void *addr, const MemberProperty *member, T val)const
+    {
+        SetAttrStruct(addr, member, &val, sizeof(T));
+    }
+
+    inline void SetAttrStruct(void *addr, const MemberProperty *member, void *conext, s32 size)const
+    {
+        const MemeoryDes **des = (const MemeoryDes **)((char*)addr);
+        ASSERT(member->offset + size <= (*des)->_allSize, "error");
+        if (member->size == size)
+        {
+            memcpy((char *)addr + member->offset, conext, size);
+            if (!(*des)->_common)
+            {
+                MemberChangeCallPool *pool = (MemberChangeCallPool *)((char*)addr + sizeof(const MemeoryDes **));
+                pool->Call(member, addr, member, conext, size);
+                pool->Call(nullptr, addr, member, conext, size);
+            }
+        }
+    }
+
+    template <typename T>
+    T GetAttrT(void *addr, const MemberProperty *member)const
+    {
+        return *(T *)((char *)addr + member->offset);
+    }
+
+    void * GetChildObj(void *addr, const MemberProperty *member)const
+    {
+        return (void *)((char *)addr + member->offset);
+    }
+public:
+    inline Memeroy * TableAddRow(TableMember *table)const
+    {
+        Memeroy memeroy;
+        memeroy.addr = table->des->memeoryDes->CreateMemeory(memeroy.size);
+        ASSERT(memeroy.addr != nullptr, "error");
+        table->members.push_back(memeroy);
+
+        return &(table->members.back());
+    }
+
+    inline void ReleaseTable(TableMember *table) const
+    {
+        for (auto member : table->members)
+            table->des->memeoryDes->ReleaseMemeory(member.addr, member.size);
+    }
+    inline s16 Count(void *addr)const
+    {
+        TableMember *table = (TableMember *)addr;
+        return (s16)(table->members.size());
+    }
+
+    inline Memeroy *GetRow(void *addr, s16 index)const
+    {
+        TableMember *table = (TableMember *)addr;
+        ASSERT(index < table->members.size(), "error");
+        return &table->members[index];
+    }
+
+    inline Memeroy *CreateRow(void *addr)const
+    {
+        TableMember *table = (TableMember *)addr;
+        return TableAddRow(table);
+    }
+    
+    inline void CreateIndex(void *addr, s64 key, Memeroy *memeroy)const
+    {
+        auto ret = ((TableMember *)addr)->index.insert(std::make_pair(key, memeroy));
+        ASSERT(ret.second, "error");
+    }
+    
+
+protected:
+    void InitMemeory(void *addr, s32 size) const;
+    void ReleaseMemeory(void *address, s32 size) const;
+private:
+    MemeoryName              _name;
+    const MemeoryDes        *_base;
+    MemberSlots              _objs;
+    MemberSlots              _tables;
+    MemberSlots              _pods;
+    s32                      _podstart;
+    s32                      _podsSize;
+    s32                      _allSize;
+    bool                     _common;
+    bool                     _fix;
+};
+#endif

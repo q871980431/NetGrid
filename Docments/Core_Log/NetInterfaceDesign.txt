@@ -1,0 +1,7 @@
+
+1, IGameConnection
+1, IGameSession
+
+2,	INetNode	ÊÇ·ñÖ÷¶¯¶Ë
+2,	IAgentSession
+

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root parent="root" startindex="10" special="true">
+	<member type="s32" name="wingid" index="11" mark="0"/>
+	<member type="s8" name="order" index="12" mark="0"/>
+</root>

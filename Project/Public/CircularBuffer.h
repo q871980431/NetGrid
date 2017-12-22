@@ -3,6 +3,7 @@
 #include "MultiSys.h"
 #include <algorithm>
 #include <limits>
+#include <atomic>
 
 class CircluarBuffer
 {
@@ -10,7 +11,7 @@ public:
 	CircluarBuffer(u16 size) :_size(size), _buff(nullptr), _wcount(0), _rcount(0)
 	{
 		if (_size&(_size - 1))_size = RoundupPowerOf2(_size);
-        _buff = new char[_size];
+        _buff = NEW char[_size];
 	}
 	~CircluarBuffer()
 	{
@@ -27,6 +28,8 @@ public:
 		l = min(len, (u16)(_size - _wcount&(_size - 1)));
 		memcpy(_buff + _wcount, buffer,  l);
 		memcpy(_buff, buffer, len - l);
+        std::atomic_signal_fence(std::memory_order_release);
+
 		_wcount += len;
 		return len;
 	}
@@ -37,6 +40,8 @@ public:
 		l = min(len, (u16)(_size - _rcount &(_size - 1)));
 		memcpy(buff, _buff + (_rcount&(_size - 1)), l);
 		memcpy((char*)buff + l, _buff, len - l);
+        std::atomic_signal_fence(std::memory_order_release);
+
 		_rcount += len;
 		return len;
 	}

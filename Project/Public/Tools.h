@@ -12,11 +12,12 @@
 unsigned int  Radnom();
 namespace tools{
 
+#pragma  pack (push, 4)             //按4字节对齐
 	typedef union _KEY_INT64{
 			struct  
 			{
+                s32 lVal;
 				s32 hVal;
-				s32 lVal;
 			};
 			s64 val;
 	}KEYINT64;
@@ -25,11 +26,12 @@ namespace tools{
 	{
 		struct  
 		{
+            s16 lVal;
 			s16 hVal;
-			s16 lVal;
 		};
 		s32 val;
 	}KEYINT32;
+#pragma  pack (pop)                 //取消知道对齐, 恢复缺省对齐
 
     inline void Mkdir(const char *path)
     {
@@ -39,15 +41,39 @@ namespace tools{
         mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif
     }
+    template<typename T>
+    inline void Zero( T &val)
+    {
+        tools::SafeMemset(&val, sizeof(T), 0, sizeof(T));
+    }
 
 
-	inline void SafeMemset(void *dest, s32 size, s8 val, s32 num)
+    inline void SafeMemset(void *__restrict dest, s32 size, s8 val, s32 num)
 	{
 		ASSERT(size >= num, "out of rang");
 		if (num > size)
 			num = size;
-		memset(dest, val, num);
+		memset(dest, val, max(0, min(size, num)));
 	}
+
+    inline void SafeMemcpy(void * __restrict dest, s32 size, const void * __restrict source, s32 num)
+    {
+        ASSERT(size >= num, "out of rang");
+        if (num > size)
+            num = size;
+        memcpy(dest, source, max(0, min(size, num)));
+    }
+
+    inline s32 SafeStrcpy(char * __restrict dest, s32 max, const char * __restrict src, s32 n)
+    {
+        max -= 1;
+        ASSERT(n <= max, "out of rang");
+        n = max(0, min(n, max));
+        memcpy(dest, src, n);
+        dest[n] = 0;
+        return n;
+    }
+
 
     //format = "%4d-%02d-%02d %02d:%02d:%02d"
 #ifdef __cplusplus

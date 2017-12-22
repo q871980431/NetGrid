@@ -47,6 +47,19 @@ public:
 	{
 		return _element->GetText();
 	}
+
+    virtual bool GetAttribute_Bool(const char *name)
+    {
+        const char *tmp = _element->Attribute(name);
+        return strcmp(tmp, "true") == 0;
+    }
+
+    virtual bool HasAttribute(const char *name)
+    {
+        const char *tmp = _element->Attribute(name);
+        return tmp != nullptr;
+    }
+
 	virtual  IXmlObject * GetFirstChrild(const char *name)
 	{
 		XMLElement *child = _element->FirstChildElement(name);

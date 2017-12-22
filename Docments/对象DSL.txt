@@ -1,0 +1,119 @@
+一个对象类型 由一个描述文件进行描述
+
+描述文件格式为	xml文件
+仅支撑单根继承, 自定义成员标记值,即一个值对应
+parent		指定其父类单元,	该父类单元,为该文件同一目录父类描述文件,所对应的对象
+startindex	startindex用于指导 该类的成员数据编号的起始编号
+
+在整个类族中,每个成员的index具有唯一性,但不保证连续性
+
+<member> 用来描述一个 成员
+	name 	描述成员名称
+	type 	数据类型
+	index	成员编号,唯一性	可用于在进行数据交换时,通过index 确立该属性
+	mark	标记,	用于对该成员进行跟多的描述	诸如是否同步 是否存储 是否立即存储 等等, 
+让扩展层可以根据 该mark标记,得到跟多的描述信息
+
+<table> 用来描述一个数组记录
+	数组中 存放<member> 该member中有key字段,用以加速find,即对该member中的key记录建立索引
+	
+
+
+
+语言层根据,描述文件构建 该对象的内存模型,并实现所需接口,以提供统一的服务。
+
+
+术语:
+	命名空间		objdef
+	通用类			Object
+	通用类指针		IObject
+	类名描述		ClassDes				void *				objdef::classname		
+	类成员描述		MemberDes				void *				objdef::classname.membername	
+	表格记录描述	TableControlDes			
+	表格指针		ITableControl
+	表格行指针		IRow
+	
+	
+需实现接口
+ClassMgr
+类管理器
+		1, 创建实例
+			IObject * CreateObj(objdef::classname, s64 id = 0);
+			IObject * ParseObj(objdef::classname, void *data, s32 len);	支持版本升级
+			
+		2, 获取类名
+			void 	* GetClassName(const char *classname);
+			
+		3, 获取类成员描述
+			void	* GetClassMemberDes( const char *membername);
+			
+		4, 获得一个全局唯一的GUID
+			s64 	  GetGUID();
+			
+		5, 获取类mark 某位标记为1的集合	index (0,31) 无效index 表示获取所有成员集合
+			void 	  GetClassMemebersByMark(objdef::classname, index, out std::vector<MemberDes> members);
+
+MemberRecord
+TableRecord
+自身完成,自己的内存构造函数
+
+
+classDes
+类描述
+	每一个类描述实例,对应一个类, 里面包含有类成员的布局形式
+	操作接口,
+	Constructor();
+	Constructor( classDes &base);
+	
+	AddMember(MemberRecord);
+	AddTable(TableRecord);
+	
+	
+
+TableDes
+表格描述
+			namespace objdef::class::table
+			{
+				void *name;
+				void *member1;
+				void *member2;
+			}
+			
+MemberDes
+类成员描述格式	objdef::classname::membername
+
+IObject 操作接口	
+基础访问接口
+	T	GetPropsT(instance, MemberDes);
+	void SetPropsT(instance, MemberDes, T);
+	ITableControl * FindTable(objdef::class::table::name);
+	
+ITableControl操作接口
+	IRow * GetRow(index);
+	IRow * FindRow(key);
+	T GetPropsT( IRow *, member);
+	void SetPropsT(IRow, member, T &val);
+	
+CallFunc
+访问接口形式
+	s32 GetPropsInt32(instance, MemberDes);
+	
+	
+	
+	
+一时遐想,对于状态机处理, 可以提供一个状态机模组,去实现该效果
+
+
+对象字段描述
+class1:class2:class3:class4
+class1:class2:class3:class5
+namespace {
+	namespace class2{
+	
+	}
+	namespace class22{
+	
+	}
+}	
+
+	

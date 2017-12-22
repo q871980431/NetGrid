@@ -3,8 +3,15 @@
 #include "Tools_time.h"
 #include "hmac.h"
 #include <map>
+#include <unordered_map>
+#include <vector>
+#include "Tools_file.h"
+#include "TCallBack.h"
+#include "MemberDef.h"
+
 Test * Test::s_self = nullptr;
 IKernel * Test::s_kernel = nullptr;
+
 
 void MyTimer::OnStart(IKernel *kernel, s64 tick)
 {
@@ -14,6 +21,7 @@ void MyTimer::OnStart(IKernel *kernel, s64 tick)
 void MyTimer::OnTime(IKernel *kernel, s64 tick)
 {
 	//ECHO("Call Time, time = %dms", (tick - _tick));
+    const IMember *meber = Root::id;
     _tick = tick;
 }
 
@@ -32,14 +40,25 @@ bool Test::Initialize(IKernel *kernel)
     name[3] = '\0';
     s32 size = name.size();
     ECHO("%s", name.c_str());
-    
+    TestPtr();
+    TestCallBack();
+
     return true;
 }
 
 bool Test::Launched(IKernel *kernel)
 {
     //TestLinkList();
-    TestBitMark();
+    //TestBitMark();
+    //TestKey();
+    //TestFiles();
+    const IMember *meber = Root::id;
+    std::vector<s32> ids;
+    s32 size = sizeof(ids);
+    for (s32 i = 0; i < 50; i++)
+        ids.push_back(i);
+    s32 size2 = sizeof(ids);
+
 	s64 now = tools::GetTimeMillisecond();
     MyTimer *timer = NEW MyTimer(1, now);
     s_kernel->StartTimer(timer, 3000, FOREVER, 1000, "my timer");
@@ -130,4 +149,71 @@ void Test::TestHmacSha1()
     std::string tmp("");
     CreateStr(buff, size, tmp);
     ECHO("%s,%d", tmp.c_str(), tmp.length());
+}
+
+void Test::TestKey()
+{
+    tools::KEYINT32 key32;
+    key32.hVal = 0;
+    key32.lVal = 1;
+    ECHO("Val = %d", key32.val);
+
+    key32.val = 0x11111111;
+    ECHO("vale h = %d, l = %d", key32.hVal, key32.lVal);
+    unsigned char tmp;
+    tmp = 1 - 2;
+    ECHO("tmp = %d", tmp);
+}
+void PrintfDirInfo(tools::DirInfo *dir);
+void Test::TestFiles()
+{
+    tools::DirInfo info;
+    char path[MAX_PATH];
+    SafeSprintf(path, sizeof(path), "%s/object/", s_kernel->GetEnvirPath());
+    FindDirectoryFiles(path, "xml", info);
+    PrintfDirInfo(&info);
+}
+
+void Test::TestPtr()
+{
+    char buff[256];
+    int a = 5;
+    int b = 6;
+    ECHO("Size ptr = %d, size ptr ptr = %d", sizeof(int*), sizeof(int **));
+    int *p = (int*)buff;
+    p = &a;
+    int *q = (int*)buff;
+    ECHO("%d", *q);
+}
+
+void PrintfDirInfo(tools::DirInfo *dir)
+{
+    ECHO("DirName:%s", dir->attr.name.GetString());
+    ECHO("File:");
+    for (auto iter : dir->files)
+        ECHO("name:%s", iter.second.name.GetString());
+    ECHO("%s SubDir:", dir->attr.name.GetString());
+    for (auto iter : dir->dirs)
+        PrintfDirInfo(&iter);
+}
+
+void func1(s32 val)
+{
+    ECHO("this is func 1, %d", val);
+}
+
+void func2(s32 val)
+{
+    ECHO("this is func 2, %d", val);
+}
+
+void Test::TestCallBack()
+{
+
+    typedef void(*CallFun)(s32);
+    tlib::TCallBack<s32, CallFun, s32> callPools;
+    callPools.RegisterCallBack(1, func1, "this is func 1");
+    callPools.RegisterCallBack(1, func2, "this is func 2");
+    callPools.Call(1, 1);
+    callPools.Call(1, 2);
 }

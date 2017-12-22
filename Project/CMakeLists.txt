@@ -65,6 +65,9 @@ SET(PUBLIC
     "${PUBLIC_DIR}/Tools_time.h"
     "${PUBLIC_DIR}/Tools_time.cpp"
     "${PUBLIC_DIR}/BitMark.h"	
+    "${PUBLIC_DIR}/Tools_file.h"
+    "${PUBLIC_DIR}/Tools_file.cpp"
+    "${PUBLIC_DIR}/TCallBack.h"	
 )
 SET(TINYXML_DIR
 	"${PUBLIC_DIR}/tinyxml2"
@@ -106,6 +109,15 @@ SET(THIRD_LIBRARIES_DEBUG_DIR
 SET(THIRD_LIBRARIES_RELEASE_DIR
 	"${PROJECT_SOURCE_DIR}/Thridlibrary/windows/release"
 )
+
+SET(OBJECT_LIBD
+	debug "${PROJECT_BINARY_DIR}/windows/debug/ObjectMgr.lib"
+)
+SET(OBJECT_LIB
+	optimized "${PROJECT_BINARY_DIR}/windows/Release/ObjectMgr.lib"
+)
+
+
 ENDIF(WIN32)
 
 SET(THIRD_LIBRARIES_INCLUDE_DIR
