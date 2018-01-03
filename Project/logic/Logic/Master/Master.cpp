@@ -25,7 +25,7 @@ bool Master::Initialize(IKernel *kernel)
 	const char *configFile = kernel->GetConfigFile();
 	if (!LoadConfigFile(configFile))
 		return false;
-	s_serviceGroup->StartService();
+	s_serviceGroup->StartService(s_kernel);
 
     return true;
 }
@@ -92,6 +92,13 @@ void Master::OnClose(s32 type, s32 nodeId)
 
 }
 
+bool Master::StartService(s8 slave, const char *name, s8 type, s32 id, const char *cmd)
+{
+	if (slave == core::INVALID)
+		s32 slave = s_self->GetBestNode(type);
+	return true;
+}
+
 void Master::OnRecvNodeHasReadyMsg(s32 type, s32 nodeId, const char *buff, s32 len)
 {
 	core::NODE_STATUS_UPDATE *msg = (core::NODE_STATUS_UPDATE *)buff;
@@ -148,3 +155,18 @@ bool Master::LoadConfigFile(const char *path)
 	return true;
 }
 
+s32 Master::GetBestNode(s8 type)
+{
+	s32 tmp = 0;
+	s32 ret = 0;
+	for (auto iter : s_slaves)
+	{
+		if (tmp == 0 || tmp < iter.second.weighted)
+		{
+			tmp = iter.second.weighted;
+			ret = iter.first;
+		}
+	}
+
+	return ret;
+}

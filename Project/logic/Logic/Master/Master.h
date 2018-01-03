@@ -24,6 +24,7 @@ struct  NodeInfo
 {
 	s32 nodeId;
 	s8  state;
+	s32 weighted;
 };
 
 
@@ -42,11 +43,14 @@ public:
     virtual void OnOpen(s32 type, s32 nodeId, const char *ip, s16 port);
     virtual void OnClose(s32 type, s32 nodeId);
 
+public:
+	static bool StartService(s8 slave, const char *name, s8 type, s32 id, const char *cmd);
 private:
 	void OnRecvNodeHasReadyMsg(s32 type, s32 nodeId, const char *buff, s32 len);
 
 private:
 	bool LoadConfigFile(const char *path);
+	s32  GetBestNode(s8 type);
 protected:
 private:
     static Master     * s_self;

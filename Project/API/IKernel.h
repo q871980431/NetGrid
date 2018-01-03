@@ -175,4 +175,10 @@ namespace core
         virtual const char * GetCmdArg(const char *name) = 0;
     };
 }
+
+#define ADD_TIMER(timer, delay, count, interval) {\
+	char trace[256];\
+	SafeSprintf(trace, sizeof(trace), "trace: %s:%d", __FILE__, __LINE__);\
+	kernel->StartTimer(timer, delay, count, interval, trace);\
+}
 #endif

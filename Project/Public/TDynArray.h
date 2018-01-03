@@ -5,7 +5,7 @@
 
 namespace tlib{
 
-    template <class T, int INITIAL_SIZE>
+    template <class T, int INITIAL_SIZE = 16>
     class TDynArray
     {
     public:

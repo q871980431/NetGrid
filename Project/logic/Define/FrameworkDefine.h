@@ -8,6 +8,8 @@ namespace core
 	const static s32 EVENT_LOCK_NUM_MAX = 128;
 	const static s32 NODE_CMD_LEN = 256;
 	const static s16 NODE_TYPE_MAX = 4096;
+	const static s32 INVALID = -1;
+
     enum NODE_MSG_ID
     {
         NODE_MSG_LOGIN_MASTER   =  1,
@@ -62,6 +64,14 @@ namespace core
 	struct NODE_STATUS_UPDATE 
 	{
 		s32 status;
+	};
+
+	struct NODE_MSG_SATRT_SERVICE
+	{
+		char name[NODE_NAME_LEN];
+		s8 type;
+		s32 id;
+		char cmd[NODE_CMD_LEN];
 	};
 
 	namespace event {
