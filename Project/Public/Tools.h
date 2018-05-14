@@ -9,7 +9,7 @@
 #include<libgen.h>
 #endif
 
-unsigned int  Radnom();
+u32  Radnom();
 namespace tools{
 
 #pragma  pack (push, 4)             //°´4×Ö½Ú¶ÔÆë
@@ -81,7 +81,7 @@ namespace tools{
 #endif
         const char * GetAppPath();
         s32 HashKey(const char *content);
-        int GetRandom(int nA, int nB);
+        s32 GetRandom(s32 nA, s32 nB);
 #ifdef __cplusplus
     }
 #endif

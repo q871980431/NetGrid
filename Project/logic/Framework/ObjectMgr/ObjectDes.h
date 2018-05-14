@@ -74,7 +74,7 @@ struct TableMember
 {
     std::vector<Memeroy> members;
     std::unordered_map<s64, Memeroy *> index;
-    MemberDes   *des;
+    const MemberDes   *des;
 };
 
 typedef std::vector<MemberProperty> PropertyLists;
@@ -92,10 +92,12 @@ public:
     void Fix();
     void GetProperty(PropertyLists &propertys);
     const char * GetMemeoryName() const { return _name.GetString(); };
+
 public:
     void *  CreateMemeory(s32 &size);
     void    DestoryMemeory(void *memeory) const;
     s32 GetMemorySize() const { ASSERT(_fix, "error"); return _allSize; };
+
 public:
     void RegisterMemberChangeCallBack(void *object, const MemberProperty *member, MEMBER_ONCHANGE_CB callBack, const char *debug);
     void UnRegisterMemberChangeCallBack(void *object, const MemberProperty *member, MEMBER_ONCHANGE_CB callBack);
@@ -133,7 +135,7 @@ public:
         return (void *)((char *)addr + member->offset);
     }
 public:
-    inline Memeroy * TableAddRow(TableMember *table)const
+    static inline Memeroy * TableAddRow(TableMember *table)
     {
         Memeroy memeroy;
         memeroy.addr = table->des->memeoryDes->CreateMemeory(memeroy.size);
@@ -148,7 +150,8 @@ public:
         for (auto member : table->members)
             table->des->memeoryDes->ReleaseMemeory(member.addr, member.size);
     }
-    inline s16 Count(void *addr)const
+
+    static inline s16 RowCount(void *addr)
     {
         TableMember *table = (TableMember *)addr;
         return (s16)(table->members.size());
@@ -161,7 +164,7 @@ public:
         return &table->members[index];
     }
 
-    inline Memeroy *CreateRow(void *addr)const
+    static inline Memeroy *CreateRow(void *addr)
     {
         TableMember *table = (TableMember *)addr;
         return TableAddRow(table);
@@ -189,4 +192,29 @@ private:
     bool                     _common;
     bool                     _fix;
 };
+
+class CommonObject : public IObject
+{
+public:
+	CommonObject(void *data) :_data(data) {};
+	virtual ~CommonObject() {};
+
+	virtual s32 GetMemberS32(const IMember *member) { return GetAttrT<s32>(member); };
+	virtual s64 GetMemberS64(const IMember *member) { return GetAttrT<s64>(member); };
+	virtual ITable  * GetTable(const IMember *member);
+public:
+	inline void * GetData() { return _data; };
+
+	template< typename T>
+	inline T GetAttrT(const IMember *member)
+	{
+		const MemeoryDes **des = (const MemeoryDes **)(_data);
+		return (*des)->GetAttrT<T>(_data, (const MemberProperty *)member);
+	}
+
+protected:
+private:
+	void *_data;
+};
+
 #endif

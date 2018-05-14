@@ -33,9 +33,16 @@ public:
     virtual bool Launched(IKernel *kernel);
     virtual bool Destroy(IKernel *kernel);    
 
+	virtual IObject * CreateObject(const char *fullName);
+public:
     virtual s32  GetAttrInt32(void *object, const MemberProperty *member);
     virtual void SetAttrInt32(void *object, const MemberProperty *member, s32 val);
-
+public:
+	void    *	 FindChildObj(void *object, const MemberProperty *member);
+public:
+	void	*	 FindTable(void *object, const MemberProperty *member);
+	s32			 GetRowCount(void *table);
+	void	*	 CreateRow(void *table);
 public:
     static void *CreateObj(const char *fullName);
     static const MemberProperty *GetMemberProperty(const char * fullName);

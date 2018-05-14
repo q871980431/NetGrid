@@ -1,10 +1,12 @@
 #include "Tools.h"
 #include <string>
-unsigned int  Radnom()
+#include <random>
+u32  Radnom()
 {
-	static unsigned int  sRandom = 16807;
-	sRandom = (214013 * sRandom + 2531011)&0x7FFFFFFF;
-	return sRandom;
+	static std::random_device dev;
+	static std::default_random_engine eng(dev());
+	static std::uniform_int_distribution<u32> distribution;
+	return distribution(eng);
 }
 
 
@@ -48,10 +50,12 @@ extern "C" {
         return hash;
     }
 
-    int GetRandom(int nA, int nB)
+    s32 GetRandom(s32 nA, s32 nB)
     {
+		if (nA == nB)return nA;
+
         if (nB < nA)std::swap(nA, nB);
-        return nA + Radnom() % nB;
+        return nA + Radnom() % (nB-nA);
     }
 
 

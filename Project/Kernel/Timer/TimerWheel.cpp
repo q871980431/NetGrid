@@ -26,15 +26,30 @@ void TimerBase::Exec(core::IKernel *kernel, s64 tick)
 		}
 		else
 		{
-			_timer->SetBase(nullptr);
-			_timer->OnTerminate(kernel, tick);
+			End(kernel, tick);
 			Release();
 		}
 	}
 	else {
+		End(kernel, tick);
+		Release();
+	}
+}
+
+void TimerBase::Kill(core::IKernel *kernel, s64 tick)
+{
+	_kill = true;
+	_count = 0;
+	End(kernel, tick);
+}
+
+void TimerBase::End(core::IKernel *kernel, s64 tick)
+{
+	if (!_remove)
+	{
 		_timer->SetBase(nullptr);
 		_timer->OnTerminate(kernel, tick);
-		Release();
+		_remove = true;
 	}
 }
 

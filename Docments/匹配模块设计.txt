@@ -1,0 +1,84 @@
+匹配模块
+分值匹配
+
+对集合进行匹配
+
+目标:
+	几个个体完成 
+
+
+由两个步骤
+	1, 提交匹配参数配置
+	
+	单人匹配
+	
+	
+	组队匹配
+	
+	
+	
+	
+对一个区间段 进行分块
+begin 
+
+step
+
+end
+
+
+匹配节点
+	
+膨胀步进
+
+递增
+
+区间 
+步进
+
+
+膨胀时延
+膨胀步进 
+膨胀策略 
+
+As1 	Av1		Ae1
+	Bs1 	Bv1		Be1
+	
+As1		Ts1 Te1  Ae1
+	Bs		Bv 		Be
+	Bs Ts1 Bv 
+		
+判定
+	Bs1 > Av1	Del	A					1 Bs1 > Av1 相离 
+	Be1 < Av1   Create New stack		2 Be1 < Av1 内包含	CreateB
+	begin 5000	10000	50 3			3
+
+满足条件
+	Bs1 <= Av1 &&
+	Bv1 <= Ae1
+
+3	
+	5500	5500-5550
+	
+			5450-5600
+			
+
+2	*
+
+* num =10
+  id =
+  
+  采用递归
+  
+  (a1, a2) (b1, b2)
+  (max(a1,b1), min(a2, b2))
+  如果存在集合(m, n)
+  max(a1, b1) min(a2, b2)
+  
+  相离
+	1 b1 > a2	(b1, a2)	OK
+	2 b2 < a1	(a1, b2)	OK
+	
+  相交
+	1, b1 >= a1 && b1 < a2 (b1, min(a2, b2)) OK
+	2, b1 <= a1 && b2 > a1 (a1, min(a2, b2)) OK
+	

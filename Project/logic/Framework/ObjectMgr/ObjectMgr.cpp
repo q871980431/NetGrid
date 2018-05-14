@@ -8,9 +8,8 @@
 #include "ObjectMgr.h"
 #include "Tools.h"
 #include "XmlReader.h"
-#include "MemberDefine.h"
 #include "ObjectMember.h"
-
+#include "MemberDef.h"
 ObjectMgr * ObjectMgr::s_self = nullptr;
 IKernel * ObjectMgr::s_kernel = nullptr;
 MemeoryMap ObjectMgr::s_memeoryMap;
@@ -39,7 +38,16 @@ bool ObjectMgr::Launched(IKernel *kernel)
     wingId = GetAttrInt32(data, propWingid);
     ReleaseObj(data);
     ObjectMember::Init();
-
+	void *player = CreateObj("logic::player");
+	void *winBag = FindTable(player, (const MemberProperty *)Logic::Player::wingbag);
+	void *bagRow = CreateRow(winBag);
+	void *wing = FindChildObj(bagRow, (const MemberProperty *)Logic::Player::Wingbag::wing);
+	s32 a = GetAttrInt32(wing, (const MemberProperty *)Logic::Wing::wingid);
+	SetAttrInt32(wing, (const MemberProperty *)Logic::Wing::wingid, 20);
+	a = GetAttrInt32(wing, (const MemberProperty *)Logic::Wing::wingid);
+	s32 b = GetAttrInt32(bagRow, (const MemberProperty *)Logic::Player::Wingbag::Wing::wingid);
+	SetAttrInt32(bagRow, (const MemberProperty *)Logic::Player::Wingbag::Wing::wingid, 30);
+	s32 c = GetAttrInt32(wing, (const MemberProperty *)Logic::Wing::wingid);
     return true;
 }
 
@@ -49,6 +57,11 @@ bool ObjectMgr::Destroy(IKernel *kernel)
     return true;
 }
 
+IObject * ObjectMgr::CreateObject(const char *fullName)
+{
+	void *data = CreateObj(fullName);
+	return NEW CommonObject(data);
+}
 s32 ObjectMgr::GetAttrInt32(void *object, const MemberProperty *member)
 {
     const MemeoryDes **des = (const MemeoryDes **)((char*)object);
@@ -61,6 +74,29 @@ void ObjectMgr::SetAttrInt32(void *object, const MemberProperty *member, s32 val
     const MemeoryDes **des = (const MemeoryDes **)object;  
     (*des)->SetAttrT(object, member, val);
 }
+
+void * ObjectMgr::FindChildObj(void *object, const MemberProperty *member)
+{
+	const MemeoryDes **des = (const MemeoryDes **)object;
+	return (*des)->GetChildObj(object, member);
+}
+
+void * ObjectMgr::FindTable(void *object, const MemberProperty *member)
+{
+	const MemeoryDes **des = (const MemeoryDes **)object;
+	return (*des)->GetChildObj(object, member);
+}
+
+s32 ObjectMgr::GetRowCount(void *table)
+{
+	return MemeoryDes::RowCount(table);
+}
+
+void * ObjectMgr::CreateRow(void *table)
+{
+	return MemeoryDes::CreateRow(table)->addr;
+}
+
 
 void OnSetAttrCallBack(void *object, const MemberProperty *member, void *context, s32 size)
 {

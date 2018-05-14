@@ -4,6 +4,7 @@
 
 #define  FIND_MODULE(module, name) {\
     module = (I##name * )(s_kernel->FindModule(#name));\
+	ASSERT(module != nullptr, "don't find module,module name = %s", #name);\
 }
 #define FOREVER	-1
 

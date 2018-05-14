@@ -25,11 +25,13 @@ public:
 	virtual const char * GetTraceInfo() { return _trace.GetString(); };
 
 	void Exec(core::IKernel *kernel, s64 tick);
+	void Kill(core::IKernel *kernel, s64 tick);
+	void End(core::IKernel *kernel, s64 tick);
+
 	inline void SetExpires(u32 expires) { _expires = expires; };
 	inline u32 GetExpires() { return _expires; };
 	inline TimerWheel * GetTimerWheel() { return _wheel; };
 	inline void SetTimerWheel(TimerWheel *timerWheel) { _wheel = timerWheel; };
-	inline void Kill() { _kill = true; };
 private:
 	TimerBase(core::ITimer *timer, s32 count, s32 interval, const char *trace) :_trace(trace),_expires(0)
 		,_wheel(nullptr), _frist(true), _kill(false){
@@ -46,6 +48,7 @@ private:
 	s32 _interval;
 	bool _frist;
 	bool _kill;
+	bool _remove;
 	tlib::TString<TRACE_LEN> _trace;
 
 	static tlib::TDynPool<TimerBase> s_pool;

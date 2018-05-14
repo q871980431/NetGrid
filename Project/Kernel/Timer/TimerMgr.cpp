@@ -24,5 +24,6 @@ void TimerMgr::KillTimer(core::ITimer *timer)
 {
 	ASSERT(timer->GetBase() != nullptr, "error");
 	TimerBase *base = (TimerBase *)timer->GetBase();
-	base->Kill();
+	s64 tick = tools::GetTimeMillisecond();
+	base->Kill(_kernel, tick);
 }

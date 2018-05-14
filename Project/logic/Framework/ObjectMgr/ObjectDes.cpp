@@ -213,7 +213,7 @@ void MemeoryDes::InitMemeory(void *addr, s32 size) const
     tools::SafeMemset(addrTmp, size - offset, 0, _podsSize);
     addrTmp += _podsSize;
 
-    for (auto obj : _objs)
+    for (auto &obj : _objs)
     {
         ASSERT(addrTmp + obj.des.memeoryDes->_allSize - addr <= size, "error");
         obj.des.memeoryDes->InitMemeory(addrTmp, obj.des.memeoryDes->_allSize);
@@ -222,11 +222,11 @@ void MemeoryDes::InitMemeory(void *addr, s32 size) const
 
     if (_tables.size() > 0)
     { 
-        for (auto table : _tables)
+        for (auto &table : _tables)
         {
             ASSERT(addrTmp + sizeof(TableMember) - addr <= size, "error");
             TableMember *tableMem = NEW(addrTmp)TableMember();
-            tableMem->des = &table.des;
+            tableMem->des = &(table.des);
             addrTmp += sizeof(TableMember);
         }
     }
@@ -269,4 +269,9 @@ void MemeoryDes::UnRegisterMemberChangeCallBack(void *object, const MemberProper
     }
     MemberChangeCallPool *pool = (MemberChangeCallPool *)((char*)object + sizeof(const MemeoryDes **));
     pool->UnRegisterCallBack(member, callBack);
+}
+
+ITable * CommonObject::GetTable(const IMember *member)
+{
+	return nullptr;
 }

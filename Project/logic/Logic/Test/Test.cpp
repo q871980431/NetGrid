@@ -8,6 +8,7 @@
 #include "Tools_file.h"
 #include "TCallBack.h"
 #include "MemberDef.h"
+#include "TestMatch.h"
 
 Test * Test::s_self = nullptr;
 IKernel * Test::s_kernel = nullptr;
@@ -20,7 +21,7 @@ void MyTimer::OnStart(IKernel *kernel, s64 tick)
 
 void MyTimer::OnTime(IKernel *kernel, s64 tick)
 {
-	//ECHO("Call Time, time = %dms", (tick - _tick));
+	ECHO("Call Time, time = %dms", (tick - _tick));
     const IMember *meber = Root::id;
     _tick = tick;
 }
@@ -52,6 +53,7 @@ bool Test::Launched(IKernel *kernel)
     //TestBitMark();
     //TestKey();
     //TestFiles();
+	TestMatch::Test(s_kernel);
     const IMember *meber = Root::id;
     std::vector<s32> ids;
     s32 size = sizeof(ids);
@@ -60,8 +62,8 @@ bool Test::Launched(IKernel *kernel)
     s32 size2 = sizeof(ids);
 
 	s64 now = tools::GetTimeMillisecond();
-    MyTimer *timer = NEW MyTimer(1, now);
-    s_kernel->StartTimer(timer, 3000, FOREVER, 1000, "my timer");
+    //MyTimer *timer = NEW MyTimer(1, now);
+    //s_kernel->StartTimer(timer, 3000, FOREVER, 1000, "my timer");
 
     return true;
 }
