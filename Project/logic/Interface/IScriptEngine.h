@@ -16,5 +16,6 @@ public:
     virtual ~IScriptEngine(){};
     virtual IDataInterchangeCaller * PrepareCall( const char *module, const char * func) = 0;
     virtual void RegModuleFunc(const char *module, const char *func, const IDataInterchangeFuncType &f, const char *debug) = 0;
+	virtual void CallScriptFunc(const char *module, const char *func, const IDataOutputFuncType &outPutFunc, const IDataCallBackFuncType &callBackFun) = 0;
 };
 #endif

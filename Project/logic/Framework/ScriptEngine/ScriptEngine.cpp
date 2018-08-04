@@ -25,12 +25,13 @@ bool ScriptEngine::Initialize(IKernel *kernel)
     char scriptPath[MAX_PATH];
     const char *envi = s_kernel->GetEnvirPath();
     SafeSprintf(scriptPath, sizeof(scriptPath), "%s/script", envi);
+	ECHO("LUA PATH:%s", scriptPath);
     SetSearchPath(scriptPath);
     s32 topIndex = lua_gettop(s_luaState);
     ExecScriptFile(LINK_FILE_NAME);
     topIndex = lua_gettop(s_luaState);
 
-    ReplacePrint();
+    //ReplacePrint();
     lua_getglobal(s_luaState, LUA_TRACE_NAME);
 
 
@@ -39,13 +40,32 @@ bool ScriptEngine::Initialize(IKernel *kernel)
 
 bool ScriptEngine::Launched(IKernel *kernel)
 {
+	ECHO("Script Engine Launched***************");
     s_self->RegModuleFunc("test", "TestAdd", TestAdd, "**************");
+	s_self->RegModuleFunc("test", "TestFunc", TestFunc, "**************");
+	
 
-    IDataInterchangeCaller *caller = s_self->PrepareCall("npc.xuping", "OnStart");
-    IDataOutputStream *ostream = caller->GetOutputStream();
-    ostream->WriteInt32(1);
-    ostream->WriteInt32(2);
-    caller->Call(s_kernel, nullptr);
+    //IDataInterchangeCaller *caller = s_self->PrepareCall("npc.xuping", "OnStart");
+    //IDataOutputStream *ostream = caller->GetOutputStream();
+    //ostream->WriteInt32(1);
+    //ostream->WriteInt32(2);
+    //caller->Call(s_kernel, nullptr);
+
+	//caller = s_self->PrepareCall("npc.xuping", "Computer");
+	//ostream = caller->GetOutputStream();
+	//ostream->WriteInt32(10);
+	//caller->Call(s_kernel, nullptr);
+
+	auto f = [](IKernel *kernel, IDataOutputStream &output)
+	{
+		output.WriteInt32(2);
+	};
+	s32 ret = 0;
+	auto callFun = [&ret](IKernel *kernel, IDataInputStream &input)
+	{
+		input.ReadInt32(ret);
+	};
+	CallScriptFunc("npc.xuping", "test", f, callFun);
 
     return true;
 }
@@ -94,6 +114,33 @@ void ScriptEngine::RegModuleFunc(const char *module, const char *func, const IDa
     lua_pop(s_luaState, 3);
 }
 
+void ScriptEngine::CallScriptFunc(const char *module, const char *func, const IDataOutputFuncType &outPutFunc, const IDataCallBackFuncType &callBackFun)
+{
+	LuaInterchangeCaller caller(this, s_luaState);
+	caller.PreCall(module, func);
+	if (outPutFunc != nullptr)
+	{
+		IDataOutputStream *outStream = caller.GetOutputStream();
+		outPutFunc(s_kernel, *outStream);
+	}
+	caller.Call(s_kernel, callBackFun);
+}
+
+s32 ScriptEngine::CallLuaFuncAdd(s32 a, s32 b)
+{
+	lua_pushstring(s_luaState, "npc.xuping");
+	lua_pushstring(s_luaState, "Add");
+	lua_pushinteger(s_luaState, a);
+	lua_pushinteger(s_luaState, b);
+	s32 ret = 0;
+	auto func = [&ret](IKernel *kernel, IDataInputStream &input)
+	{
+		input.ReadInt32(ret);
+	};
+	ExecGlobalFunction(CALL_FUNCTION, 4, func);
+	return ret;
+}
+
 void ScriptEngine::TestCallLuaFunction()
 {
     lua_getglobal(s_luaState, "test");
@@ -138,6 +185,7 @@ int ScriptEngine::LuaCall(lua_State *state)
 
 int ScriptEngine::Log(lua_State *state)
 {
+	ECHO("Enter Script Engine Log");
     tlib::TString<4096> content;
     luaL_where(state, 1);
     content << lua_tostring(state, -1);
@@ -221,13 +269,42 @@ bool ScriptEngine::ExecFunction(s8 argc, const IDataCallBackFuncType callback)
 void ScriptEngine::ReplacePrint()
 {
     lua_register(s_luaState, "print", Log);
-    //lua_pushcclosure(s_luaState, Log, 0);
-    //lua_setglobal(s_luaState,)
+    //lua_pushcclosure(s_luaState, Log, 0);//lua_setglobal(s_luaState,)
 }
 
 void ScriptEngine::TestAdd(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out)
 {
     s32 a, b;
     input.ReadInt32(a)->ReadInt32(b);
-    out.WriteInt32(a + b);
+	if (b == 0)
+	{
+		out.WriteInt32(1);
+		return;
+	}
+	s32 ret = s_self->CallLuaFuncAdd(a, b-1);
+    out.WriteInt32(ret);
+}
+
+void ScriptEngine::TestFunc(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out)
+{
+	s32 a;
+	input.ReadInt32(a);
+	if (a == 0)
+	{
+		out.WriteInt32(0);
+	}
+	else
+	{
+		auto f = [a](IKernel *kernel, IDataOutputStream &output)
+		{
+			output.WriteInt32(a);
+		};
+		s32 ret = 0;
+		auto callBack = [&ret](IKernel *kernel, IDataInputStream &input)
+		{
+			input.ReadInt32(ret);
+		};
+		s_self->CallScriptFunc("npc.xuping", "test", f, callBack);
+		out.WriteInt32(ret);
+	}
 }

@@ -26,6 +26,9 @@ public:
     virtual bool Destroy(IKernel *kernel);
     virtual IDataInterchangeCaller * PrepareCall(const char *module, const char * func);
     virtual void RegModuleFunc(const char *module, const char *func, const IDataInterchangeFuncType &f, const char *debug);
+	virtual void CallScriptFunc(const char *module, const char *func, const IDataOutputFuncType &outPutFunc, const IDataCallBackFuncType &callBackFun);
+
+	s32 CallLuaFuncAdd(s32 a, s32 b);
 public:
     bool ExecGlobalFunction(const char *func, s8 argc, const IDataCallBackFuncType callback);
 private:
@@ -39,6 +42,7 @@ private:
     static int LuaCall(lua_State *state);
     static int Log(lua_State *state);
     static void TestAdd(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out);
+	static void TestFunc(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out);
 private:
     static ScriptEngine     * s_self;
     static IKernel  * s_kernel;

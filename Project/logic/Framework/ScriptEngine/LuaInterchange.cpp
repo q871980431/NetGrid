@@ -71,6 +71,11 @@ IDataInputStream * LuaInputStream::ReadStr(const char *&val)
     if (_index < _count)
     {
         val = lua_tostring(_luaState, ++_index);
+		lua_len(_luaState, _index);
+		size_t len = lua_tointeger(_luaState, -1);
+		lua_pop(_luaState, 1);
+		ASSERT(val[len] == 0, "error");
+		ASSERT(strlen(val) <= len, "error");
     }
 
     return this;
@@ -203,5 +208,12 @@ void LuaInterchangeCaller::Call(IKernel *kernel, const IDataCallBackFuncType &fu
     _scriptEngine->ExecGlobalFunction(CALL_FUNCTION, _input.Count(), fun);
     s32 indexTop = lua_gettop(_luaState);
     ASSERT(indexTop == _topIndex, "error");
+	if (indexTop != _topIndex)
+	{
+		IKernel *_kernel = kernel;
+		TRACE_LOG("Call lua function error");
+	}
+
+	_use = false;
 }
 

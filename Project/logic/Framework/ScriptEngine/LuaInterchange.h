@@ -23,6 +23,7 @@ public:
     virtual IDataInputStream * ReadBlob(const char *&val, s32 &size);
     virtual IDataInputStream * ReadPtr(void *&val, const char *type);
     virtual IDataInputStream * Reset();
+	virtual s32				   GetCount() { return _count; };
 protected:
 private:
     lua_State   *_luaState;

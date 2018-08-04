@@ -16,6 +16,7 @@ public:
     virtual IDataInputStream * ReadBlob(const char *&val, s32 &size) = 0;
     virtual IDataInputStream * ReadPtr(void *&val, const char *type) = 0;
     virtual IDataInputStream * Reset() = 0;
+	virtual s32				   GetCount() = 0;
 };
 
 class IDataOutputStream
@@ -34,6 +35,7 @@ public:
 
 typedef std::function<void(IKernel *kernel, IDataInputStream &input)> IDataCallBackFuncType;
 typedef std::function<void(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out)> IDataInterchangeFuncType;
+typedef std::function<void(IKernel *kernel, IDataOutputStream &output)> IDataOutputFuncType;
 
 class IDataInterchangeCaller
 {

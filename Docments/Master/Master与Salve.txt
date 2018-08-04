@@ -4,17 +4,40 @@ Master主要用来管理一组网络节点
 	各个网络节点状态信息	--ping
 	网络节点组网			--
 	管理可用物理机信息		--slavemgr
+	
 	服务器组状态管理		--ServiceGroup		
 	
 slavemgr 用于管理各slave 同时提供最优slave能力
+
 ServiceGroup 用于管理各Service 包括状态监测等等
+	核心,
+		服务管控
+		动态扩容	這个是可以做到的
+		平滑升级 是否需要考虑，待商榷
+		
+	提示:可以参考腾讯的L5组件方式，进行质量控制 散发对负载控制的处理
+ServiceGroup侧
+	1, 负责Service的生命周期管理
+		A,创建Service
+		B,注销Service
+		
+	2,ServiceGroup 对Service 所处状态进行处理
+		A,对ServiceGroup状态进行更新,同时做出相应的管理操作,诸如 在某服务整体处于过载状态时,进行扩容处理
+		B,维持各服务的实例的服务状态同步, 以便于对各服务提供 服务抉择服务和能否路由服务
+		
+		注:
+			各Service通告ServiceGroup状态 诸如	正常 过载 拒绝服务
+			各Service可根据ServiceGroup的状态 进行相关业务处理
 	
-	ServiceGroup 会向各Service通告ServiceGroup状态 诸如	正常 过载 拒绝服务
+	
+Service侧
+	1,Service会向ServiceGroup汇报自己的状态信息
+	
 	
 	
 slave 主要用来管理物理机可用资源和创建网络节点
 	管理物理机信息			--cpu 内存 网络端口	
-	创建和关闭网络节点		
+	创建和关闭网络节点
 	
 状态管理组件, 依赖于事件系统支持
 	抽象层
@@ -34,5 +57,6 @@ slave 主要用来管理物理机可用资源和创建网络节点
 		允许,需求方在条件满足时,可
 		
 Master 与 Slave关系
-Master 
+
+可能需要在FramWork层加入FramWorkCore这种存在
 	
