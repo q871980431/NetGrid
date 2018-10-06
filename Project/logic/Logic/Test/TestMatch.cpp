@@ -2,7 +2,8 @@
 #include "ISearch.h"
 #include "Tools.h"
 #include "Tools_time.h"
-
+#include <map>
+#include <algorithm>
 core::IKernel * TestMatch::s_kernel = nullptr;
 ISearch * TestMatch::s_search = nullptr;
 s64 *g_ids = nullptr;
@@ -11,8 +12,13 @@ s32 *g_scores = nullptr;
 void TestMatch::Test(core::IKernel *kernel)
 {
 	s_kernel = kernel;
-	FIND_MODULE(s_search, Search);
+	//FIND_MODULE(s_search, Search);
 
+    std::map<s32, s32, std::greater<s32>> playerScore;
+    for (s32 i = 0; i < 10; i++)
+    {
+        playerScore.insert(std::make_pair(i, i));
+    }
 
 	TestIndividualSearch();
 }
