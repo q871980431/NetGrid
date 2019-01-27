@@ -9,6 +9,8 @@
 #include "TCallBack.h"
 #include "MemberDef.h"
 #include "TestMatch.h"
+#include <set>
+#include "ObjectTest.h"
 
 Test * Test::s_self = nullptr;
 IKernel * Test::s_kernel = nullptr;
@@ -49,11 +51,36 @@ bool Test::Initialize(IKernel *kernel)
 
 bool Test::Launched(IKernel *kernel)
 {
-    //TestLinkList();
+	//ObjectTest objTest(kernel);
+	//objTest.Initialize(kernel);
+    TestLinkList();
     //TestBitMark();
     //TestKey();
     //TestFiles();
-	TestMatch::Test(s_kernel);
+	//TestMatch::Test(s_kernel);
+	IKernel *_kernel = kernel;
+	TRACE_LOG("test:%d, %d", 1, 2);
+	s32 tmp = 0;
+	TestLamda(tmp);
+	typedef std::map<s32, s32> PlayerScore;
+	PlayerScore scoreMap;
+	for (s32 i = 0; i < 10; i++)
+	{
+		scoreMap.insert(std::make_pair(i, i));
+	}
+	typedef std::map<s32, PlayerScore> TestMap;
+	TestMap testMap;
+	//if (testMap[1].find(1) == testMap[1].end())
+	//{
+	//	return true;
+	//}
+
+	std::set<s32, std::greater<s32>> sets;
+	for (s32 i = 0; i < 10; i++)
+	{
+		sets.insert(i);
+	}
+
     const IMember *meber = Root::id;
     std::vector<s32> ids;
     s32 size = sizeof(ids);
@@ -113,9 +140,18 @@ void Test::TestLinkList()
     while (node)
     {
         Player *tmp = (Player *)node;
-        //tmp->Printf();
+        tmp->Printf();
         node = node->_next;
     }
+	players.TailMerge(&player1);
+	node = players.Head();
+	while (node)
+	{
+		Player *tmp = (Player *)node;
+		tmp->Printf();
+		node = node->_next;
+	}
+	printf("End");
 }
 
 void Test::TestBitMark()
@@ -218,4 +254,15 @@ void Test::TestCallBack()
     callPools.RegisterCallBack(1, func2, "this is func 2");
     callPools.Call(1, 1);
     callPools.Call(1, 2);
+}
+
+void Test::TestLamda(s32 &a)
+{
+	auto f = [a]()mutable
+	{
+		a = 5;
+	};
+	f();
+	s32 b = a + 1;
+	return;
 }

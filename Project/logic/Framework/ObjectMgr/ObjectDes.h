@@ -86,7 +86,7 @@ public:
 
     typedef std::vector<MemeoryMemberInfo> MemberSlots;
     MemeoryDes(const char *name, const MemeoryDes *des, bool common);
-    ~MemeoryDes();
+	~MemeoryDes() {};
 
     void AddMember(MemberDes &des);
     void Fix();
@@ -98,9 +98,16 @@ public:
     void    DestoryMemeory(void *memeory) const;
     s32 GetMemorySize() const { ASSERT(_fix, "error"); return _allSize; };
 
+	IObject * CreateObject();
+	void	DestoryObject(IObject *obj) const;
+	inline IObject * GetObject(void *ptr) {
+		char *tmpObj = (char*)ptr + sizeof(MemeoryDes **);
+		return (IObject *)((char*)ptr + sizeof(MemeoryDes **));
+	};
 public:
     void RegisterMemberChangeCallBack(void *object, const MemberProperty *member, MEMBER_ONCHANGE_CB callBack, const char *debug);
     void UnRegisterMemberChangeCallBack(void *object, const MemberProperty *member, MEMBER_ONCHANGE_CB callBack);
+	inline MemberChangeCallPool * GetCallPoolPtr(void *addr) const;
 public:
     template <typename T>
     void SetAttrT(void *addr, const MemberProperty *member, T val)const
@@ -117,7 +124,7 @@ public:
             memcpy((char *)addr + member->offset, conext, size);
             if (!(*des)->_common)
             {
-                MemberChangeCallPool *pool = (MemberChangeCallPool *)((char*)addr + sizeof(const MemeoryDes **));
+                MemberChangeCallPool *pool = GetCallPoolPtr(addr);
                 pool->Call(member, addr, member, conext, size);
                 pool->Call(nullptr, addr, member, conext, size);
             }
@@ -201,8 +208,16 @@ public:
 
 	virtual s32 GetMemberS32(const IMember *member) { return GetAttrT<s32>(member); };
 	virtual s64 GetMemberS64(const IMember *member) { return GetAttrT<s64>(member); };
+
+	virtual void SetMemberS32(const IMember *member, s32 val) { SetAttrT<s32>(member, val); };
+	virtual void SetMemberS64(const IMember *member, s64 val) { SetAttrT<s64>(member, val); };;
+
 	virtual ITable  * GetTable(const IMember *member);
 public:
+	inline void Release() {
+		const MemeoryDes **des = (const MemeoryDes **)(_data);
+		(*(const MemeoryDes **)(_data))->DestoryObject(this);
+	};
 	inline void * GetData() { return _data; };
 
 	template< typename T>
@@ -211,10 +226,48 @@ public:
 		const MemeoryDes **des = (const MemeoryDes **)(_data);
 		return (*des)->GetAttrT<T>(_data, (const MemberProperty *)member);
 	}
+	template< typename T>
+	inline void SetAttrT(const IMember *member, T val)
+	{
+		const MemeoryDes **des = (const MemeoryDes **)(_data);
+		(*des)->SetAttrT<T>(_data, (const MemberProperty *)member, val);
+	}
 
 protected:
 private:
 	void *_data;
 };
 
+class TableObject : public ITable
+{
+public:
+	TableObject( TableMember *tableMember) :_tableMember(tableMember){};
+	~TableObject() {};
+
+	IObject * TableAddRow(TableMember *table)
+	{
+		Memeroy memeroy;
+		memeroy.addr = table->des->memeoryDes->CreateMemeory(memeroy.size);
+		ASSERT(memeroy.addr != nullptr, "error");
+		table->members.push_back(memeroy);
+		return table->des->memeoryDes->GetObject(memeroy.addr);
+	}
+
+	inline IObject *GetRow(s16 index)const
+	{
+		ASSERT(index < _tableMember->members.size(), "error");
+		if (index < _tableMember->members.size())
+			_tableMember->des->memeoryDes->GetObject(&_tableMember->members[index].addr);
+
+		return nullptr;
+	}
+
+	IObject * FindRowByKey(s16 key)
+	{
+		return nullptr;
+	}
+
+private:
+	TableMember	*_tableMember;
+};
 #endif

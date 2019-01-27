@@ -18,7 +18,7 @@ bool Modulemgr::Initialize()
 
 bool Modulemgr::Destroy()
 {
-    IKernel *_kernel = s_kernel;
+    IKernel *kernel = s_kernel;
     for (auto iter : _modules)
     {
         if (!iter.second->Destroy(s_kernel))
@@ -40,7 +40,7 @@ IModule * Modulemgr::FindModule(const char *name)
 
 bool Modulemgr::LoadModule()
 {
-    IKernel *_kernel = s_kernel;
+    IKernel *kernel = s_kernel;
     const ModuleConfigs *config = Configmgr::GetInstance()->GetModuleConfig();
     char path[MAX_PATH];
     for (auto iter : config->vecModules)

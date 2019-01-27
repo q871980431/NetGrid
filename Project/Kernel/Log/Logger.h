@@ -7,8 +7,11 @@
 #include "TString.h"
 #include "CircularQueue.h"
 #include <thread>
+#include <mutex>
+#include <list>
 
 #define LOG_FILE_ATT    ".log"
+#define LOG_CONNECT_SIGN "_"
 
 class Logger   : public ILogger, public Singleton<Logger>
 {
@@ -19,12 +22,24 @@ class Logger   : public ILogger, public Singleton<Logger>
         LogNode() :_time(), _contents(){};
         LogNode(const char *time, const char *contents) :_time(time), _contents(contents){};
     };
-    enum 
-    {
-        LOG_NODE_COUNT = 1024,
-        TIME_OUT_FOR_CUT_FILE = 7200 * 1000,
-        FLUSH_ASYNC_BATCH = 512,
+	enum
+	{
+		LOG_NODE_COUNT = 1024,
+		TIME_OUT_FOR_CUT_FILE = 7200 * 1000,
+		FLUSH_ASYNC_BATCH = 512,
+		COMPUT_TIME_BATCH_COUNT = 200,
+		DELAY_FLUSH_COUNT = 2,
+		SLEEP_TIME = 100,
     };
+
+	typedef std::list<LogNode*> LogList;
+	struct LogListThreadData
+	{
+		LogList threadA;
+		LogList threadB;
+		LogList	swap;
+		std::mutex	mutex;
+	};
 public:
     //virtual ~Logger(){};
 
@@ -34,6 +49,7 @@ public:
 
     virtual void SyncLog(const char *contents);
     virtual void AsyncLog(const char *contents);
+	virtual void Process(s32 tick);
 protected:
 private:
     const char *GetLogTimeString();
@@ -44,15 +60,22 @@ private:
 
 private:
 
+
+private:
+
     tlib::TString<MAX_PATH>         _logPath;
     tlib::TString<LOG_PREFIX_LEN>   _asyncPrefix;
     tlib::TString<LOG_PREFIX_LEN>   _syncPrefix;
     LogFile _asyncFile;
     LogFile _syncFile;
 
-    CircluarQueue<LogNode>             *_syncLogs;
     std::thread                         _thread;
     bool                                _terminate;
+	std::string							_procName;
+	std::string							_procId;
+
+	LogListThreadData					_write;
+	LogListThreadData					_dels;
 };
 
 #define LOGGER  (Logger::GetInstancePtr())

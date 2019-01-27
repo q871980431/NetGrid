@@ -31,8 +31,11 @@ typedef int32_t s32;
 typedef int64_t s64;
 
 #define LOG_BUFF_SIZE   2048
-#define SafeSprintf sprintf_s
+//#define SafeSprintf sprintf_s
 #define MSLEEP(n)   Sleep(n)
+
+
+#define CHECK_FMT(a, b)	__attribute__((format(printf, a, b)))
 
 #define ECHO(format, ...)\
 {\
@@ -43,7 +46,7 @@ typedef int64_t s64;
 #define PTF(pszFmt,...)\
 {\
 	char buff[4096]; \
-    	sprintf_s(buff, sizeof(buff), "%s", ""##pszFmt"\n"); \
+    	SafeSprintf(buff, sizeof(buff), "%s", ""##pszFmt"\n"); \
        	printf(buff, __VA_ARGS__); \
 }
 
@@ -51,21 +54,21 @@ typedef int64_t s64;
  #define PTF_INFO(pszFmt,...)\
 {\
 	char buff[4096]; \
-    	sprintf_s(buff, sizeof(buff), "%s", "[INFO], [%s,%d], "##pszFmt"\n"); \
+    	SafeSprintf(buff, sizeof(buff), "%s", "[INFO], [%s,%d], "##pszFmt"\n"); \
        	printf(buff, __FUNCTION__, __LINE__, __VA_ARGS__); \
 }
 
 #define PTF_DEBUG(pszFmt,...)\
 {\
 	char buff[4096]; \
-	sprintf_s(buff, sizeof(buff), "%s", "[DEBUG], [%s,%d], "##pszFmt"\n"); \
+	SafeSprintf(buff, sizeof(buff), "%s", "[DEBUG], [%s,%d], "##pszFmt"\n"); \
 	printf(buff, __FUNCTION__, __LINE__, __VA_ARGS__); \
 }
 		  
 #define PTF_ERROR(pszFmt,...)\
 {\
     	char buff[4096];\
-     	sprintf_s(buff, sizeof(buff), "%s", "[ERROR], [%s,%d], "##pszFmt"\n");\
+     	SafeSprintf(buff, sizeof(buff), "%s", "[ERROR], [%s,%d], "##pszFmt"\n");\
 	printf(buff, __FUNCTION__, __LINE__, __VA_ARGS__);\
 }
 		        
@@ -82,5 +85,7 @@ typedef int64_t s64;
 
 
 #endif
+
+
 
 #endif

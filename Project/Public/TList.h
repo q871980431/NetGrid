@@ -103,6 +103,28 @@ namespace tlib
                 }
             }
 
+			void TailMerge(LinkList *list)
+			{
+				ASSERT(list->_size != 0, "error");
+				ILinkNode **tailInsertPos = GetTailInsertPos();
+				list->_head->_prev = _tail;
+				*tailInsertPos = list->_head;
+
+				ILinkNode *temp = _tail->_next;
+				while (temp)
+				{
+					temp->_host = this;
+					temp = temp->_next;
+				}
+				_tail = list->_tail;
+				_size += list->_size;
+				list->_head = nullptr;
+				list->_tail = nullptr;
+				list->_size = 0;
+			}
+
+			inline ILinkNode ** GetTailInsertPos(){return _tail != nullptr ? &_tail->_next : &_head;}
+			inline ILinkNode ** GetHeadInsertPos(){	return _head != nullptr ? &_head->_prev : &_tail;}
             inline ILinkNode * Head(){ return _head; };
             inline ILinkNode * Tail(){ return _tail; };
 			inline void Swap(LinkList *lists)

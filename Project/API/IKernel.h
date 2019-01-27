@@ -14,7 +14,7 @@
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[LUA]: %s", (content)); \
-    _kernel->AsyncLog(log);\
+    kernel->AsyncLog(log);\
 }
 
 #define DEBUG_LOG(format, ...)\
@@ -28,21 +28,21 @@
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[TRACE]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-    _kernel->AsyncLog(log); \
+    kernel->AsyncLog(log); \
 }
 
 #define ERROR_LOG(format, ...)\
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[ERROR]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-    _kernel->AsyncLog(log); \
+    kernel->AsyncLog(log); \
 }
 
 #define IMPORTANT_LOG(format, ...)\
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[IMPORTANT]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-    _kernel->SyncLog(log); \
+    kernel->SyncLog(log); \
 }
 
 
@@ -59,7 +59,7 @@
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[TRACE]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##a); \
-    _kernel->AsyncLog(log); \
+    kernel->AsyncLog(log); \
 }
 
 
@@ -67,14 +67,14 @@
 {\
 	char log[LOG_BUFF_SIZE] = { 0 }; \
 	SafeSprintf(log, sizeof(log), "[ERROR]: %s:%d:%s | " format, __FILE__, __LINE__, __FUNCTION__, ##a); \
-	_kernel->AsyncLog(log); \
+	kernel->AsyncLog(log); \
 }
 
 #define IMPORTANT_LOG(format, a...)\
 {\
 	char log[LOG_BUFF_SIZE] = { 0 }; \
 	SafeSprintf(log, sizeof(log), "[IMPORTANT]: %s:%d:%s | " format, __FILE__, __LINE__, __FUNCTION__, ##a); \
-	_kernel->SyncLog(log); \
+	kernel->SyncLog(log); \
 }
 #endif
 class IModule;

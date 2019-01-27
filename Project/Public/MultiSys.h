@@ -13,6 +13,9 @@
 #define MAX_PATH	260
 #define TRACE_LEN   512
 #define IP_LEN      32
+#define  SafeSprintf __SafeSprintf
+#define TMALLOC	malloc
+#define TFREE	free
 
 enum DATA_TYPE
 {
@@ -28,5 +31,17 @@ enum DATA_TYPE
     DATA_TYPE_TABLE     = 9,
     DATA_TYPE_OBJ       = 10,
 };
+
+inline s32 __SafeSprintf(char *buf, s32 size, const char *fromat, ...)
+#ifdef LINUX
+	__attribute__((format(printf, 3, 4)))
+#endif
+{
+	va_list argList;
+	va_start(argList, fromat);
+	s32 ret = vsnprintf(buf, size, fromat, argList);
+	va_end(argList);
+	return ret;
+}
 
 #endif

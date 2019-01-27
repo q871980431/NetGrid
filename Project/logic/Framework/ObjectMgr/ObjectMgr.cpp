@@ -48,6 +48,12 @@ bool ObjectMgr::Launched(IKernel *kernel)
 	s32 b = GetAttrInt32(bagRow, (const MemberProperty *)Logic::Player::Wingbag::Wing::wingid);
 	SetAttrInt32(bagRow, (const MemberProperty *)Logic::Player::Wingbag::Wing::wingid, 30);
 	s32 c = GetAttrInt32(wing, (const MemberProperty *)Logic::Wing::wingid);
+	using Lwing = Logic::Wing;
+	s32 d = GetAttrInt32(wing, (const MemberProperty *)Lwing::wingid);
+
+	ReleaseObj(player);
+	TestObject();
+
     return true;
 }
 
@@ -133,6 +139,24 @@ const MemberProperty * ObjectMgr::GetMemberProperty(const char * fullName)
         return nullptr;
     }
     return &iter->second;
+}
+
+IObject * ObjectMgr::InnerCreateObject(const char *fullName)
+{
+	auto iter = s_memeoryMap.find(fullName);
+	if (iter == s_memeoryMap.end())
+	{
+		//ASSERT(false, "error");
+		return nullptr;
+	}
+	IObject *ret = iter->second->CreateObject();
+	return ret;
+}
+
+void ObjectMgr::InnerReleaseObject(IObject *object)
+{
+	CommonObject *tmp = (CommonObject*)object;
+	tmp->Release();
 }
 
 bool ObjectMgr::LoadObjDir(const char *path)
@@ -347,4 +371,18 @@ void ObjectMgr::InitType(const char *type, s8 val, s16 size)
 
     auto ret = s_typeMap.insert(std::make_pair(tools::HashKey(type), key.val));
     ASSERT(ret.second, "error");
+}
+
+void ObjectMgr::TestObject()
+{
+	IObject *player = InnerCreateObject("logic::player");
+	s64 oldLevel = player->GetMemberS64(Logic::Player::lvl);
+	player->SetMemberS64(Logic::Player::lvl, oldLevel + 10);
+	s64 nowLevel = player->GetMemberS64(Logic::Player::lvl);
+	InnerReleaseObject(player);
+	player = InnerCreateObject("logic::player");
+	oldLevel = player->GetMemberS64(Logic::Player::lvl);
+	player->SetMemberS64(Logic::Player::lvl, oldLevel + 10);
+	nowLevel = player->GetMemberS64(Logic::Player::lvl);
+
 }

@@ -47,6 +47,9 @@ public:
     static void *CreateObj(const char *fullName);
     static const MemberProperty *GetMemberProperty(const char * fullName);
     static void ReleaseObj(void *object);
+
+	static IObject * InnerCreateObject(const char *fullName);
+	static void InnerReleaseObject(IObject *object);
 private: 
     static bool LoadObjDir(const char *path);
     static bool LoadDirFiles(const char *path, const char *nameSpace, tools::DirInfo *dirInfo);
@@ -60,6 +63,10 @@ private:
 private:
     static void InitTypeMap();
     static void InitType(const char *type, s8 val, s16 size);
+
+private:
+	void TestObject();
+
 private:
     static ObjectMgr     * s_self;
     static IKernel  * s_kernel;

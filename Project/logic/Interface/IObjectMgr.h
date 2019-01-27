@@ -22,19 +22,20 @@ class IRow
 public:
     virtual ~IRow(){};
 
-    virtual s32 GetMemberS32(IMember *member);
+    virtual s32 GetMemberS32(IMember *member) = 0;
 protected:
 private:
 };
 
+class IObject;
 class ITable
 {
 public:
     virtual ~ITable(){};
 
-    virtual IRow * CreateRow() = 0;
-    virtual IRow * GetRow(s16 index) = 0;
-    virtual IRow * FindRowByKey(s16 key) = 0;
+    virtual IObject * CreateRow() = 0;
+    virtual IObject * GetRow(s16 index) = 0;
+    virtual IObject * FindRowByKey(s16 key) = 0;
 };
 
 class IObject
@@ -44,6 +45,8 @@ public:
 
     virtual s32 GetMemberS32(const IMember *member) = 0;
     virtual s64 GetMemberS64(const IMember *member) = 0;
+	virtual void SetMemberS32(const IMember *member, s32 val) = 0;
+	virtual void SetMemberS64(const IMember *member, s64 val) = 0;
     virtual ITable  * GetTable(const IMember *member) = 0;
 };
 
@@ -61,22 +64,5 @@ public:
     //virtual s64  GetAttrInt64(void *object, const MemberProperty *member) = 0;
     //virtual void SetAttrInt64(void *object, const MemberProperty *member, s64 val) = 0;
 };
-namespace object
-{
-    namespace logic
-    {
-        namespace wing
-        {
 
-        }
-
-        namespace player
-        {
-            namespace wing{
-
-            }
-        }
-    }
-
-}
 #endif
