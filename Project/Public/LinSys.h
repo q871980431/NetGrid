@@ -24,7 +24,7 @@ typedef int32_t s32;
 typedef int64_t s64;
 
 #define LOG_BUFF_SIZE   4096
-#define SafeSprintf snprintf
+//#define SafeSprintf snprintf
 #define MSLEEP(n)	usleep(n*1000)
 
 

@@ -107,7 +107,7 @@ protected:
     void TestFiles();
     void TestPtr();
     void TestCallBack();
-
+	void TestLamda(s32 &a);
 private:
     static Test     * s_self;
     static IKernel  * s_kernel;

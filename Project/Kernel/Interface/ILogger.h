@@ -10,6 +10,7 @@ public:
 
     virtual void SyncLog(const char *contents) = 0;
     virtual void AsyncLog(const char *contents) = 0;
+	virtual void Process(s32 tick) = 0;
 };
 
 #endif

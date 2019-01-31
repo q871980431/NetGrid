@@ -30,6 +30,7 @@ void MemeoryDes::Fix()
 {
     ASSERT(!_fix, "error");
     _allSize += sizeof(MemeoryDes **);
+	_allSize += sizeof(CommonObject);
     if (!_common)
         _allSize += sizeof(MemberChangeCallPool);
 
@@ -133,6 +134,22 @@ void MemeoryDes::DestoryMemeory(void *memeory) const
     DEL[] memeory;
 }
 
+IObject * MemeoryDes::CreateObject()
+{
+	ASSERT(_fix, "don't fix");
+	char *addr = NEW char[_allSize];
+	InitMemeory(addr, _allSize);
+	addr += sizeof(MemeoryDes **);
+	CommonObject *commonObj = (CommonObject*)addr;
+	return commonObj;
+}
+
+void MemeoryDes::DestoryObject(IObject *obj) const
+{
+	void *memeory = ((CommonObject*)obj)->GetData();
+	DestoryMemeory(memeory);
+}
+
 void MemeoryDes::ReleaseMemeory(void *addr, s32 size) const
 {
     ASSERT(_allSize == size, "size error");
@@ -140,6 +157,9 @@ void MemeoryDes::ReleaseMemeory(void *addr, s32 size) const
 
     char *addrTmp = (char *)addr;
     addrTmp += sizeof(MemeoryDes **);
+	CommonObject *commonObj = (CommonObject*)addrTmp;
+	commonObj->~CommonObject();
+	addrTmp += sizeof(CommonObject);
     if (!_common)
     {
         MemberChangeCallPool *pool = (MemberChangeCallPool *)addrTmp;
@@ -191,6 +211,8 @@ void MemeoryDes::InitMemeory(void *addr, s32 size) const
     const MemeoryDes **tmp = (const MemeoryDes **)addrTmp;
     *tmp = this;
     addrTmp += sizeof(MemeoryDes **);
+	CommonObject *commonObj = NEW(addrTmp)CommonObject(addr);
+	addrTmp += sizeof(CommonObject);
     if (!_common)
     {
         NEW(addrTmp)MemberChangeCallPool();
@@ -250,7 +272,7 @@ void MemeoryDes::RegisterMemberChangeCallBack(void *object, const MemberProperty
         ASSERT(false, "error, obj %s is common object, not bind callback", (*des)->_name.GetString());
         return;
     }
-    MemberChangeCallPool *pool = (MemberChangeCallPool *)((char*)object + sizeof(const MemeoryDes **));
+    MemberChangeCallPool *pool = GetCallPoolPtr(object);
     pool->RegisterCallBack(member, callBack, debug);
 }
 
@@ -267,8 +289,13 @@ void MemeoryDes::UnRegisterMemberChangeCallBack(void *object, const MemberProper
         ASSERT(false, "error, obj %s is common object, not bind callback", (*des)->_name.GetString());
         return;
     }
-    MemberChangeCallPool *pool = (MemberChangeCallPool *)((char*)object + sizeof(const MemeoryDes **));
+    MemberChangeCallPool *pool = GetCallPoolPtr(object);
     pool->UnRegisterCallBack(member, callBack);
+}
+
+MemeoryDes::MemberChangeCallPool * MemeoryDes::GetCallPoolPtr(void *addr) const
+{
+	return (MemberChangeCallPool *)((char*)addr + sizeof(CommonObject) + sizeof(const MemeoryDes **));
 }
 
 ITable * CommonObject::GetTable(const IMember *member)

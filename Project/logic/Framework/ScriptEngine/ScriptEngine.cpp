@@ -205,7 +205,7 @@ int ScriptEngine::Log(lua_State *state)
     case LUA_TSTRING: content << lua_tostring(state, 1); break;
     default:content << luaL_typename(state, 1) << ":" << (s64)lua_topointer(state, 1);break;
     }
-    core::IKernel *_kernel = s_kernel;
+    core::IKernel *kernel = s_kernel;
     LUA_LOG(content.GetString());
     return 0;
 }
@@ -226,7 +226,7 @@ bool ScriptEngine::ExecGlobalFunction(const char *func, s8 argc, const IDataCall
 
 bool ScriptEngine::ExecFunction(s8 argc, const IDataCallBackFuncType callback)
 {
-    core::IKernel *_kernel = s_kernel;
+    core::IKernel *kernel = s_kernel;
     s8 findex = -(argc + 1);
     if (!lua_isfunction(s_luaState, findex))
     {

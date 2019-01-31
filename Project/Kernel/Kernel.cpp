@@ -33,6 +33,7 @@ void Kernel::Loop()
     {
         NetEngine::GetInstance()->Process(10);
 		TimerMgr::GetInstance()->Process(10);
+		_logger.Process(10);
         Sleep(10);
     }
 }
