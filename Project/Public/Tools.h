@@ -7,6 +7,7 @@
 
 #ifdef LINUX
 #include<libgen.h>
+#include<dlfcn.h>
 #endif
 
 u32  Radnom();
@@ -41,13 +42,6 @@ namespace tools{
         mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif
     }
-    template<typename T>
-    inline void Zero( T &val)
-    {
-        tools::SafeMemset(&val, sizeof(T), 0, sizeof(T));
-    }
-
-
     inline void SafeMemset(void *__restrict dest, s32 size, s8 val, s32 num)
 	{
 		ASSERT(size >= num, "out of rang");
@@ -64,16 +58,32 @@ namespace tools{
         memcpy(dest, source, max(0, min(size, num)));
     }
 
-    inline s32 SafeStrcpy(char * __restrict dest, s32 max, const char * __restrict src, s32 n)
+    inline s32 SafeStrcpy(char * __restrict dest, s32 size, const char * __restrict src, s32 n)
     {
-        max -= 1;
-        ASSERT(n <= max, "out of rang");
-        n = max(0, min(n, max));
+		size -= 1;
+        ASSERT(n < size, "out of rang");
+        n = max(0, min(n, size));
         memcpy(dest, src, n);
         dest[n] = 0;
         return n;
     }
 
+	template<typename T>
+	inline void Zero(T &val)
+	{
+		tools::SafeMemset(&val, sizeof(T), 0, sizeof(T));
+	}
+	template<typename T>
+	bool Desc(const T &lVal, const T &rVal)
+	{
+		return lVal > rVal;
+	}
+
+	template<typename T>
+	bool Asc(const T &lVal, const T &rVal)
+	{
+		return lVal < rVal;
+	}
 
     //format = "%4d-%02d-%02d %02d:%02d:%02d"
 #ifdef __cplusplus
@@ -143,13 +153,13 @@ namespace tools{
         }
     }
     template<typename FUN>
-    FUN LoadDynamicFun(const char *path, const char *funName, bool global = false)
+    FUN LoadDynamicFun(const char *path, const char *dllName, const char *funName, bool global = false)
     {
         FUN fun = nullptr;
         char filePath[MAX_PATH];
 
 #ifdef LINUX
-        SafeSprintf(filePath, sizeof(filePath), "%s.so", path);
+        SafeSprintf(filePath, sizeof(filePath), "%s/lib%s.so", path, dllName);
         void *handle = dlopen( filePath, global ? RTLD_LAZY | RTLD_GLOBAL :  RTLD_LAZY);
         ASSERT(handle, "open %s error %d", filePath, errno);
         fun = (FUN)dlsym(handle, funName);
@@ -157,7 +167,7 @@ namespace tools{
 #endif
 
 #ifdef WIN32
-        SafeSprintf(filePath, sizeof(filePath), "%s.dll", path);
+        SafeSprintf(filePath, sizeof(filePath), "%s/%s.dll", path, dllName);
         HINSTANCE instance = ::LoadLibrary(filePath);
         ASSERT(instance != NULL, "open %s error %d", filePath, errno);
         fun = (FUN)::GetProcAddress(instance, funName);

@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root parent="root" startindex="100" special="true">
-	<member name="lvl" type="s64" index="101" mark=""/>
-	<member name="bag" type="array" index="102" mark="">
+	<member name="name" type="str" size="32" index="101" mark=""/>
+	<member name="lvl" type="s64" index="102" mark=""/>
+	
+	<member name="bag" type="array" index="103" mark="">
 		<member name="place" type="s32" />
-		<member name="randattr" type="array">
-			<member name="id" type="s32"/>
-			<member name="type" type="s32"/>
-			<member name="value" type="s32"/>
-		</member>
-	</member>
-	<member name="wingbag" type="array" index="103" mark="0">
-		<member name="wing" type="wing"/>
 	</member>
 </root>

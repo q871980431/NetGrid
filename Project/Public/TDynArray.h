@@ -1,7 +1,7 @@
 #ifndef __T_DynArray_h__
 #define __T_DynArray_h__
 #include "MultiSys.h"
-#include <limits>
+#include <limits.h>
 
 namespace tlib{
 
@@ -47,7 +47,7 @@ namespace tlib{
 
         void PopArr(s32 count) {
             ASSERT(count >= 0, "count exception");
-            TIXMLASSERT(_size >= count);
+			ASSERT(_size >= count, "count exception");
             _size -= count;
         }
 

@@ -1,6 +1,9 @@
 #include "NetConnection.h"
 #include "NetEngine.h"
 #include "../Kernel.h"
+#ifdef LINUX
+#include <arpa/inet.h>
+#endif
 
 NetConnection::NetConnection(NetConnectionMgr *connectionMgr, s32 connectionId) :_connectionId(connectionId),
 _connetionMgr(connectionMgr)
@@ -76,6 +79,7 @@ void NetConnection::ForceClose()
 void NetConnection::Close()
 {
     _doClose = true;
+	OnSend();
 }
 
 const char * NetConnection::GetRemoteIP()
@@ -85,7 +89,7 @@ const char * NetConnection::GetRemoteIP()
 
 s32 NetConnection::GetRemoteIpAddr()
 {
-    return _romoteAddr.sin_addr.S_un.S_addr;
+	return _romoteAddr.sin_addr.s_addr;
 }
 
 void NetConnection::SettingBuffSize(s32 recvSize, s32 sendSize)

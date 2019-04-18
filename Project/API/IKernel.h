@@ -8,14 +8,14 @@
 }
 #define FOREVER	-1
 
-#ifdef WIN32
-
 #define LUA_LOG(content)\
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[LUA]: %s", (content)); \
     kernel->AsyncLog(log);\
 }
+
+#ifdef WIN32
 
 #define DEBUG_LOG(format, ...)\
 {\

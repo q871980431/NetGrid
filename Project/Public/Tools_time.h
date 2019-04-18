@@ -11,6 +11,11 @@ namespace tools
         return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     }
 
+	inline s64 GetTimeNanosecond()
+	{
+		return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	}
+
 #ifdef __cplusplus
     extern "C"{
 #endif

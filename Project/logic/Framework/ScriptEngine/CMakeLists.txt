@@ -28,6 +28,7 @@ IF(LINUX)
 	INCLUDE_DIRECTORIES(
         ${API_DIR}
         ${PUBLIC_DIR}
+		${THIRD_LIBRARIES_INCLUDE_DIR}/lua/include		
         ${2D_DIR}
 		${COMMON_TIME_DIR}
 		${TINYXML_DIR}
@@ -55,7 +56,12 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(LINUX)
-
+	SET(THIRD_LIB_DEBUG
+	    debug "${THIRD_LIBRARIES_DEBUG_DIR}/liblua.a"
+	)
+	SET(THIRD_LIB_RELEASE
+        optimized "${THIRD_LIBRARIES_RELEASE_DIR}/liblua.a"
+	)
 ENDIF(LINUX)
 
 ADD_LIBRARY( ScriptEngine SHARED

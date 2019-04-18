@@ -26,7 +26,8 @@ typedef int64_t s64;
 #define LOG_BUFF_SIZE   4096
 //#define SafeSprintf snprintf
 #define MSLEEP(n)	usleep(n*1000)
-
+using std::max;
+using std::min;
 
 #define ECHO(format, ...)\
 {\

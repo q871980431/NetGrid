@@ -4,6 +4,8 @@
 #include "Tools_time.h"
 #include <map>
 #include <algorithm>
+#include <vector>
+
 core::IKernel * TestMatch::s_kernel = nullptr;
 ISearch * TestMatch::s_search = nullptr;
 s64 *g_ids = nullptr;
@@ -136,6 +138,7 @@ bool MatchTask::Initialize(IKernel *kernel)
 		AddPlayerToMatch();
 	}
 	_kernel->StartTimer(this, 1000, FOREVER, 2000, "match task");
+	return true;
 }
 
 void MatchTask::OnTime(IKernel *kernel, s64 tick)

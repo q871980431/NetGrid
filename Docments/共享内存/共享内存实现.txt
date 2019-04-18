@@ -1,0 +1,20 @@
+Windows共享内存API
+CreateFileMapping
+MapViewOfFile
+UnmapViewOfFile
+OpenFileMapping
+
+
+共享内存模型
+[]
+[]
+只写 
+只读
+双工
+
+Header	[]
+Content<--------->
+
+构建一个ShareMemory管理器
+
+

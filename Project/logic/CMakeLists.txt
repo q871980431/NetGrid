@@ -10,6 +10,7 @@ SET(LOGIC_DEFINE
 	"${LOGIC_DEFINE_DIR}/FrameworkDefine.h"
 	"${LOGIC_DEFINE_DIR}/MemberDefine.h"
 	"${LOGIC_DEFINE_DIR}/MemberDef.h"
+	"${LOGIC_DEFINE_DIR}/Game_tools.h"	
 )
 
 #SET(LOGIC_INTERFACE

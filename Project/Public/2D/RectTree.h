@@ -57,7 +57,7 @@ public:
 
     typedef tlib::TDynPool<VectorNode>              ObjPool;
     typedef std::unordered_map<s64, VectorNode *>   ObjMap;
-    typedef RTree<VectorNode *, s32, 2, int, 16>    SearchTree;
+    typedef RTree<VectorNode *, s32, 2, s32, 64, 48> SearchTree;
 
 public:
 

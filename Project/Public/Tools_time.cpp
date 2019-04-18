@@ -1,5 +1,8 @@
 #include "Tools_time.h"
 
+#ifdef LINUX
+#include<sys/time.h>
+#endif
 const char *format = "%4d-%02d-%02d %02d:%02d:%02d";
 #ifdef __cplusplus
 extern "C"  {

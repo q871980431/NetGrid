@@ -53,12 +53,12 @@ namespace tlib
             IN_USE = 0,
             IS_FREE,
 #ifdef WIN32
-#if(_MSC_VER <= 1800)
-            CHUNK_SIZE = (16 * 1024) / (128),
+	#if(_MSC_VER <= 1800)
+				CHUNK_SIZE = (16 * 1024) / (128),
+	#else
+				CHUNK_SIZE = sizeof(T),
+	#endif
 #else
-            CHUNK_SIZE = sizeof(T),
-#endif
-#elif
             CHUNK_SIZE = (16 * 1024) / (128),
 #endif // WIN32
         };
@@ -119,7 +119,7 @@ namespace tlib
         {
             ChunkNode *chunk = GetChunk(file, line);
 #else
-        T *Create(Args... args)
+        T *Create(const char *file, s32 line, Args... args)
         {
             ChunkNode *chunk = GetChunk();
 #endif
@@ -224,18 +224,10 @@ namespace tlib
         BlockNode *_blokRoot;
     };
 
-#ifdef _DEBUG
 #ifdef WIN32
-#define CREAT_FROM_POOL(pool, ...) pool.Create(__FILE__, __LINE__, ##__VA_ARGS__)
+#define CREAT_FROM_POOL(pool, ...) pool.Create(__FILE__, __LINE__, __VA_ARGS__)
 #else
 #define CREAT_FROM_POOL(pool, a...) pool.Create(__FILE__, __LINE__, ##a)
-#endif
-#else
-#ifdef WIN32
-#define CREAT_FROM_POOL(pool, ...) pool.Create(##__VA_ARGS__)
-#else
-#define CREAT_FROM_POOL(pool, a...) pool.Create(##a)
-#endif
 #endif
 
 

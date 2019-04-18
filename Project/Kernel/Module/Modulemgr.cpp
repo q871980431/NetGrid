@@ -45,8 +45,8 @@ bool Modulemgr::LoadModule()
     char path[MAX_PATH];
     for (auto iter : config->vecModules)
     {
-        SafeSprintf(path, sizeof(path), "%s/%s/%s", tools::GetAppPath(), config->strModulePath.c_str(), iter.c_str());
-        GetModuleFun fun = tools::LoadDynamicFun<GetModuleFun>(path, GET_LOGIC_FUN_NAME);
+		SafeSprintf(path, sizeof(path), "%s/%s", tools::GetAppPath(), config->strModulePath.c_str());
+        GetModuleFun fun = tools::LoadDynamicFun<GetModuleFun>(path, iter.c_str(), GET_LOGIC_FUN_NAME);
         if (fun == nullptr)
             return false;
         IModule *module = fun();

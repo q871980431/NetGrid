@@ -9,6 +9,10 @@
 #include "Tools.h"
 #include "XmlReader.h"
 #include "ServiceGroup.h"
+#ifdef LINUX
+#include <arpa/inet.h>
+#endif
+
 Master * Master::s_self = nullptr;
 IKernel * Master::s_kernel = nullptr;
 IHarbor * Master::s_harbor = nullptr;

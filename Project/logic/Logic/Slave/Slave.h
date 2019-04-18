@@ -40,6 +40,10 @@ public:
 private:
 	static s32 CreateProcess(const char *cmd);
 	static void InitMachineInfo();
+
+private:
+	static s32 CreateProcessWin(const char *cmd);
+	static s32 CreateProcessLinux(const char *cmd);
 protected:
 private:
     static Slave     * s_self;

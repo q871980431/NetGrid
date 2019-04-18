@@ -3,6 +3,7 @@
 #include "WinSys.h"
 #include "LinSys.h"
 #include <functional>
+#include <stdarg.h>
 
 #define NEW     new
 #define DEL     delete
@@ -34,8 +35,10 @@ enum DATA_TYPE
 
 inline s32 __SafeSprintf(char *buf, s32 size, const char *fromat, ...)
 #ifdef LINUX
-	__attribute__((format(printf, 3, 4)))
+__attribute__((format(printf, 3, 4)))
 #endif
+;
+s32 __SafeSprintf(char *buf, s32 size, const char *fromat, ...)
 {
 	va_list argList;
 	va_start(argList, fromat);

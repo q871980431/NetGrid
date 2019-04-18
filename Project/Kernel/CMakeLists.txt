@@ -90,8 +90,15 @@ IF(LINUX)
                 ${PUBLIC_DIR}
                 ${KERNEL_INTERFACE_DIR}
                 ${KERNEL_LOG_DIR}
+				${THIRD_LIBRARIES_INCLUDE_DIR}/libevent/include				
                 ${KERNEL_CONFIG_DIR}
 				${KERNEL_MODULE_DIR}
+				${COMMON_TIME_DIR}
+				${TINYXML_DIR}
+				${KERNEL_MODULE_DIR}
+				${KERNEL_NET_DIR}
+				${KERNEL_TIMER_DIR}
+				${KERNEL_FRAME_DIR}				
         )
 ENDIF(LINUX)
 MESSAGE("test")
@@ -130,7 +137,13 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(LINUX)
-
+	SET(THIRD_LIB_DEBUG
+	)
+	SET(THIRD_LIB_RELEASE
+	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent.a"
+	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent_core.a"
+	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent_extra.a"
+	)
 ENDIF(LINUX)
 
 ADD_EXECUTABLE( NetGrid

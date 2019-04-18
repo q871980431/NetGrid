@@ -3,6 +3,11 @@
 #ifdef WIN32
 #include <winsock2.h>
 #endif
+#ifdef LINUX
+#include<netinet/in.h>
+#include<sys/socket.h>
+#include <arpa/inet.h>
+#endif
 
 NetEngine::EventBase * NetEngine::s_eventBase = nullptr;
 NetEngine::EventListener * NetEngine::s_eventListener = nullptr;
@@ -42,7 +47,7 @@ bool NetEngine::Destroy()
 
 void NetEngine::Process(s32 tick)
 {
-    int rt = event_base_loop(s_eventBase, EVLOOP_ONCE | EVLOOP_NONBLOCK);
+    int rt = event_base_loop(s_eventBase, EVLOOP_NONBLOCK);
 }
 
 void NetEngine::CreateNetSession(const char *ip, s16 port, core::IMsgSession *session)
@@ -60,7 +65,7 @@ void NetEngine::CreateNetSession(const char *ip, s16 port, core::IMsgSession *se
     bufferevent_socket_connect(bev, (struct sockaddr *)&stAddr, sizeof(stAddr));
     connction->SetBuffEvent(bev);
 
-    bufferevent_setcb(bev, OnReadEvent, NULL, OnErrorEvent, connction);
+    bufferevent_setcb(bev, OnReadEvent, OnWriteEvent, OnErrorEvent, connction);
     bufferevent_enable(bev, EV_READ | EV_PERSIST | EV_WRITE);
 
     connction->SetSession(session);
@@ -156,7 +161,6 @@ void NetEngine::OnErrorEvent(struct bufferevent* bev, short error, void * ctx)
     {
         /* connection has been closed, do any clean up here*/
         ASSERT(session != nullptr, "error");
-        session->OnTerminate();
     }
     else if (error & BEV_EVENT_CONNECTED)
     {
@@ -172,9 +176,9 @@ void NetEngine::OnErrorEvent(struct bufferevent* bev, short error, void * ctx)
     {
         /* must be a timeout event handle, handle it*/
     }
-    if (nullptr != session)
-        session->SetConnection(nullptr);
 
+	session->SetConnection(nullptr);
+	session->OnTerminate();
     s_connectionMgr.RealseConnection(connetion);
     bufferevent_free(bev);
 }

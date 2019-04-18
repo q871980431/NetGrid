@@ -11,10 +11,11 @@
 #include "TestMatch.h"
 #include <set>
 #include "ObjectTest.h"
+#include "TestRtree.h"
+#include "TestSort.h"
 
 Test * Test::s_self = nullptr;
 IKernel * Test::s_kernel = nullptr;
-
 
 void MyTimer::OnStart(IKernel *kernel, s64 tick)
 {
@@ -51,9 +52,11 @@ bool Test::Initialize(IKernel *kernel)
 
 bool Test::Launched(IKernel *kernel)
 {
+	TestSort::Test(kernel);
+	//TestRtree::Test(kernel);
 	//ObjectTest objTest(kernel);
 	//objTest.Initialize(kernel);
-    TestLinkList();
+	//TestLinkList();
     //TestBitMark();
     //TestKey();
     //TestFiles();

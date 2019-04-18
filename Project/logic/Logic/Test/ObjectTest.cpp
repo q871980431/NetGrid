@@ -26,11 +26,11 @@ bool ObjectTest::Initialize(IKernel *kernel)
 
 	}
 
-	ECHO("[1] Parent.iparent = %d",(int)pVtab[1]);
+	ECHO("[1] Parent.iparent = %d",(int)*pVtab[1]);
 
-	ECHO("[2] Child.ichild = %d",(int)pVtab[2]);
+	ECHO("[2] Child.ichild = %d",(int)*pVtab[2]);
 
-	ECHO("[3] GrandChild.igrandchild = %d",(int)pVtab[3]);
+	ECHO("[3] GrandChild.igrandchild = %d",(int)*pVtab[3]);
 
     return true;
 }

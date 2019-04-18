@@ -6,12 +6,12 @@
  */
 
 #include "Slave.h"
-#include <ShlObj.h>
-#include <shellapi.h>
 #include "Tools.h"
 #include "Tools_time.h"
 #ifdef WIN32
 #include <process.h>
+#include <ShlObj.h>
+#include <shellapi.h>
 #endif
 
 Slave * Slave::s_self = nullptr;
@@ -51,6 +51,28 @@ bool Slave::Destroy(IKernel *kernel)
 
 s32 Slave::CreateProcess(const char *cmd)
 {
+#ifdef WIN32
+	return CreateProcessWin(cmd);
+#endif
+
+#ifdef LINUX
+	return CreateProcessLinux(cmd);
+#endif
+}
+
+void Slave::InitMachineInfo()
+{
+#ifdef WIN32
+	SYSTEM_INFO sysInfo = { 0 };
+	GetSystemInfo(&sysInfo);
+	s_machineInfo.cpuNum = sysInfo.dwNumberOfProcessors;
+	s_machineInfo.processId = getpid();
+#endif // WIN32
+}
+
+s32 Slave::CreateProcessWin(const char *cmd)
+{
+#if WIN32
 	STARTUPINFO si; //一些必备参数设置  
 	memset(&si, 0, sizeof(STARTUPINFO));
 	si.dwFlags = STARTF_USESHOWWINDOW;
@@ -89,20 +111,15 @@ s32 Slave::CreateProcess(const char *cmd)
 	}
 
 	return pi.dwProcessId;
-}
-
-void Slave::InitMachineInfo()
-{
-#ifdef WIN32
-	SYSTEM_INFO sysInfo = { 0 };
-	GetSystemInfo(&sysInfo);
-	s_machineInfo.cpuNum = sysInfo.dwNumberOfProcessors;
-	s_machineInfo.processId = getpid();
-#endif // WIN32
+#endif
+#ifdef LINUX
+	return 0;
+#endif
 }
 
 void ProcessPercentTimer::OnTime(IKernel *kernel, s64 tick)
 {
+#ifdef WIN32
 	FILETIME CreateTime, ExitTime, KernelTime, UserTime;
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, _machineInfo->processId);
 	BOOL bRetCode = GetProcessTimes(hProcess, &CreateTime, &ExitTime, &KernelTime, &UserTime);
@@ -130,10 +147,12 @@ void ProcessPercentTimer::OnTime(IKernel *kernel, s64 tick)
 		}
 	}
 	DEBUG_LOG("percent = %d, core = %d", percent, _machineInfo->cpuNum);
+#endif
 }
 
 void CpuIdlePercentTimer::OnTime(IKernel *kernel, s64 tick)
 {
+#ifdef WIN32
 	FILETIME idleTime, kernelTime, userTime;
 	GetSystemTimes(&idleTime, &kernelTime, &userTime);
 	LARGE_INTEGER lgKernelTime;
@@ -154,4 +173,5 @@ void CpuIdlePercentTimer::OnTime(IKernel *kernel, s64 tick)
 	_preTotalTick = lgKernelTime.QuadPart + lgUserTime.QuadPart;
 	_preIdleTick = lgIdleTime.QuadPart;
 	DEBUG_LOG("machine idle percent = %d, core = %d", _machineInfo->idlePercent, _machineInfo->cpuNum);
+#endif
 }

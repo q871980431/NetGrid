@@ -2,7 +2,7 @@
  * File:	MemberDef.h
  * Author:	xuping
  * 
- * Created On 2017/12/16 22:06:09
+ * Created On 2019/3/27 17:12:44
  */
 
 #ifndef __MemberDefine_h__
@@ -31,44 +31,35 @@ struct MEMBER_API Logic
         static const IMember * id;
     };
 
-    struct MEMBER_API Wing
-    {
-        static const IMember * wingid;
-        static const IMember * order;
-    };
-
     struct MEMBER_API Player
     {
+        static const IMember * name;
         static const IMember * lvl;
         static const IMember * bag;
-        static const IMember * wingbag;
+        static const IMember * skill;
+        static const IMember * notice;
 
         struct MEMBER_API Bag
         {
             static const IMember * place;
-            static const IMember * randattr;
-
-            struct MEMBER_API Randattr
-            {
-                static const IMember * id;
-                static const IMember * type;
-                static const IMember * value;
-            };
-
         };
 
-        struct MEMBER_API Wingbag
+        struct MEMBER_API Skill
         {
-            static const IMember * wing;
-
-            struct MEMBER_API Wing
-            {
-                static const IMember * wingid;
-                static const IMember * order;
-            };
-
+            static const IMember * skillId;
         };
 
+        struct MEMBER_API Notice
+        {
+            static const IMember * content;
+        };
+
+    };
+
+    struct MEMBER_API Wing
+    {
+        static const IMember * wingid;
+        static const IMember * order;
     };
 
 };

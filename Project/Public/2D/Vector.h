@@ -78,8 +78,8 @@ struct MBRect
 
     MBRect()
     {
-        memset(left, 0, Size(left));
-        memset(right, 0, Size(right));
+        memset(&left, 0, sizeof(left));
+        memset(&right, 0, sizeof(right));
     }
     MBRect(const MBRect &val)
     {

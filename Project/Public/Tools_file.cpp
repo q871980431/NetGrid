@@ -2,6 +2,8 @@
 #include "Tools.h"
 #ifdef LINUX
 #include <sys/stat.h>
+#include<sys/types.h>
+#include<dirent.h>
 #endif
 
 #ifdef __cplusplus
@@ -140,17 +142,16 @@ void GetDirName(const char *dirpath, char name[MAX_PATH])
         }
 
         struct dirent * filename;    // return value for readdir()  
-        DIR * dir;                   // return value for opendir()  
-        dir = opendir(dirpath);
-        if (NULL == dir)
+		DIR * dirPtr = opendir(dirpath);  // return value for opendir()
+        if (NULL == dirPtr)
         {
-            ASSERT("Can not open dir %s", dirpath);
+            ASSERT(false, "Can not open dir %s", dirpath);
             return;
         }
 
         chdir(dirpath); 
         /* read all the files in the dir ~ */
-        while ((filename = readdir(dir)) != NULL)
+        while ((filename = readdir(dirPtr)) != NULL)
         {
             lstat(filename->d_name, &statbuf);
 
@@ -159,7 +160,7 @@ void GetDirName(const char *dirpath, char name[MAX_PATH])
                 continue;
             ECHO("file %s", filename->d_name);                           //这行语句会输出所有符合条件的文件名 
             attr.attrib = 0;
-            if (S_IFDIR(statbuf.st_mode))
+            if (S_ISDIR(statbuf.st_mode))
                 attr.attrib |= _A_SUBDIR;
 
             attr.time_create = 0;
@@ -196,7 +197,7 @@ void GetDirName(const char *dirpath, char name[MAX_PATH])
             }
         }
         chdir("..");
-        closedir(dir); 
+        closedir(dirPtr);
     }
 #endif
 //===================================END======================================

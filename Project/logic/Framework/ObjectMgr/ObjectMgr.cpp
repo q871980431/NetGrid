@@ -10,16 +10,22 @@
 #include "XmlReader.h"
 #include "ObjectMember.h"
 #include "MemberDef.h"
+#include "CommonObject.h"
+
 ObjectMgr * ObjectMgr::s_self = nullptr;
 IKernel * ObjectMgr::s_kernel = nullptr;
 MemeoryMap ObjectMgr::s_memeoryMap;
 TypeMap     ObjectMgr::s_typeMap;
 PropertyMap ObjectMgr::s_propertyMap;
+GUID_ALLOCATER_CB ObjectMgr::s_cbFun = nullptr;
+ObjectMap   ObjectMgr::s_objectMap;
+ObjectGuidInfo ObjectMgr::s_guidInfo;
 
 bool ObjectMgr::Initialize(IKernel *kernel)
 {
     s_self = this;
     s_kernel = kernel;
+	tools::Zero(s_guidInfo);
     InitTypeMap();
     char path[MAX_PATH];
     SafeSprintf(path, sizeof(path), "%s/object", s_kernel->GetEnvirPath());
@@ -31,27 +37,8 @@ bool ObjectMgr::Initialize(IKernel *kernel)
 
 bool ObjectMgr::Launched(IKernel *kernel)
 {
-    void *data = CreateObj("logic::wing");
     const MemberProperty *propWingid = GetMemberProperty("logic::wing::wingid");
-    s32 wingId = GetAttrInt32(data, propWingid);
-    SetAttrInt32(data, propWingid, 15);
-    wingId = GetAttrInt32(data, propWingid);
-    ReleaseObj(data);
     ObjectMember::Init();
-	void *player = CreateObj("logic::player");
-	void *winBag = FindTable(player, (const MemberProperty *)Logic::Player::wingbag);
-	void *bagRow = CreateRow(winBag);
-	void *wing = FindChildObj(bagRow, (const MemberProperty *)Logic::Player::Wingbag::wing);
-	s32 a = GetAttrInt32(wing, (const MemberProperty *)Logic::Wing::wingid);
-	SetAttrInt32(wing, (const MemberProperty *)Logic::Wing::wingid, 20);
-	a = GetAttrInt32(wing, (const MemberProperty *)Logic::Wing::wingid);
-	s32 b = GetAttrInt32(bagRow, (const MemberProperty *)Logic::Player::Wingbag::Wing::wingid);
-	SetAttrInt32(bagRow, (const MemberProperty *)Logic::Player::Wingbag::Wing::wingid, 30);
-	s32 c = GetAttrInt32(wing, (const MemberProperty *)Logic::Wing::wingid);
-	using Lwing = Logic::Wing;
-	s32 d = GetAttrInt32(wing, (const MemberProperty *)Lwing::wingid);
-
-	ReleaseObj(player);
 	TestObject();
 
     return true;
@@ -63,50 +50,36 @@ bool ObjectMgr::Destroy(IKernel *kernel)
     return true;
 }
 
-IObject * ObjectMgr::CreateObject(const char *fullName)
+void ObjectMgr::SetGUIDAllocater(const GUID_ALLOCATER_CB &cbFun)
 {
-	void *data = CreateObj(fullName);
-	return NEW CommonObject(data);
-}
-s32 ObjectMgr::GetAttrInt32(void *object, const MemberProperty *member)
-{
-    const MemeoryDes **des = (const MemeoryDes **)((char*)object);
-    s32 ret = (*des)->GetAttrT<s32>(object, member);
-    return ret;
+	s_cbFun = cbFun;
 }
 
-void ObjectMgr::SetAttrInt32(void *object, const MemberProperty *member, s32 val)
+IObject * ObjectMgr::CreateObject(const char *fullName, ID_TYPE type /* = ID_TYPE_GUID */, s64 id /* = 0 */)
 {
-    const MemeoryDes **des = (const MemeoryDes **)object;  
-    (*des)->SetAttrT(object, member, val);
+	if (id == 0)
+		id = GetNewGUID(type == ID_TYPE_LOCAL);
+	if (id == 0)
+		return nullptr;
+
+	IObject *object = InnerCreateObject(fullName);
+	s_objectMap.emplace(id, object);
+	return object;
 }
 
-void * ObjectMgr::FindChildObj(void *object, const MemberProperty *member)
+void ObjectMgr::ReleaseObject(s64 id)
 {
-	const MemeoryDes **des = (const MemeoryDes **)object;
-	return (*des)->GetChildObj(object, member);
+	auto iter = s_objectMap.find(id);
+	if (iter != s_objectMap.end())
+	{
+		InnerReleaseObject(iter->second);
+		s_objectMap.erase(iter);
+	}
 }
-
-void * ObjectMgr::FindTable(void *object, const MemberProperty *member)
-{
-	const MemeoryDes **des = (const MemeoryDes **)object;
-	return (*des)->GetChildObj(object, member);
-}
-
-s32 ObjectMgr::GetRowCount(void *table)
-{
-	return MemeoryDes::RowCount(table);
-}
-
-void * ObjectMgr::CreateRow(void *table)
-{
-	return MemeoryDes::CreateRow(table)->addr;
-}
-
 
 void OnSetAttrCallBack(void *object, const MemberProperty *member, void *context, s32 size)
 {
-    const MemeoryDes **des = (const MemeoryDes **)object;
+    const ObjectDes **des = (const ObjectDes **)object;
     ECHO("obj %s, member %s changeing", (*des)->GetMemeoryName(), member->des->name.GetString());
 }
 
@@ -120,13 +93,13 @@ void * ObjectMgr::CreateObj(const char *fullName)
     }
     s32 size = 0;
     void *ret = iter->second->CreateMemeory(size);
-    iter->second->RegisterMemberChangeCallBack(ret, ANY, OnSetAttrCallBack, "On SetAttrCallBack");
+    //iter->second->RegisterMemberChangeCallBack(ret, ANY, OnSetAttrCallBack, "On SetAttrCallBack");
     return ret;
 }
 
 void ObjectMgr::ReleaseObj(void *object)
 {
-    const MemeoryDes **des = (const MemeoryDes **)((char*)object);
+    const ObjectDes **des = (const ObjectDes **)((char*)object);
     (*des)->DestoryMemeory(object);
 }
 
@@ -138,10 +111,10 @@ const MemberProperty * ObjectMgr::GetMemberProperty(const char * fullName)
         //ASSERT(false, "error");
         return nullptr;
     }
-    return &iter->second;
+    return iter->second;
 }
 
-IObject * ObjectMgr::InnerCreateObject(const char *fullName)
+IObject * ObjectMgr::InnerCreateObject(const char *fullName, s64 id /* = 0 */)
 {
 	auto iter = s_memeoryMap.find(fullName);
 	if (iter == s_memeoryMap.end())
@@ -149,14 +122,13 @@ IObject * ObjectMgr::InnerCreateObject(const char *fullName)
 		//ASSERT(false, "error");
 		return nullptr;
 	}
-	IObject *ret = iter->second->CreateObject();
+	CommonObject *ret = NEW CommonObject(iter->second, id);
 	return ret;
 }
 
 void ObjectMgr::InnerReleaseObject(IObject *object)
 {
-	CommonObject *tmp = (CommonObject*)object;
-	tmp->Release();
+	DEL object;
 }
 
 bool ObjectMgr::LoadObjDir(const char *path)
@@ -208,7 +180,7 @@ bool ObjectMgr::LoadObjFiles(const char *path, const char *dirname, tools::FileM
     return true;
 }
 
-MemeoryDes * ObjectMgr::LoadObjFile(const char *path, const char *fileName, const char *nameSpace, tools::FileMap *files, DependenceMap &dependence)
+ObjectDes * ObjectMgr::LoadObjFile(const char *path, const char *fileName, const char *nameSpace, tools::FileMap *files, DependenceMap &dependence)
 {
     char filePath[MAX_PATH];
     SafeSprintf(filePath, sizeof(filePath), "%s/%s", path, fileName);
@@ -231,10 +203,7 @@ MemeoryDes * ObjectMgr::LoadObjFile(const char *path, const char *fileName, cons
         return nullptr;
     }
     const char *parent = readr.Root()->GetAttribute_Str("parent");
-    bool isCommon = true;
-    if (readr.Root()->HasAttribute("special"))
-        isCommon = readr.Root()->GetAttribute_Bool("special") ? false : true;
-    MemeoryDes *parentDes = nullptr;
+    ObjectDes *parentDes = nullptr;
     if (strcmp(parent, "") != 0)
     {
         BuildDependence(fileName, parent, dependence);
@@ -244,32 +213,42 @@ MemeoryDes * ObjectMgr::LoadObjFile(const char *path, const char *fileName, cons
         parentDes = LoadObjFile(path, parentFile.GetString(), nameSpace, files, dependence);
         CancelDependence(fileName, parent, dependence);
     }
-    MemeoryDes *memeory = NEW MemeoryDes(simpleName, parentDes, isCommon);
+    ObjectDes *memeory = NEW ObjectDes(simpleName, parentDes);
     IXmlObject *member = readr.Root()->GetFirstChrild("member");
     BuildMemberDes(path, fileName, nameSpace, files, dependence, member, memeory, fullName.GetString());
     auto ret = s_memeoryMap.insert(std::make_pair(fullName, memeory));
     ASSERT(ret.second, "error");
     memeory->Fix();
-    PropertyLists propertyLists;
-    memeory->GetProperty(propertyLists);
-    for (auto prop : propertyLists)
-    {
-        MemberName name(fullName.GetString());
-        name << mem_split_name << prop.name.GetString();
-        prop.name = name;
-        auto propRet = s_propertyMap.insert(std::make_pair(prop.name.GetString(), prop));
-        ASSERT(propRet.second, "error");
-    }
+	const auto &propertyMap = memeory->GetPropertyMap();
+	for (auto &prop : propertyMap)
+	{
+		MemberName name(fullName.GetString());
+		name << mem_split_name << prop.first.c_str();
+		auto propRet = s_propertyMap.insert(std::make_pair(name.GetString(), prop.second));
+		ASSERT(propRet.second, "error");
+
+	}
+    //PropertyLists propertyLists;
+    //memeory->GetProperty(propertyLists);
+    //for (auto prop : propertyLists)
+    //{
+    //    MemberName name(fullName.GetString());
+    //    name << mem_split_name << prop.name.GetString();
+    //    prop.name = name;
+    //    auto propRet = s_propertyMap.insert(std::make_pair(prop.name.GetString(), prop));
+    //    ASSERT(propRet.second, "error");
+    //}
 
     return memeory;
 }
 
-void ObjectMgr::BuildMemberDes(const char *path, const char *fileName, const char *nameSpace, tools::FileMap *files, DependenceMap &dependence, IXmlObject *member, MemeoryDes *memeory, const char *host)
+void ObjectMgr::BuildMemberDes(const char *path, const char *fileName, const char *nameSpace, tools::FileMap *files, DependenceMap &dependence, IXmlObject *member, ObjectDes *memeory, const char *host)
 {
     IXmlObject *childMember = member;
     while (childMember != nullptr)
     {
         MemberDes des;
+		des.memeoryDes = nullptr;
         const char *name = childMember->GetAttribute_Str("name");
         const char *type = childMember->GetAttribute_Str("type");
         des.index = childMember->GetAttribute_S32("index");
@@ -296,10 +275,21 @@ void ObjectMgr::BuildMemberDes(const char *path, const char *fileName, const cha
             des.type = key.lVal;
             if (des.type == DATA_TYPE_TABLE)
             {
-                MemeoryDes *tableMemeory = NEW MemeoryDes(name, nullptr, true);
+				tools::FileName childHost(host);
+				childHost << mem_split_name << name;
+				TableDes *tableMemeory = NEW TableDes(childHost.GetString());
+				if (childMember->HasAttribute("key"))
+				{
+					const char *keyName = childMember->GetAttribute_Str("key");
+					if (childMember->HasAttribute("des"))
+					{
+						bool des = childMember->GetAttribute_Bool("des");
+						tableMemeory->SetDes(des);
+					}
+					tableMemeory->SetKeyName(keyName);
+				}
+
                 IXmlObject *tableMember = childMember->GetFirstChrild("member");
-                tools::FileName childHost(host);
-                childHost << mem_split_name << name;
                 BuildMemberDes(path, fileName, nameSpace, files, dependence, tableMember, tableMemeory, childHost.GetString());
                 des.memeoryDes = tableMemeory;
                 auto ret = s_memeoryMap.insert(std::make_pair(childHost.GetString(), tableMemeory));
@@ -317,8 +307,6 @@ void ObjectMgr::BuildMemberDes(const char *path, const char *fileName, const cha
         childMember = childMember->GetNextSibling();
     }
 }
-
-
 
 bool ObjectMgr::BuildDependence(const char *file, const char *dependenceFile, DependenceMap &dependence)
 {
@@ -373,6 +361,48 @@ void ObjectMgr::InitType(const char *type, s8 val, s16 size)
     ASSERT(ret.second, "error");
 }
 
+s64 ObjectMgr::GetNewGUID(bool local)
+{
+	s64 id = 0;
+	if (local)
+	{
+		for (s32 i = 0; i < ID_QUERY_SIZE; i++)
+		{
+			id = ++s_guidInfo.localId;
+			if (s_guidInfo.localId == LOCAL_OBJ_MAX)
+				s_guidInfo.localId = 0;
+
+			auto iter = s_objectMap.find(id);
+			if (iter == s_objectMap.end())
+				break;
+		}
+	}
+	else
+	{
+		if (s_cbFun != nullptr)
+		{
+			for (s32 i = 0; i < ID_QUERY_SIZE; i++)
+			{
+				if (s_guidInfo.guidMin < s_guidInfo.guidMax)
+				{
+					auto iter = s_objectMap.find(s_guidInfo.guidMin);
+					if (iter == s_objectMap.end())
+						id = s_guidInfo.guidMin++;
+				}
+				else
+				{
+					s32 num = 0;
+					s_cbFun(s_guidInfo.guidMin, num);
+					s_guidInfo.guidMax = s_guidInfo.guidMin + num;
+				}
+			}
+
+		}
+	}
+
+	return id;
+}
+
 void ObjectMgr::TestObject()
 {
 	IObject *player = InnerCreateObject("logic::player");
@@ -384,5 +414,30 @@ void ObjectMgr::TestObject()
 	oldLevel = player->GetMemberS64(Logic::Player::lvl);
 	player->SetMemberS64(Logic::Player::lvl, oldLevel + 10);
 	nowLevel = player->GetMemberS64(Logic::Player::lvl);
-
+	ITable *bag = player->GetTable(Logic::Player::bag);
+	s32 count = bag->RowCount();
+	IRow *row = bag->CreateRow();
+	row->SetMemberS32(Logic::Player::Bag::place, 1);
+	s32 place = row->GetMemberS32(Logic::Player::Bag::place);
+	count = bag->RowCount();
+	const char *name = player->GetMemberStr(Logic::Player::name);
+	player->SetMemberStr(Logic::Player::name, "test0test1test2test3");
+	name = player->GetMemberStr(Logic::Player::name);
+	ITable *notic = player->GetTable(Logic::Player::notice);
+	s32 noticCount = notic->RowCount();
+	IRow *noticRow = nullptr;
+	noticRow = notic->AddRowByKey("test2");
+	noticRow = notic->AddRowByKey("test1");
+	noticRow = notic->AddRowByKey("test3");
+	auto fun = [](IRow *row)
+	{
+		IKernel *kernel = s_kernel;
+		const char *content = row->GetMemberStr(Logic::Player::Notice::content);
+		DEBUG_LOG("notice, content:%s", content);
+	};
+	notic->ForEach(fun);
+	IRow *findRow = notic->FindRowByKey("test1");
+	findRow = notic->FindRowByKey("testt");
+	noticRow->SetMemberStr(Logic::Player::Notice::content, "test4");
+	noticRow->SetMemberStr(Logic::Player::name, "xuping");
 }

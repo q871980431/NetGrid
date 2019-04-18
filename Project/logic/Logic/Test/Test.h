@@ -4,13 +4,6 @@
 #include "Tools.h"
 #include "TList.h"
 
-namespace obj1
-{
-    const static s8 obj2;
-    namespace Obj2{
-        const static s8 obj3;
-    }
-}
 struct ATTR 
 {
     s64 operator ()(const char *name)

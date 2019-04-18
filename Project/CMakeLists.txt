@@ -21,14 +21,48 @@ IF(LINUX)
 	#SET(CMAKE_BUILD_TYPE "Debug")
 	LINK_DIRECTORIES("${PROJECT_BINARY_DIR}/linux")
 	#SET(CMAKE_C_FLAGS	"-std=c++0x -Wall -lpthread -rdynamic -ldl -Dlinux -lcurl -lmysqlclient -lTNavigation")
-        SET(CMAKE_CXX_FLAGS " -std=c++11 -Wall -DLINUX -pthread -rdynamic -ldl")
+		SET(CMAKE_C_FLAGS "-fPIC")
+        SET(CMAKE_CXX_FLAGS " -std=c++11 -Wall -DLINUX -pthread -rdynamic -ldl -lrt")
 	#SET(CMAKE_C_FLAGS_DEBUG	"-g -D_DEBUG -o0 -pg -L${PROJECT_SOURCE_DIR}/Thridlibrary/debug/linux")
-        SET(CMAKE_C_FLAGS_DEBUG "-g -D_DEBUG -O -pg -L${PROJECT_SOURCE_DIR}/Thridlibrary/debug/linux")
+        SET(CMAKE_C_FLAGS_DEBUG "-g -D_DEBUG -O -pg -L${PROJECT_SOURCE_DIR}/Thridlibrary/linux")
 	#SET(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O2 _L${PROJECT_SOURCE_DIR}/Thridlibrary/release/linux")
-	SET(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O2 _L${PROJECT_SOURCE_DIR}/Thridlibrary/release/linux")
+	SET(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O2 _L${PROJECT_SOURCE_DIR}/Thridlibrary/linux")
 	#SET(CMAKE_C_FLAGS_RELEASE "-O3 _L${PROJECT_SOURCE_DIR}/Thridlibrary/release/linux")
-	SET(CMAKE_C_FLAGS_RELEASE "-O3 _L${PROJECT_SOURCE_DIR}/Thridlibrary/release/linux")
+	SET(CMAKE_C_FLAGS_RELEASE "-O3 _L${PROJECT_SOURCE_DIR}/Thridlibrary/linux")
 	MESSAGE(STATUS "Linux")
+ENDIF(LINUX)
+
+IF(WIN32)
+SET(THIRD_LIBRARIES_DEBUG_DIR
+	"${PROJECT_SOURCE_DIR}/Thridlibrary/windows/debug"
+)
+SET(THIRD_LIBRARIES_RELEASE_DIR
+	"${PROJECT_SOURCE_DIR}/Thridlibrary/windows/release"
+)
+
+SET(OBJECT_LIBD
+	debug "${PROJECT_BINARY_DIR}/windows/debug/ObjectMgr.lib"
+)
+SET(OBJECT_LIB
+	optimized "${PROJECT_BINARY_DIR}/windows/Release/ObjectMgr.lib"
+)
+
+ENDIF(WIN32)
+
+IF(LINUX)
+SET(THIRD_LIBRARIES_DEBUG_DIR
+	"${PROJECT_SOURCE_DIR}/Thridlibrary/linux"
+)
+SET(THIRD_LIBRARIES_RELEASE_DIR
+	"${PROJECT_SOURCE_DIR}/Thridlibrary/linux"
+)
+
+SET(OBJECT_LIBD
+	debug "${PROJECT_BINARY_DIR}/linux/libObjectMgr.so"
+)
+SET(OBJECT_LIB
+	optimized "${PROJECT_BINARY_DIR}/linux/libObjectMgr.so"
+)
 ENDIF(LINUX)
 
 SET(API_DIR
@@ -81,16 +115,7 @@ SET(2D_DIR
 )
 SET(2D
 	"${2D_DIR}/Zone.h"
-	"${2D_DIR}/ZoneAOI.h"
-    "${2D_DIR}/TZoneAOI.h"
-	"${2D_DIR}/ZoneAOI.cpp"
 	"${2D_DIR}/Vector.h"
-    "${2D_DIR}/RectTree.h"
-	"${2D_DIR}/RectTree.cpp"
-    "${2D_DIR}/RTree.h"
-    "${2D_DIR}/TRectTree.h"
-    "${2D_DIR}/SearchTree.cpp"
-    "${2D_DIR}/SearchTree.h"
 )
 
 SET(COMMON_TIME_DIR
@@ -102,23 +127,6 @@ SET(COMMON_TIME
 
 
 MESSAGE(STATUS ${PUBLIC})
-IF(WIN32)
-SET(THIRD_LIBRARIES_DEBUG_DIR
-	"${PROJECT_SOURCE_DIR}/Thridlibrary/windows/debug"
-)
-SET(THIRD_LIBRARIES_RELEASE_DIR
-	"${PROJECT_SOURCE_DIR}/Thridlibrary/windows/release"
-)
-
-SET(OBJECT_LIBD
-	debug "${PROJECT_BINARY_DIR}/windows/debug/ObjectMgr.lib"
-)
-SET(OBJECT_LIB
-	optimized "${PROJECT_BINARY_DIR}/windows/Release/ObjectMgr.lib"
-)
-
-
-ENDIF(WIN32)
 
 SET(THIRD_LIBRARIES_INCLUDE_DIR
 	"${PROJECT_SOURCE_DIR}/Thridlibrary/include"

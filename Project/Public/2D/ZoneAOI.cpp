@@ -59,7 +59,7 @@ void ZoneAoi::Update(s64 id, Vector3D &pos)
 }
 void ZoneAoi::Flush( const call_back &fun)
 {
-    PTF("*****************Exec Fulsh***************");
+    //PTF("*****************Exec Fulsh***************");
     StopWatch watch;
     auto iter = _objMap.begin();
     auto endIter = _objMap.end();
@@ -263,7 +263,7 @@ void ZoneAoi::EchoInterest(s64 id)
     if (iter != _objMap.end())
     {
         obj = iter->second;
-        PTF("Obj %lld:\n Last Interest ID:\n", id);
+        //PTF("Obj %lld:\n Last Interest ID:\n", id);
         for (auto tmp = obj->_last.begin(); tmp != obj->_last.end(); tmp++)
         {
             printf("     %lld", *tmp);

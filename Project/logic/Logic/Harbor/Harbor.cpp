@@ -9,6 +9,9 @@
 #include "FrameworkDefine.h"
 #include "XmlReader.h"
 #include "Convert.h"
+#ifdef LINUX
+#include <arpa/inet.h>
+#endif
 
 Harbor * Harbor::s_self = nullptr;
 IKernel * Harbor::s_kernel = nullptr;
@@ -266,7 +269,7 @@ void Harbor::OnRecvMasterConnectHarborMsg(s32 type, s32 nodeId, const char *buff
     ASSERT(sizeof(NODE_MSG_NODE_DISCOVER) == len, "error");
     NODE_MSG_NODE_DISCOVER *msg = (NODE_MSG_NODE_DISCOVER *)buff;
     struct in_addr addr;
-    addr.S_un.S_addr = msg->ipAddr;
+    addr.s_addr = msg->ipAddr;
     char ip[IP_LEN] = {0};
     SafeSprintf(ip, sizeof(ip), "%s", inet_ntoa(addr));
     ConnectHarbor(ip, msg->port);

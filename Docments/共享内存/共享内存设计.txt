@@ -1,0 +1,12 @@
+构建一个基于ShareMemory实现的进程通信模块
+
+ShareMemoryIPC
+
+IPCManager
+
+<>
+<>
+<>
+
+
+bool CreateReadFile()
