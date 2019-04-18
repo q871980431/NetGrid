@@ -96,10 +96,17 @@ void Master::OnClose(s32 type, s32 nodeId)
 
 }
 
-bool Master::StartService(s8 slave, const char *name, s8 type, s32 id, const char *cmd)
+bool Master::StartServiceNode(s32 slave, const char *name, s8 type, s32 id, const char *cmd)
 {
 	if (slave == core::INVALID)
-		s32 slave = s_self->GetBestNode(type);
+		slave = s_self->GetBestNode(type);
+	auto iter = s_slaves.find(slave);
+	ASSERT(iter != s_slaves.end(), "error");
+	if (iter != s_slaves.end())
+	{
+
+	}
+
 	return true;
 }
 
@@ -117,6 +124,7 @@ void Master::OnRecvNodeHasReadyMsg(s32 type, s32 nodeId, const char *buff, s32 l
 		}
 	}else
 	{
+
 	}
 }
 

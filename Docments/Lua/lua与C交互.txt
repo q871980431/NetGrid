@@ -1,0 +1,36 @@
+int lua_getglobal (lua_State *L, const char *name);
+把全局变量 name 里的值压栈，返回该值的类型。
+
+方便起见， 所有针对栈的 API 查询操作都不严格遵循栈的操作规则。 
+而是可以用一个 索引 来指向栈上的任何元素： 
+正的索引指的是栈上的绝对位置（从1开始）； 负的索引则指从栈顶开始的偏移量。 展开来说，如果堆栈有 n 个元素， 那么索引 1 表示第一个元素 （也就是最先被压栈的元素） 而索引 n 则指最后一个元素； 索引 -1 也是指最后一个元素 （即栈顶的元素）， 索引 -n 是指第一个元素
+
+Lua 以一个严格的 LIFO 规则（后进先出；也就是说，始终存取栈顶）来操作栈
+栈顶		-1
+
+
+
+
+
+
+栈底	1
+	
+
+在交互层,操作C和lua间的栈 需要压栈和弹栈成对出现 尽可能的	
+
+lua_register
+[-0, +0, e]
+void lua_register (lua_State *L, const char *name, lua_CFunction f);
+把 C 函数 f 设到全局变量 name 中。 它通过一个宏定义：
+
+     #define lua_register(L,n,f) \
+            (lua_pushcfunction(L, f), lua_setglobal(L, n))
+
+C API 是一个 C 代码与 Lua 进行交互的函数集。他有以下部分组成：读写 Lua 全局
+变量的函数，调用 Lua 函数的函数，运行 Lua 代码片断的函数，注册 C 函数然后可以在
+Lua 中被调用的函数，等等
+
+C API分类
+	头文件 lauxlib.h 定义了辅助库（auxlib）提供的函数
+	
+多个C调用Lua时 操作的是 同一个栈

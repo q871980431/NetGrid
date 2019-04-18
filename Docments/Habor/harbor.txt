@@ -1,0 +1,7 @@
+nodeType nodeId 均为s16 足够了
+
+nodeType s16
+nodeId	 s16
+
+serverid s32
+

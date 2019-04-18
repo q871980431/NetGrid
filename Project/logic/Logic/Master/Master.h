@@ -44,7 +44,7 @@ public:
     virtual void OnClose(s32 type, s32 nodeId);
 
 public:
-	static bool StartService(s8 slave, const char *name, s8 type, s32 id, const char *cmd);
+	static bool StartServiceNode(s32 slave, const char *name, s8 type, s32 id, const char *cmd);
 private:
 	void OnRecvNodeHasReadyMsg(s32 type, s32 nodeId, const char *buff, s32 len);
 
