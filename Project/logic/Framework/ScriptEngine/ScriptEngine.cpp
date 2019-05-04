@@ -44,6 +44,7 @@ bool ScriptEngine::Launched(IKernel *kernel)
     s_self->RegModuleFunc("test", "TestAdd", TestAdd, "**************");
 	s_self->RegModuleFunc("test", "TestFunc", TestFunc, "**************");
 	
+    //s_self->RegModuleFunc("test", "TestAdd", TestAdd, "**************");
 
     //IDataInterchangeCaller *caller = s_self->PrepareCall("npc.xuping", "OnStart");
     //IDataOutputStream *ostream = caller->GetOutputStream();
@@ -82,6 +83,18 @@ IDataInterchangeCaller * ScriptEngine::PrepareCall(const char *module, const cha
 {
     s_caller->PreCall(module, func);
     return s_caller;
+}
+
+void ScriptEngine::Call(const char *module, const char * func, const IDataOutputFuncType &writeFun, const IDataCallBackFuncType &readFun)
+{
+	LuaInterchangeCaller caller(s_self, s_luaState);
+	caller.InitCall(module, func);
+	if (writeFun)
+	{
+		IDataOutputStream *outStream = caller.GetOutputStream();
+		writeFun(s_kernel, *outStream);
+	}
+	caller.Call(s_kernel, readFun);
 }
 
 void ScriptEngine::RegModuleFunc(const char *module, const char *func, const IDataInterchangeFuncType &f, const char *debug)
@@ -212,16 +225,39 @@ int ScriptEngine::Log(lua_State *state)
 
 bool ScriptEngine::ExecGlobalFunction(const char *func, s8 argc, const IDataCallBackFuncType callback)
 {
-    lua_getglobal(s_luaState, func);
+	IKernel *kernel = s_kernel;
+    lua_getglobal(s_luaState, func);				//将func 函数压入栈中
     if (!lua_isfunction(s_luaState, -1))
     {
         ASSERT(false, "error, don't find function: %s", func);
         lua_pop(s_luaState, 1);
         return false;
     }
+	TRACE_LOG("************Exe ExecGlobalFunction**************");
+	PrintLuaStack();
     if (argc > 0)
-        lua_insert(s_luaState, -(argc + 1));
+        lua_insert(s_luaState, -(argc + 1));		//将func 移动到 距离栈顶 argc+1的位置
+	TRACE_LOG("************Exe ExecGlobalFunction Insert**************");
+	PrintLuaStack();
     return ExecFunction(argc, callback);
+}
+
+void ScriptEngine::PrintLuaStack()
+{
+	IKernel *kernel = s_kernel;
+	lua_State* pLuaState = s_luaState;
+	s32 stackTop = lua_gettop(pLuaState);//获取栈顶的索引值
+	s32 nIdx = 0;
+	int nType; 
+	TRACE_LOG(" element count: %d", stackTop); 
+	TRACE_LOG("--栈顶(v)(%d)--", stackTop);
+	//显示栈中的元素	
+	for(nIdx = stackTop; nIdx > 0; --nIdx)
+	{		
+		nType = lua_type(pLuaState, nIdx);
+		TRACE_LOG("(i:%d) %s(%s)", nIdx, lua_typename(pLuaState,nType), lua_tostring(pLuaState,nIdx));
+	} 
+	TRACE_LOG("--栈底--");
 }
 
 bool ScriptEngine::ExecFunction(s8 argc, const IDataCallBackFuncType callback)
@@ -244,6 +280,8 @@ bool ScriptEngine::ExecFunction(s8 argc, const IDataCallBackFuncType callback)
         tarceIndex = findex - 1;
         lua_insert(s_luaState, tarceIndex);
     }
+	TRACE_LOG("************Exe PCallBegin**************");
+	PrintLuaStack();
     s32 error = lua_pcall(s_luaState, argc, LUA_RESULT_COUNT, tarceIndex);
     if (error != LUA_OK)
     {
@@ -259,6 +297,8 @@ bool ScriptEngine::ExecFunction(s8 argc, const IDataCallBackFuncType callback)
     LuaInputStream ack(s_luaState);
     if (callback != nullptr)
         callback(s_kernel, ack);
+	TRACE_LOG("************Exe PCallEnd**************");
+	PrintLuaStack();
     lua_pop(s_luaState, LUA_RESULT_COUNT);
     if (tarceIndex != 0)
         lua_pop(s_luaState, 1);

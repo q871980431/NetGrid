@@ -25,8 +25,10 @@ public:
     virtual bool Launched(IKernel *kernel);
     virtual bool Destroy(IKernel *kernel);
     virtual IDataInterchangeCaller * PrepareCall(const char *module, const char * func);
+	virtual void Call(const char *module, const char * func, const IDataOutputFuncType &writeFun, const IDataCallBackFuncType &readFun);
     virtual void RegModuleFunc(const char *module, const char *func, const IDataInterchangeFuncType &f, const char *debug);
 	virtual void CallScriptFunc(const char *module, const char *func, const IDataOutputFuncType &outPutFunc, const IDataCallBackFuncType &callBackFun);
+	virtual void PrintLuaStack();
 
 	s32 CallLuaFuncAdd(s32 a, s32 b);
 public:

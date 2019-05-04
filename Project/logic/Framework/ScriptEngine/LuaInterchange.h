@@ -67,6 +67,7 @@ public:
     virtual void Call(IKernel *kernel, const IDataCallBackFuncType &fun);
 public:
     bool PreCall(const char *module, const char *func);
+	void InitCall(const char *module, const char *func);
 private:
     LuaOutputStream     _input;
     s32                 _topIndex;

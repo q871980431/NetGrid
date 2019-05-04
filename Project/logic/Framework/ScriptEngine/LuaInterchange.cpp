@@ -203,8 +203,21 @@ bool LuaInterchangeCaller::PreCall(const char *module, const char *func)
     return true;
 }
 
+void LuaInterchangeCaller::InitCall(const char *module, const char *func)
+{
+	_topIndex = lua_gettop(_luaState);
+
+	_trace.Assign(module);
+	_trace << "." << func;
+	_input.WriteStr(module);
+	_input.WriteStr(func);
+}
+
 void LuaInterchangeCaller::Call(IKernel *kernel, const IDataCallBackFuncType &fun)
 {
+	IKernel *_kernel = kernel;
+	TRACE_LOG("BeginCall, NextStack");
+	_scriptEngine->PrintLuaStack();
     _scriptEngine->ExecGlobalFunction(CALL_FUNCTION, _input.Count(), fun);
     s32 indexTop = lua_gettop(_luaState);
     ASSERT(indexTop == _topIndex, "error");

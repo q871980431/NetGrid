@@ -34,6 +34,7 @@ public:
 };
 
 typedef std::function<void(IKernel *kernel, IDataInputStream &input)> IDataCallBackFuncType;
+typedef std::function<void(IKernel *kernel, IDataOutputStream &output)> IDataOutputFuncType;
 typedef std::function<void(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out)> IDataInterchangeFuncType;
 typedef std::function<void(IKernel *kernel, IDataOutputStream &output)> IDataOutputFuncType;
 

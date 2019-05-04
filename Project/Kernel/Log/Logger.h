@@ -40,6 +40,7 @@ class Logger   : public ILogger, public Singleton<Logger>
 		LogList	swap;
 		std::mutex	mutex;
 	};
+
 public:
     //virtual ~Logger(){};
 

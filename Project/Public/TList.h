@@ -53,14 +53,24 @@ namespace tlib
                 ASSERT(node && node->_host == this, "error");
                 if (node && node->_host)
                 {
-                    if (node->_prev != nullptr)
+                    if (node->_prev)
                         node->_prev->_next = node->_next;
+					else
+					{
+						_head = node->_next;
+						if (_head)
+							_head->_prev = nullptr;
+					}
+
                     if (node->_next != nullptr)
                         node->_next->_prev = node->_prev;
-                    if (_head == node)
-                        _head = node->_next;
-                    if (_tail == node)
-                        _tail = node->_prev;
+					else
+					{
+						_tail = node->_prev;
+						if (_tail)
+							_tail->_next = nullptr;
+					}
+
                     CleanNodeIndex(node);
                     --_size;
 
@@ -74,14 +84,20 @@ namespace tlib
                 ASSERT(node && node->_host == nullptr, "error");
                 if (node && node->_host == nullptr)
                 {
-                    node->_next = _head;
                     node->_host = this;
 
-                    if (_head == nullptr)
-                        _tail = node;
-                    else
-                        _head->_prev = node;
-                    _head = node;
+					if (_head == nullptr)
+					{
+						_head = _tail = node;
+						node->_prev = node->_next = nullptr;
+					}
+					else
+					{
+						node->_prev = nullptr;
+						node->_next = _head;
+						_head->_prev = node;
+						_head = node;
+					}
                     ++_size;
                 }
             }
@@ -91,14 +107,20 @@ namespace tlib
                 ASSERT(node && node->_host == nullptr, "error");
                 if (node && node->_host == nullptr)
                 {
-                    node->_prev = _tail;
                     node->_host = this;
 
-                    if (_tail == nullptr)
-                        _head = node;
-                    else
-                        _tail->_next = node;
-                    _tail = node;
+					if (_tail == nullptr)
+					{
+						_head  = _tail = node;
+						node->_prev = node->_next = nullptr;
+					}
+					else
+					{
+						node->_prev = _tail;
+						node->_next = nullptr;
+						_tail->_next = node;
+						_tail = node;
+					}
                     ++_size;
                 }
             }

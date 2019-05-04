@@ -13,6 +13,7 @@
 #include "ObjectTest.h"
 #include "TestRtree.h"
 #include "TestSort.h"
+#include "TestScriptEngine.h"
 
 Test * Test::s_self = nullptr;
 IKernel * Test::s_kernel = nullptr;
@@ -61,29 +62,7 @@ bool Test::Launched(IKernel *kernel)
     //TestKey();
     //TestFiles();
 	//TestMatch::Test(s_kernel);
-	IKernel *_kernel = kernel;
-	TRACE_LOG("test:%d, %d", 1, 2);
-	s32 tmp = 0;
-	TestLamda(tmp);
-	typedef std::map<s32, s32> PlayerScore;
-	PlayerScore scoreMap;
-	for (s32 i = 0; i < 10; i++)
-	{
-		scoreMap.insert(std::make_pair(i, i));
-	}
-	typedef std::map<s32, PlayerScore> TestMap;
-	TestMap testMap;
-	//if (testMap[1].find(1) == testMap[1].end())
-	//{
-	//	return true;
-	//}
-
-	std::set<s32, std::greater<s32>> sets;
-	for (s32 i = 0; i < 10; i++)
-	{
-		sets.insert(i);
-	}
-
+	TestScriptEngine::Test(kernel);
     const IMember *meber = Root::id;
     std::vector<s32> ids;
     s32 size = sizeof(ids);

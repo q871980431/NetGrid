@@ -16,6 +16,8 @@ SET(TEST
 	"${CMAKE_CURRENT_SOURCE_DIR}/TestSort.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/TestAlgorithm.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/TestAlgorithm.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/TestScriptEngine.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/TestScriptEngine.h"
 )
 
 IF(WIN32)
