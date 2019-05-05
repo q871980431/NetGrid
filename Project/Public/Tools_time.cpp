@@ -8,45 +8,30 @@ const char *format = "%4d-%02d-%02d %02d:%02d:%02d";
 extern "C"  {
 #endif
 //===============================================START===============================
-    const char * GetCurrentTimeString()
+    const char * GetCurrentTimeString(const char *timeFormat)
     {
-        static char oldTime[64];
-        static char newTime[64];
-        static time_t t;
-        static char *now = nullptr;
+		thread_local static char newTime[128];
+		thread_local static time_t t = 0;
 
-        if (nullptr == now)
+		thread_local const tm *tm = nullptr;
+		if (timeFormat == nullptr)
+			timeFormat = format;
+        time_t t1 = tools::GetTimeSecond();
+        if (t1 - t > 0)
         {
-            tm *tm = nullptr;
-            t = time(NULL);
-            tm = localtime(&t);
-            SafeSprintf(oldTime, sizeof(oldTime), format, tm->tm_year + 1900, tm->tm_mon + 1, \
+            tm = tools::SafeLocalTime(&t1);
+            SafeSprintf(newTime, sizeof(newTime), timeFormat, tm->tm_year + 1900, tm->tm_mon + 1, \
                 tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
-            now = oldTime;
-        }
-        else
-        {
-            time_t t1 = time(NULL);
-            tm *tm = nullptr;
-            if (t1 - t > 0)
-            {
-                char *tmp = (now == oldTime) ? newTime : oldTime;
-                tm = localtime(&t1);
-                SafeSprintf(tmp, sizeof(oldTime), format, tm->tm_year + 1900, tm->tm_mon + 1, \
-                    tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
-                now = tmp;
-            }
         }
 
-        return now;
+        return newTime;
     }
 
     bool UpdateLocalTime(time_t time)
     {
 #ifdef WIN32
-        tm t;
+        tm t = *(tools::SafeLocalTime(&time));
         SYSTEMTIME st;
-        localtime_s(&t, &time);
         st.wYear = t.tm_year + 1900;
         st.wMonth = t.tm_mon + 1;
         st.wDay = t.tm_mday;
@@ -91,22 +76,22 @@ extern "C"  {
 
     time_t GetYearTime(s32 year, s32 month, s32 day, s32 hour, s32 min)
     {
-        time_t now = time(nullptr);
-        tm *time = localtime(&now);
-        time->tm_mon = month - 1;
-        time->tm_mday = day;
-        time->tm_hour = hour;
-        time->tm_min = min;
-        time->tm_sec = 0;
-        time->tm_year = year - 1900;
+        time_t now = tools::GetTimeSecond();
+        tm time = *(tools::SafeLocalTime(&now));
+        time.tm_mon = month - 1;
+        time.tm_mday = day;
+        time.tm_hour = hour;
+        time.tm_min = min;
+        time.tm_sec = 0;
+        time.tm_year = year - 1900;
 
-        return mktime(time);
+        return mktime(&time);
     }
 
     s32 GetGameWeek(time_t tick)
     {
         time_t zero = 0;
-        tm *time = localtime(&zero);
+        const tm *time = tools::SafeLocalTime(&zero);
         tick += time->tm_hour * 3600;
         tick -= (GAME_FRESH_TIME * 3600);
         s32 day = tick / 86400;

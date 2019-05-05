@@ -8,6 +8,7 @@
 #include "EchoServer.h"
 #include "XmlReader.h"
 #include "Game_tools.h"
+#include <vector>
 
 EchoServer * EchoServer::s_self = nullptr;
 IKernel * EchoServer::s_kernel = nullptr;
@@ -47,6 +48,8 @@ IMsgSession * EchoServer::CreateSession()
 
 void EchoServer::StartServer()
 {
+	IKernel *kernel = s_kernel;
+	TRACE_LOG("StartServer:%s, %d", s_configInfo.ip.GetString(), s_configInfo.port);
 	s_kernel->CreateNetListener(s_configInfo.ip.GetString(), s_configInfo.port, this);
 }
 

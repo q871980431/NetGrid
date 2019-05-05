@@ -45,13 +45,19 @@
     kernel->SyncLog(log); \
 }
 
+#define THREAD_LOG(labl,format, ...)\
+{\
+    char log[LOG_BUFF_SIZE] = { 0 }; \
+    SafeSprintf(log, sizeof(log), "[%s]: %s:%d:%s | "#format, labl, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+    kernel->ThreadLog(log); \
+}
 
 #endif
 #ifdef LINUX
 #define DEBUG_LOG(format, a...)\
 {\
     	char log[LOG_BUFF_SIZE] = { 0 }; \
-        SafeSprintf(log, sizeof(log), "[DEBUG]: %s:%d:%s | " format, __FILE__, __LINE__, __FUNCTION__, ##a); \
+        SafeSprintf(log, sizeof(log), "[DEBUG]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##a); \
 	    kernel->AsyncLog(log);\
 }
 
@@ -66,16 +72,24 @@
 #define ERROR_LOG(format, a...)\
 {\
 	char log[LOG_BUFF_SIZE] = { 0 }; \
-	SafeSprintf(log, sizeof(log), "[ERROR]: %s:%d:%s | " format, __FILE__, __LINE__, __FUNCTION__, ##a); \
+	SafeSprintf(log, sizeof(log), "[ERROR]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##a); \
 	kernel->AsyncLog(log); \
 }
 
 #define IMPORTANT_LOG(format, a...)\
 {\
 	char log[LOG_BUFF_SIZE] = { 0 }; \
-	SafeSprintf(log, sizeof(log), "[IMPORTANT]: %s:%d:%s | " format, __FILE__, __LINE__, __FUNCTION__, ##a); \
+	SafeSprintf(log, sizeof(log), "[IMPORTANT]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##a); \
 	kernel->SyncLog(log); \
 }
+
+#define THREAD_LOG(labl,format, ...)\
+{\
+    char log[LOG_BUFF_SIZE] = { 0 }; \
+    SafeSprintf(log, sizeof(log), "[%s]: %s:%d:%s | "#format, labl, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+    kernel->ThreadLog(log); \
+}
+
 #endif
 class IModule;
 namespace core
@@ -163,12 +177,13 @@ namespace core
     public:
         virtual void SyncLog(const char *contens) = 0;
         virtual void AsyncLog(const char *contens) = 0;
+		virtual void ThreadLog(const char *contents) = 0;
         virtual IModule * FindModule(const char *name) = 0;
         virtual void CreateNetSession(const char *ip, s16 port, core::IMsgSession *session) = 0;
         virtual void CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener) = 0;
 		virtual void StartTimer(core::ITimer *timer, s32 delay, s32 count, s32 interval, const char *trace) = 0;
 		virtual void KillTimer(core::ITimer *timer) = 0;
-		virtual void AddFrame(core::IFrame *frame, u8 runLvl) = 0;
+		virtual void AddFrame(core::IFrame *frame, u8 runLvl, const char *trace) = 0;
 		virtual void RemoveFrame(core::IFrame *frame) = 0;
         virtual const char* GetCoreFile() = 0;
         virtual const char* GetConfigFile() = 0;
@@ -181,5 +196,11 @@ namespace core
 	char trace[256];\
 	SafeSprintf(trace, sizeof(trace), "trace: %s:%d", __FILE__, __LINE__);\
 	kernel->StartTimer(timer, delay, count, interval, trace);\
+}
+
+#define ADD_FRAME(frame, runLvl){\
+	char trace[256];\
+	SafeSprintf(trace, sizeof(trace), "trace: %s:%d", __FILE__, __LINE__);\
+	kernel->AddFrame(frame, runLvl, trace);\
 }
 #endif

@@ -1,0 +1,284 @@
+/*
+ * File:	NetService.cpp
+ * Author:	xuping
+ * 
+ * Created On 2019/4/23 10:59:11
+ */
+
+#include "NetListenerMgr.h"
+#include "Tools.h"
+#include <set>
+
+bool NetListenerMgr::CreateNetListener(IKernel *kernel, const char *ip, s32 port, INetTcpListener *listener)
+{
+	sockaddr_in stAddr;
+	tools::InitSocketAddr(stAddr, ip, port);
+	NetSocket netSocket = tools::InitTcpSocket();
+	if (netSocket == tools::INVALID_NETSOCKET)
+	{
+		TRACE_LOG("Init TcpSocket Error, ErrorCode:%d", tools::GetSocketError());
+		return false;
+	}
+
+	tools::SetSocketNonlock(netSocket);
+	tools::SetSocketReuseAddr(netSocket);
+	if (!tools::BindSocket(netSocket, stAddr))
+	{
+		TRACE_LOG("Bind Socket Error, ErrorCode:%d", tools::GetSocketError());
+		return false;
+	}
+
+	if (!tools::ListenSocket(netSocket))
+	{
+		TRACE_LOG("Listen Socket Error, ErrorCode:%d", tools::GetSocketError());
+		return false;
+	}
+	TRACE_LOG("Create Listener: netsocket:%d", netSocket);
+	OnCreateNetListener(port, netSocket, listener);
+
+	return true;
+}
+
+bool NetListenerMgr::CreateNetConnecter(IKernel *kernel, const char *ip, s32 port, ITcpSession *tcpsession)
+{
+	sockaddr_in stAddr;
+	tools::InitSocketAddr(stAddr, ip, port);
+	NetSocket netSocket = tools::InitTcpSocket();
+	if (netSocket == tools::INVALID_NETSOCKET)
+	{
+		TRACE_LOG("Init TcpSocket Error, ErrorCode:%d", tools::GetSocketError());
+		return false;
+	}
+	tools::SetSocketNonlock(netSocket);
+	NetSocket ret = tools::ConnectSocket(netSocket, stAddr);
+	if (tools::INVALID_NETSOCKET == ret)
+	{
+		TRACE_LOG("Connect Socket Error, ErrorCode:%d", tools::GetSocketError());
+		return false;
+	}
+	if (ret == 0)
+		OnCreateNetConnecter(netSocket, stAddr, tcpsession);
+	if (ret == netSocket)
+		_netService->OnConnectedSocket(_kernel, netSocket, stAddr, tcpsession);
+	return true;
+}
+
+void NetListenerMgr::Process(IKernel *kernel, s64 tick)
+{
+
+	MainEvent *evt = _mainQueue.Pop();
+	while (evt)
+	{
+		if (evt->opt == LISTEN_EVT_ADD)
+		{
+			if (evt->type == LISTENER)
+				OnAccept(kernel, evt->listSocket, evt->socket);
+			if (evt->type == CONNECTER)
+				OnConnect(kernel, evt->socket);
+		}
+		if (evt->opt == LISTEN_EVT_REMOVE)
+		{
+			if (evt->type == LISTENER)
+			{
+				auto iter = _listenSockMap.find(evt->socket);
+				ASSERT(iter != _listenSockMap.end(), "error");
+				if (iter != _listenSockMap.end())
+				{
+					iter->second.listener->OnRelease();
+					tools::CloseSocket(iter->second.socket);
+					_listenSockMap.erase(iter);
+				}
+			}
+
+		}
+		evt = _mainQueue.Pop();
+	}
+}
+
+void NetListenerMgr::OnCreateNetListener(s32 port, NetSocket netSocket, INetTcpListener *listener)
+{
+	ListenerNode node;
+	node.socket = netSocket;
+	node.listener = listener;
+
+	_listenSockMap.emplace(netSocket, node);
+	StartListen();
+	ThreadEvent evt;
+	evt.type = LISTENER;
+	evt.socket = netSocket;
+	evt.opt = LISTEN_EVT_ADD;
+	_threadQueue.TryPush(evt);
+}
+
+void NetListenerMgr::OnCreateNetConnecter(NetSocket netSocket, sockaddr_in &addr, ITcpSession *tcpsession)
+{
+	ConnectNode node;
+	node.session = tcpsession;
+	node.socket = netSocket;
+	node.addr = addr;
+	_connectSockMap.emplace(netSocket, node);
+	StartListen();
+	ThreadEvent evt;
+	evt.type = CONNECTER;
+	evt.socket = netSocket;
+	evt.opt = LISTEN_EVT_ADD;
+	_threadQueue.TryPush(evt);
+}
+
+void NetListenerMgr::StartListen()
+{
+	if (!_listen)
+	{
+		_listenThread = std::thread(&NetListenerMgr::Run, this);
+		_listen = true;
+	}
+}
+
+void NetListenerMgr::OnAccept(IKernel *kernel, NetSocket listenSocket, NetSocket clientSocket)
+{
+	auto iter = _listenSockMap.find(listenSocket);
+	ASSERT(iter != _listenSockMap.end(), "error");
+	if (iter != _listenSockMap.end())
+	{
+		ITcpSession *session = iter->second.listener->CreateSession();
+		if (nullptr == session)
+		{
+			tools::CloseSocket(clientSocket);
+			return;
+		}
+		tools::SetSocketNonlock(clientSocket);
+		_netService->OnAcceptSocket(kernel, clientSocket, session);
+	}
+}
+
+void NetListenerMgr::OnConnect(IKernel *kernel, NetSocket connectSocket)
+{
+	auto iter = _connectSockMap.find(connectSocket);
+	ASSERT(iter != _connectSockMap.end(), "error");
+	if (iter != _connectSockMap.end())
+	{
+		_netService->OnConnectedSocket(_kernel, iter->second.socket, iter->second.addr, iter->second.session);
+		_connectSockMap.erase(iter);
+	}
+}
+
+void NetListenerMgr::Run()
+{
+	IKernel *kernel = _kernel;
+	SocketArray netSockets;
+	tools::Zero(netSockets);
+	fd_set readFd;
+	fd_set writFd;
+	s32 maxFd = 0;
+	s32 nSockets = 0;
+	sockaddr_in stClient;
+	
+	timeval timeOut;
+	timeOut.tv_sec = 0;
+	timeOut.tv_usec = SELECT_TIME_OUT;
+
+	while (true)
+	{
+		//THREAD_LOG("NetListener","NetListenerMgr Running");
+		ThreadEvent *evt = _threadQueue.Pop();
+		if (evt != nullptr)
+		{
+			if (evt->opt == LISTEN_EVT_ADD)
+			{
+				//上层逻辑保护 不会有超过LISTEN_SOCKET_SIZE 数量
+				if (netSockets.size < LISTEN_SOCKET_SIZE)
+				{
+					SocketNode *node = &(netSockets.sockets[netSockets.size++]);
+					node->socket = evt->socket;
+					node->type = evt->type;
+				}
+			}
+			else if (evt->opt == LISTEN_EVT_REMOVE)
+			{
+				if (DelSoeckt(netSockets, evt->socket))
+				{
+					MainEvent mainEvt;
+					mainEvt.opt = evt->opt;
+					mainEvt.socket = evt->socket;
+					mainEvt.type = evt->type;
+					_mainQueue.TryPush(mainEvt);
+				}
+			}
+		}
+
+		FD_ZERO(&readFd);
+		FD_ZERO(&writFd);
+		maxFd = 0;
+		for (s32 i = 0; i < netSockets.size; i++)
+		{
+			FD_SET(netSockets.sockets[i].socket, &readFd);
+			if (netSockets.sockets[i].type == CONNECTER)
+				FD_SET(netSockets.sockets[i].socket, &writFd);
+			maxFd = max(maxFd, netSockets.sockets[i].socket);
+		}
+#ifdef LINUX
+		maxFd++;
+#endif
+		nSockets = select(maxFd, &readFd, &writFd, nullptr, &timeOut);
+		std::vector<NetSocket> dels;
+		for (s32 i = 0; i < netSockets.size; i++)
+		{
+			if (FD_ISSET(netSockets.sockets[i].socket, &writFd))
+			{
+				if (netSockets.sockets[i].type == CONNECTER)
+				{
+					MainEvent evt;
+					evt.socket = netSockets.sockets[i].socket;
+					evt.opt = LISTEN_EVT_ADD;
+					evt.type = CONNECTER;
+					dels.push_back(evt.socket);
+					_mainQueue.TryPush(evt);
+				}
+			}
+
+			if (FD_ISSET(netSockets.sockets[i].socket, &readFd))
+			{
+				TRACE_LOG("Listen", "Listen socket:%d, type:%d", netSockets.sockets[i].socket, netSockets.sockets[i].type);
+				if (netSockets.sockets[i].type == LISTENER)
+				{
+					NetSocket clientSocket;
+					if (!tools::AcceptSocket(netSockets.sockets[i].socket, stClient, clientSocket))
+					{
+						THREAD_LOG("ACCEPT", "%d accept error, code:%d", netSockets.sockets[i].socket, tools::GetSocketError());
+						continue;
+					}
+					MainEvent evt;
+					evt.socket = clientSocket;
+					evt.opt = LISTEN_EVT_ADD;
+					evt.type = LISTENER;
+					evt.listSocket = netSockets.sockets[i].socket;
+					_mainQueue.TryPush(evt);
+				}
+
+			}
+		}
+		for (auto delSoeckt : dels)
+			DelSoeckt(netSockets, delSoeckt);
+
+		if (_terminate)
+			break;
+		MSLEEP(50);
+	}
+}
+
+bool NetListenerMgr::DelSoeckt(SocketArray &netSockets, NetSocket delSocket)
+{
+	s32 i = 0;
+	for (; i < netSockets.size; i++)
+	{
+		if (netSockets.sockets[i].socket == delSocket)
+			break;
+	}
+	if (i != netSockets.size)
+	{
+		netSockets.sockets[i] = netSockets.sockets[--netSockets.size];
+		return true;
+	}
+
+	return false;
+}

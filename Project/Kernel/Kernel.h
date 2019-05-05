@@ -19,12 +19,13 @@ public:
 public:
     virtual void SyncLog(const char *contens);
     virtual void AsyncLog(const char *contens);
+	virtual void ThreadLog(const char *contents);
     virtual IModule * FindModule(const char *name);
     virtual void CreateNetSession(const char *ip, s16 port, core::IMsgSession *session);
     virtual void CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener);
 	virtual void StartTimer(core::ITimer *timer, s32 delay, s32 count, s32 interval, const char *trace);
 	virtual void KillTimer(core::ITimer *timer);
-	virtual void AddFrame(core::IFrame *frame, u8 runLvl);
+	virtual void AddFrame(core::IFrame *frame, u8 runLvl, const char *trace);
 	virtual void RemoveFrame(core::IFrame *frame);
     virtual const char* GetCoreFile();
     virtual const char* GetConfigFile();

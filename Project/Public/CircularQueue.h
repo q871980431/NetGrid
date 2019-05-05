@@ -30,10 +30,11 @@ public:
 		return true;
 	}
 
-	inline T * Push()
+	inline void TryPush(const T &t)
 	{
-		if (_tail - _front >= _size)return nullptr;
-		return &_queue[_tail++ &(_size - 1)];
+		while (_tail - _front >= _size)
+			MSLEEP(1);
+		_queue[_tail++ &(_size - 1)] = t;
 	}
 	inline u32	Size(){ return _tail - _front; };
 	inline u32  Capacity(){ return _size; };

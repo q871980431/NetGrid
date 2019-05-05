@@ -9,6 +9,10 @@ bool Logger::Ready()
 {
 	
     _logPath << tools::GetAppPath() << DIR_DELIMITER << "log";
+	_syncFile.SetFilePrefixName("sync");
+	_asyncFile.SetFilePrefixName("async");
+	_asyncThreadFile.SetFilePrefixName("thread");
+
     _asyncPrefix << "async";
     _syncPrefix << "sync";
     tools::Mkdir(_logPath.GetString());
@@ -20,18 +24,14 @@ bool Logger::Initialize()
 {
 	_procName = Kernel::GetInstance().GetCmdArg("name");
 	_procId = Kernel::GetInstance().GetCmdArg("id");
-
-    tlib::TString<MAX_PATH> syncLogName;
-    syncLogName << _procName.c_str() << LOG_CONNECT_SIGN  << _procId.c_str() << LOG_CONNECT_SIGN << GetLogTimeString() << LOG_CONNECT_SIGN << _syncPrefix.GetString() << LOG_FILE_ATT;
-    if (!_syncFile.Open(_logPath.GetString(), syncLogName.GetString()))
-    {
-        ASSERT(false, "open log file: %s failed", syncLogName.GetString());
-        return false;
-    }
+	CreateLogFile(_syncFile);
+	_asyncFile.SetAutoFlushNum(FLUSH_ASYNC_BATCH);
+	_asyncThreadFile.SetAutoFlushNum(FLUSH_ASYNC_BATCH);
     _thread = std::thread(&Logger::ThreadRun, this);
 
     return true;
 }
+
 bool Logger::Destroy()
 {
     if ( _thread.joinable())
@@ -44,15 +44,16 @@ bool Logger::Destroy()
 
     return true;
 }
+
 void Logger::SyncLog(const char *contents)
 {
-    ECHO("Current Time: %s", tools::GetCurrentTimeString());
     _syncFile.Write(tools::GetCurrentTimeString());
     _syncFile.Write(" | ");
     _syncFile.Write(contents);
     _syncFile.Write("\n");
     _syncFile.Flush();
 }
+
 void Logger::AsyncLog(const char *contents)
 {
     LogNode *logNode = (LogNode*)TMALLOC(sizeof(LogNode));
@@ -65,6 +66,25 @@ void Logger::AsyncLog(const char *contents)
         logNode->_contents.Assign("NULL");
     }
 	_write.threadA.push_back(logNode);
+}
+
+void Logger::ThreadLog(const char *contents)
+{
+	LogNode *logNode = (LogNode*)TMALLOC(sizeof(LogNode));
+	logNode->_time.Assign(tools::GetCurrentTimeString());
+	if (nullptr != contents)
+	{
+		logNode->_contents.Assign(contents);
+	}
+	else
+	{
+		logNode->_contents.Assign("NULL");
+	}
+	{
+		std::lock_guard<std::mutex> guard(_threadLogMutex);
+		_threadLog.threadA.push_back(logNode);
+	}
+
 }
 
 void Logger::Process(s32 tick)
@@ -81,6 +101,15 @@ void Logger::Process(s32 tick)
 		{
 			if (_dels.threadA.empty())
 				_dels.threadA.swap(_dels.swap);
+		}
+	}
+	{
+		std::lock_guard<std::mutex> guard(_threadLog.mutex);
+		if (_threadLog.swap.empty())
+		{
+			std::lock_guard<std::mutex> guad1(_threadLogMutex);
+			if (!_threadLog.threadA.empty())
+				_threadLog.threadA.swap(_threadLog.swap);
 		}
 	}
 
@@ -104,21 +133,23 @@ void Logger::Process(s32 tick)
 
 const char * Logger::GetLogTimeString()
 {
-    static char buffer[64];
-    time_t t;
+    //static char buffer[64];
+    //time_t t;
 
-    tm *tm = nullptr;
-    t = time(NULL);
-    tm = localtime(&t);
-    SafeSprintf(buffer, sizeof(buffer), "%4d_%02d_%02d_%02d_%02d_%02d", tm->tm_year + 1900, tm->tm_mon + 1, \
-        tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
-    return buffer;
+    //tm *tm = nullptr;
+    //t = time(NULL);
+    //tm = localtime(&t);
+    //SafeSprintf(buffer, sizeof(buffer), "%4d_%02d_%02d_%02d_%02d_%02d", tm->tm_year + 1900, tm->tm_mon + 1, \
+    //    tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
+    //return buffer;
+	return tools::GetCurrentTimeString("%4d_%02d_%02d_%02d_%02d_%02d");
 }
 void Logger::ThreadRun()
 {
     LogNode *logNode = nullptr;
     s32 mark = 0;
     s32 delay = 0;
+	s32 delay1 = 0;
     while (true)
     {
         if ( _write.threadB.empty())
@@ -145,52 +176,80 @@ void Logger::ThreadRun()
                 mark = 0;
                 delay = 0;
             }
-            continue;
-        }
+		}
+		else
+		{
+			logNode = _write.threadB.front();
 
-		logNode = _write.threadB.front();
+			WriteLogNode(_asyncFile, logNode);
 
-        if (!_asyncFile.IsOpen())
-        {
-            if (!CreateAsyncFile())
-                return;
-        }
-        if (tools::GetTimeMillisecond() - _asyncFile.CreateTick() > TIME_OUT_FOR_CUT_FILE)
-        {
-            _asyncFile.Close();
-            if (!CreateAsyncFile())
-                return;
-        }
-        _asyncFile.Write(logNode->_time.GetString());
-        _asyncFile.Write(" | ");
-        _asyncFile.Write(logNode->_contents.GetString());
-        _asyncFile.Write("\n");
-        if (++mark > FLUSH_ASYNC_BATCH)
-        {
-            _asyncFile.Flush();
-            mark = 0;
-        }
+			_dels.threadB.push_back(logNode);
+			_write.threadB.pop_front();
+		}
 
-		_dels.threadB.push_back(logNode);
-		_write.threadB.pop_front();
+		if (_threadLog.threadB.empty())
+		{
+			{
+				std::lock_guard<std::mutex> guard(_threadLog.mutex);
+				if (!_threadLog.swap.empty())
+					_threadLog.threadB.swap(_threadLog.swap);
+			}
+			delay1 += 1;
+			if (delay1 > DELAY_FLUSH_COUNT)
+			{
+				_asyncThreadFile.Flush();
+				delay1 = 0;
+			}
+		}
+		else
+		{
+			logNode = _threadLog.threadB.front();
+			WriteLogNode(_asyncThreadFile, logNode);
+			DEL logNode;
+			_threadLog.threadB.pop_front();
+		}
+
     }
 }
 
-bool Logger::CreateAsyncFile()
+bool Logger::CreateLogFile(LogFile &logFile)
 {
-    if (_asyncFile.IsOpen())
-    {
-        ASSERT(false, "Async log file is open");
-        return false;
-    }
+	if (logFile.IsOpen())
+	{
+		ASSERT(false, "log file is open");
+		return false;
+	}
 
-    tlib::TString<MAX_PATH> asyncLogName;
-    asyncLogName << _procName.c_str() << LOG_CONNECT_SIGN << _procId.c_str() << LOG_CONNECT_SIGN << GetLogTimeString() << LOG_CONNECT_SIGN << _asyncPrefix.GetString() << LOG_FILE_ATT;
-    if (!_asyncFile.Open( _logPath.GetString(), asyncLogName.GetString()))
-    {
-        ASSERT(false, "Open asynce log file: %s,error", asyncLogName.GetString());
-        return false;
-    }
+	tlib::TString<MAX_PATH> logName;
+	logName << _procName.c_str() << LOG_CONNECT_SIGN << _procId.c_str() << LOG_CONNECT_SIGN << GetLogTimeString() << LOG_CONNECT_SIGN << logFile.GetFilePrefixName().c_str() << LOG_FILE_ATT;
+	if (!logFile.Open(_logPath.GetString(), logName.GetString()))
+	{
+		ASSERT(false, "Open log file: %s,error", logName.GetString());
+		return false;
+	}
 
-    return true;
+	return true;
+}
+
+bool Logger::WriteLogNode(LogFile &logFile, const LogNode *logNode)
+{
+	if (!logFile.IsOpen())
+	{
+		if (!CreateLogFile(logFile))
+			return false;
+	}
+
+	if (tools::GetTimeMillisecond() - logFile.CreateTick() > TIME_OUT_FOR_CUT_FILE)
+	{
+		logFile.Close();
+		if (!CreateLogFile(logFile))
+			return false;
+	}
+
+	logFile.Write(logNode->_time.GetString());
+	logFile.Write(" | ");
+	logFile.Write(logNode->_contents.GetString());
+	logFile.Write("\n");
+	logFile.Commit();
+	return true;
 }

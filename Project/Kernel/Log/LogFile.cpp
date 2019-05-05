@@ -41,6 +41,12 @@ void LogFile::Write(const char *contents)
 
     }
 }
+
+void LogFile::Commit()
+{
+
+}
+
 void LogFile::Flush()
 {
     if (_file)

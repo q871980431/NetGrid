@@ -6,6 +6,7 @@
 #include "Modulemgr.h"
 #include "NetEngine.h"
 #include "TimerMgr.h"
+#include "FrameMgr.h"
 
 template<> Kernel * Singleton<Kernel>::_instance = nullptr;
 
@@ -33,8 +34,9 @@ void Kernel::Loop()
     {
         NetEngine::GetInstance()->Process(10);
 		TimerMgr::GetInstance()->Process(10);
+		FrameMgr::GetInstance()->Process(10);
 		_logger.Process(10);
-		MSLEEP(10);
+		MSLEEP(5);
     }
 }
 void Kernel::Destroy()
@@ -84,6 +86,11 @@ void Kernel::SyncLog(const char *contens)
     _logger.SyncLog(contens);
 }
 
+void Kernel::ThreadLog(const char *contents)
+{
+	_logger.ThreadLog(contents);
+}
+
 IModule * Kernel::FindModule(const char *name)
 {
     ASSERT(name != nullptr, "errpr");
@@ -110,14 +117,14 @@ void Kernel::KillTimer(core::ITimer *timer)
 	TimerMgr::GetInstance()->KillTimer(timer);
 }
 
-void Kernel::AddFrame(core::IFrame *frame, u8 runLvl)
+void Kernel::AddFrame(core::IFrame *frame, u8 runLvl, const char *trace)
 {
-
+	FrameMgr::GetInstance()->AddFrame(frame, runLvl, trace);
 }
 
 void Kernel::RemoveFrame(core::IFrame *frame)
 {
-
+	FrameMgr::GetInstance()->DelFrame(frame);
 }
 
 const char * Kernel::GetCoreFile()

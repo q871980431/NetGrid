@@ -3,10 +3,10 @@ PROJECT(NetGrid)
 IF(WIN32)
 	SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 	LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/windows)
-	set(CMAKE_C_FLAGS_DEBUG_INIT "/D_DEBUG /MTd /Zm2000 /Zi /Ob0 /Od /RTC1") 
-	SET(CMAKE_C_FLAGS_MINSIZEREL_INIT "/MT /Zm2000 /O1 /Ob1 /D NDEBUG")
-	SET(CMAKE_C_FLAGS_RELEASE_INIT "/MT /Zm2000 /O2 /Ob2 /D NDEBUG")
-	SET(CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "/MT /Zm2000 /Zi /O2 /Ob1 /D NDEBUG")
+	set(CMAKE_C_FLAGS_DEBUG_INIT "/D_DEBUG /MDd /Zm2000 /Zi /Ob0 /Od /RTC1") 
+	SET(CMAKE_C_FLAGS_MINSIZEREL_INIT "/MD /Zm2000 /O1 /Ob1 /D NDEBUG")
+	SET(CMAKE_C_FLAGS_RELEASE_INIT "/MD /Zm2000 /O2 /Ob2 /D NDEBUG")
+	SET(CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "/MD /Zm2000 /Zi /O2 /Ob1 /D NDEBUG")
 	SET(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/windows/")
 	MESSAGE(STATUS "WINDOWS")
 	IF(CMAKE_CL_64)
@@ -22,7 +22,7 @@ IF(LINUX)
 	LINK_DIRECTORIES("${PROJECT_BINARY_DIR}/linux")
 	#SET(CMAKE_C_FLAGS	"-std=c++0x -Wall -lpthread -rdynamic -ldl -Dlinux -lcurl -lmysqlclient -lTNavigation")
 		SET(CMAKE_C_FLAGS "-fPIC")
-        SET(CMAKE_CXX_FLAGS " -std=c++11 -Wall -DLINUX -pthread -rdynamic -ldl -lrt")
+        SET(CMAKE_CXX_FLAGS " -std=c++11 -Wall -DLINUX -pthread -rdynamic -ldl -lrt -g")
 	#SET(CMAKE_C_FLAGS_DEBUG	"-g -D_DEBUG -o0 -pg -L${PROJECT_SOURCE_DIR}/Thridlibrary/debug/linux")
         SET(CMAKE_C_FLAGS_DEBUG "-g -D_DEBUG -O -pg -L${PROJECT_SOURCE_DIR}/Thridlibrary/linux")
 	#SET(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O2 _L${PROJECT_SOURCE_DIR}/Thridlibrary/release/linux")
@@ -102,6 +102,8 @@ SET(PUBLIC
     "${PUBLIC_DIR}/Tools_file.h"
     "${PUBLIC_DIR}/Tools_file.cpp"
     "${PUBLIC_DIR}/TCallBack.h"	
+    "${PUBLIC_DIR}/Tools_Net.h"
+    "${PUBLIC_DIR}/Tools_Net.cpp"	
 )
 SET(TINYXML_DIR
 	"${PUBLIC_DIR}/tinyxml2"

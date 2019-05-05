@@ -9,7 +9,7 @@
 void EchoSession::OnEstablish()
 {
 	core::IKernel *kernel = _kernel;
-	TRACE_LOG("Session:%lld, Enter Establish", _sessionId);
+	TRACE_LOG("Session:%lld, Enter Establish, RemoteIp:%s", _sessionId, _connection->GetRemoteIP());
 }
 
 void EchoSession::OnTerminate()

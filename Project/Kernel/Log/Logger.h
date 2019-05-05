@@ -50,6 +50,7 @@ public:
 
     virtual void SyncLog(const char *contents);
     virtual void AsyncLog(const char *contents);
+	virtual void ThreadLog(const char *contents);
 	virtual void Process(s32 tick);
 protected:
 private:
@@ -57,10 +58,9 @@ private:
 
     void ThreadRun();
 
-    bool CreateAsyncFile();
-
 private:
-
+	bool CreateLogFile(LogFile &logFile);
+	bool WriteLogNode(LogFile &logFile, const LogNode *logNode);
 
 private:
 
@@ -68,6 +68,7 @@ private:
     tlib::TString<LOG_PREFIX_LEN>   _asyncPrefix;
     tlib::TString<LOG_PREFIX_LEN>   _syncPrefix;
     LogFile _asyncFile;
+	LogFile _asyncThreadFile;		
     LogFile _syncFile;
 
     std::thread                         _thread;
@@ -77,6 +78,8 @@ private:
 
 	LogListThreadData					_write;
 	LogListThreadData					_dels;
+	LogListThreadData					_threadLog;
+	std::mutex							_threadLogMutex;
 };
 
 #define LOGGER  (Logger::GetInstancePtr())

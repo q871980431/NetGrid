@@ -40,21 +40,21 @@ using std::min;
 #define PTF_INFO(pszFmt,a...)\
 {\
     char buff[4096]; \
-    SafeSprintf(buff, sizeof(buff), "[INFO], [%s,%d], " pszFmt "\n", __FUNCTION__, __LINE__, ##a); \
+    SafeSprintf(buff, sizeof(buff), "[INFO], [%s,%d], "#pszFmt, __FUNCTION__, __LINE__, ##a); \
     printf(buff); \
 }
 
 #define PTF_DEBUG(pszFmt,a...)\
 {\
 	char buff[4096]; \
-	SafeSprintf(buff, sizeof(buff), "[DEBUG, [%s,%d], " pszFmt "\n", __FUNCTION__, __LINE__, ##a); \
+	SafeSprintf(buff, sizeof(buff), "[DEBUG, [%s,%d], "#pszFmt, __FUNCTION__, __LINE__, ##a); \
 	printf(buff); \
 }
 
 #define PTF_ERROR(pszFmt,a...)\
 {\
 	char buff[4096];\
-	SafeSprintf(buff, sizeof(buff), "[ERROR, [%s,%d], " pszFmt "\n", __FUNCTION__, __LINE__, ##a); \
+	SafeSprintf(buff, sizeof(buff), "[ERROR, [%s,%d], "#pszFmt, __FUNCTION__, __LINE__, ##a); \
 	printf(buff);\
 }
 
@@ -63,7 +63,7 @@ using std::min;
 	if (!(_condition))\
 	{\
 		char buff[4096];\
-		SafeSprintf(buff, sizeof(buff), "[ASSERT, [%s,%d], " _format "\n", __FUNCTION__, __LINE__, ##a);\
+		SafeSprintf(buff, sizeof(buff), "[ASSERT, [%s,%d], "#_format, __FUNCTION__, __LINE__, ##a);\
 		printf(buff);\
 		assert(false);\
 	}\
