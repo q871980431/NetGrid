@@ -30,11 +30,24 @@ class IOEngineEpoll : public IIOEngine
 {
 	const static s32 QUEUE_SIZE = 2048;
 	const static s32 TIME_OUT = 10;
+	enum EventType
+	{
+		BIND = 1,
+		UNBIND = 2,
+		SHUT_DWON = 3,
+	};
+
 	struct DrivierEvent 
 	{
 		EpollDriver *dirver;
 		NetSocket socket;
-		bool bind;
+		EventType type;
+	};
+
+	struct ReadyDelDrivier 
+	{
+		EpollDriver *dirver;
+		s64 tick;
 	};
 
 public:
@@ -47,7 +60,7 @@ public:
 	virtual bool AddIODriver(IIODriver *ioDriver);
 	virtual bool RemoveIODriver(IIODriver *ioDriver);
 	virtual IIODriver * CreateDriver(TcpConnection *connection);
-	virtual void RemoveIODriver(TcpConnection *connection);
+	virtual void RemoveConnection(TcpConnection *connection);
 
 private:
 	void Run();
@@ -66,6 +79,7 @@ private:
 	epoll_event	*_events;
 	std::unordered_map<s32, EpollDriver *> _driversMain;
 	std::unordered_map<s32, EpollDriver *> _ctlAddDrivers;
+	std::unordered_map<s32, ReadyDelDrivier> _readyDelDriver;
 };
 #endif
 #endif

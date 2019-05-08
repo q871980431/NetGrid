@@ -57,6 +57,7 @@ namespace tools
 		NetSocket ConnectSocket(NetSocket connectSocket, sockaddr_in &sockAddr);
 		bool CloseSocket(NetSocket netSocket);
 		void SocketFroceClose(NetSocket netSocket);
+		bool QuerySocketError(NetSocket netSocket, s32 &error);
 
 		bool SetSocketNonlock(NetSocket netSocket);
 		void SetSocketReuseAddr(NetSocket netSocket);

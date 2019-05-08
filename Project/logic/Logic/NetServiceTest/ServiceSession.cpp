@@ -11,9 +11,9 @@ void EchoSession::OnEstablish()
 	core::IKernel *kernel = _kernel;
 	TRACE_LOG("Session:%lld, Enter Establish, RemoteIp:%s", _sessionId, _connection->GetRemoteIP());
 
-	char buff[256] = { 0 };
-	SafeSprintf(buff, sizeof(buff), "Hello My is froce close server");
-	SendMsg(1101, buff, sizeof(buff));
+	//char buff[256] = { 0 };
+	//SafeSprintf(buff, sizeof(buff), "Hello My is froce close server");
+	//SendMsg(1101, buff, sizeof(buff));
 	//_connection->Close();
 }
 
@@ -35,7 +35,7 @@ void EchoSession::OnRecv(const char *buff, s32 len)
 	MessageHead *head = (MessageHead*)buff;
 	ASSERT(head->len == len, "error");
 	core::IKernel *kernel = _kernel;
-	TRACE_LOG("Session:%lld, Recv MsgId:%d, content:%s len:%d", _connection->GetSessionId(), head->messageId, buff+sizeof(MessageHead), len-sizeof(MessageHead));
+	TRACE_LOG("Session:%lld, Recv MsgId:%d, content:%s len:%d", _sessionId, head->messageId, buff+sizeof(MessageHead), len-sizeof(MessageHead));
 	if (head->messageId == 1102)	//服务器主动断开
 	{
 		TRACE_LOG("Recv Server close msg");
@@ -83,13 +83,13 @@ void EchoClientSession::OnRecv(const char *buff, s32 len)
 	core::IKernel *kernel = _kernel;
 	MessageHead *head = (MessageHead*)buff;
 	ASSERT(head->len == len, "error");
-	TRACE_LOG("EchoClientSession Session:%lld, Recv  Server Rsp MsgId:%d, content:%s len:%d", _connection->GetSessionId(), head->messageId, buff + sizeof(MessageHead), len - sizeof(MessageHead));
+	TRACE_LOG("EchoClientSession Session:%lld, Recv  Server Rsp MsgId:%d, content:%s len:%d", _sessionId, head->messageId, buff + sizeof(MessageHead), len - sizeof(MessageHead));
 	SendContent();
 }
 
 void EchoClientSession::SendContent()
 {
-	if (_sendCount >= 1000)
+	if (_sendCount >= 5)
 	{
 		if (_clientClose)
 			_connection->Close();

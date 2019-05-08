@@ -11,19 +11,47 @@
 #ifdef WIN32
 #include "NetIOEngine.h"
 #include "CircularQueue.h"
-#include <sys/epoll.h>
 #include <unordered_map>
+#include <mutex>
 
-class EpollDriver : public IIODriver
+class IocpDriver : public IIODriver
 {
+	enum OPT_TYPE
+	{
+		SEND = 1,
+		RECV = 2,
+	};
+	struct PerIoOperationData
+	{
+		OVERLAPPED overlapped;
+		WSABUF dataBuff;
+		OPT_TYPE opType;
+	};
 public:
-	EpollDriver(TcpConnection *connection) : IIODriver(connection) {};
+	IocpDriver(TcpConnection *connection, HANDLE complatPort);
 
-	bool OnEvent(IKernel *kernel, u32 events);
-	bool OnSend();
-	bool OnRead();
+	void OnError(IKernel *kernel, OVERLAPPED *perIoOperation);
+	void OnEvent(IKernel *kernel, OVERLAPPED *perIoOperation, s32 transferSize);
+
+	bool PostRecv(IKernel *kernel);
+	void BindCompletionPort();
+	bool CheckClose();
+	bool PostSend();
+	inline bool Sending() { return _sending; };
+
 protected:
+	bool OnSend(s32 transferSize);
+	bool OnRead(IKernel *kernel, s32 transferSize);
+	void EnterClose();
+
 private:
+	HANDLE	_complationPort;
+
+	PerIoOperationData	_sendPerData;
+	PerIoOperationData	_recvPerData;
+	std::mutex			_sendMutex;
+	bool				_sending;
+	bool				_recving;
 };
 
 class IOEngineIocp : public IIOEngine
@@ -32,13 +60,19 @@ class IOEngineIocp : public IIOEngine
 	const static s32 TIME_OUT = 10;
 	struct DrivierEvent 
 	{
-		EpollDriver *dirver;
+		IocpDriver *dirver;
 		NetSocket socket;
 		bool bind;
 	};
 
+	struct ReadyDelDrivier
+	{
+		IocpDriver *dirver;
+		s64 tick;
+	};
+
 public:
-	IOEngineIocp(s32 size);
+	IOEngineIocp(s32 threadSize);
 
 	virtual bool Init(IKernel *kernel);
 	virtual bool Stop(IKernel *kernel);
@@ -47,27 +81,29 @@ public:
 	virtual bool AddIODriver(IIODriver *ioDriver);
 	virtual bool RemoveIODriver(IIODriver *ioDriver);
 	virtual IIODriver * CreateDriver(TcpConnection *connection);
-	virtual void RemoveIODriver(TcpConnection *connection);
+	virtual void RemoveConnection(TcpConnection *connection);
 
 public:
+	void EnterDel(IocpDriver *driver);
 
 private:
 	void Run();
-	void BindEpoll(IKernel *kernel, DrivierEvent *evt);
-	void UnBindEpoll(IKernel *kernel, DrivierEvent *evt);
-	void FlushData();
+
 private:
-	s32 _size;
-	s32 _epFd;
-	std::thread _workThread;
+	s32 _threadSize;
+	HANDLE _completionPort;
+	std::vector<std::thread> _workThread;
 	bool _terminate;
 	IKernel *_kernel;
 
 	CircluarQueue<DrivierEvent>	_threadQueue;
 	CircluarQueue<DrivierEvent> _mainQueue;
-	epoll_event	*_events;
-	std::unordered_map<s32, EpollDriver *> _driversMain;
-	std::unordered_map<s32, EpollDriver *> _ctlAddDrivers;
+	HANDLE	*_events;
+	std::unordered_map<s32, IocpDriver *> _driversMain;
+	std::vector<IocpDriver *> _dels;
+	std::mutex			   _delMutex;
+	std::unordered_map<s32, IocpDriver *> _hasDel;
+	std::unordered_map<s32, ReadyDelDrivier> _readyDelDriver;
 };
 #endif
 #endif

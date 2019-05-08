@@ -30,7 +30,7 @@ protected:
 
 protected:
 	ITcpConnection *_connection;
-	s32 _sessionId;
+	s64 _sessionId;
 	core::IKernel *_kernel;
 };
 

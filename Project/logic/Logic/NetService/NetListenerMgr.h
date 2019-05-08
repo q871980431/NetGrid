@@ -17,6 +17,8 @@ class NetListenerMgr
 {
 	const static s32 LISTEN_SOCKET_SIZE = 64;
 	const static s32 SELECT_TIME_OUT = 10;
+	const static s32 CONNECT_TIME_OUT = 300;
+	const static s32 CONNECT_TIME_OUT_SIZE = CONNECT_TIME_OUT * (1000 / (2*10));
 	struct ListenerNode 
 	{
 		NetSocket socket;
@@ -64,6 +66,7 @@ class NetListenerMgr
 	{
 		SOCKET_TYPE type;
 		NetSocket socket;
+		s32	size;
 	};
 
 	struct SocketArray 
@@ -92,6 +95,7 @@ private:
 	void StartListen();
 	void OnAccept(IKernel *kernel, NetSocket listenSocket, NetSocket clientSocket);
 	void OnConnect(IKernel *kernel, NetSocket connectSocket);
+	void OnConnectFailed(IKernel *kernel, NetSocket connectSocket, s32 error);
 
 private:
 	//Running in thread functions

@@ -7,6 +7,7 @@
 #include "IOEngine_Epoll.h"
 #ifdef LINUX
 #include "Tools_Net.h"
+#include "Tools_time.h"
 #include <signal.h>
 
 bool EpollDriver::OnEvent(IKernel *kernel, u32 events)
@@ -54,6 +55,12 @@ bool EpollDriver::OnSend()
 			}
 		}
 	}
+	if (_activeClose)
+	{
+		shutdown(_connetion->GetNetSocket(), SHUT_WR);
+		return true;
+	}
+
 	return true;
 }
 
@@ -116,11 +123,31 @@ void IOEngineEpoll::Process(IKernel *kernel, s64 tick)
 	DrivierEvent *evt = _mainQueue.Pop();
 	while (evt)
 	{
-		if (evt->bind)	
+		if (evt->type == BIND)	
 			evt->dirver->OnEstablish();
-		else
+		if (evt->type == UNBIND)
+		{
+			auto iter = _readyDelDriver.find(evt->dirver->GetNetSocket());
+			if (iter != _readyDelDriver.end())
+				_readyDelDriver.erase(iter);
 			evt->dirver->OnClose();
+		}
 		evt = _mainQueue.Pop();
+	}
+
+	for (auto iter = _readyDelDriver.begin(); iter != _readyDelDriver.end(); )
+	{
+		if (tick - iter->second.tick >= IIOEngine::DELAY_SEND * 1000)
+		{
+			DrivierEvent unBindEvt;
+			unBindEvt.type = UNBIND;
+			unBindEvt.dirver = iter->second.dirver;
+			unBindEvt.socket = iter->second.dirver->GetNetSocket();
+			_threadQueue.TryPush(unBindEvt);
+			iter = _readyDelDriver.erase(iter);
+			continue;
+		}
+		iter++;
 	}
 }
 
@@ -134,7 +161,7 @@ bool IOEngineEpoll::AddIODriver(IIODriver *ioDriver)
 	{
 		TRACE_LOG("Add IO Driver Event");
 		DrivierEvent evt;
-		evt.bind = true;
+		evt.type = BIND;
 		evt.dirver = driver;
 		evt.socket = driver->GetNetSocket();
 		_threadQueue.TryPush(evt);
@@ -149,11 +176,22 @@ bool IOEngineEpoll::RemoveIODriver(IIODriver *ioDriver)
 	ASSERT(driver != nullptr, "error");
 	if (nullptr != driver)
 	{
-		DrivierEvent evt;
-		evt.bind = false;
-		evt.dirver = driver;
-		evt.socket = driver->GetNetSocket();
-		_threadQueue.TryPush(evt);
+		if (driver->GetSendBuff()->DataSize() == 0)
+		{
+			DrivierEvent evt;
+			evt.type = SHUT_DWON;
+			evt.dirver = driver;
+			evt.socket = driver->GetNetSocket();
+			_threadQueue.TryPush(evt);
+		}
+		else
+		{
+			driver->ActiveClose();
+			ReadyDelDrivier node;
+			node.dirver = driver;
+			node.tick = tools::GetTimeMillisecond();
+			_readyDelDriver.insert(std::make_pair(driver->GetNetSocket(), node));
+		}
 	}
 }
 
@@ -175,7 +213,7 @@ IIODriver * IOEngineEpoll::CreateDriver(TcpConnection *connection)
 	return nullptr;
 }
 
-void IOEngineEpoll::RemoveIODriver(TcpConnection *connection)
+void IOEngineEpoll::RemoveConnection(TcpConnection *connection)
 {
 	IKernel *kernel = _kernel;
 	auto iter = _driversMain.find(connection->GetSessionId());
@@ -202,26 +240,38 @@ void IOEngineEpoll::Run()
 		DrivierEvent *evt = _threadQueue.Pop();
 		while (evt)
 		{
-			THREAD_LOG("Rcv evt: socket:%d, bind:%d", evt->socket, evt->bind);
-			if (evt->bind)
+			THREAD_LOG("EpollEvent", "Rcv evt: socket:%d, optType:%d", evt->socket, evt->type);
+			if (evt->type == BIND)
 				BindEpoll(_kernel, evt);
-			else
+			if (evt->type == UNBIND)
 				UnBindEpoll(_kernel, evt);
+			if (evt->type == SHUT_DWON)
+			{
+				shutdown(evt->socket, SHUT_WR);
+			}
 			evt = _threadQueue.Pop();
 		}
 		s32 count = epoll_wait(_epFd, _events, _size, TIME_OUT);
-		
+		if (count == -1)
+		{
+			if (tools::GetSocketError() == EINTR)
+			{
+				continue;
+			}
+			THREAD_LOG("Epoll", "Epoll wait error, error code:%d", tools::GetSocketError());
+			break;
+		}
+
 		for (s32 i = 0; i < count; i++)
 		{
 			if (!((EpollDriver*)_events[i].data.ptr)->OnEvent(_kernel, _events[i].events))
 			{
 				DrivierEvent tmpEvt;
-				tmpEvt.bind = false;
+				tmpEvt.type = UNBIND;
 				tmpEvt.dirver = (EpollDriver*)_events[i].data.ptr;
 				tmpEvt.socket = tmpEvt.dirver->GetNetSocket();
 				UnBindEpoll(_kernel, &tmpEvt);
 			}
-
 		}
 
 		if (_terminate)
@@ -236,7 +286,7 @@ void IOEngineEpoll::BindEpoll(IKernel *kernel, DrivierEvent *evt)
 	if (iter != _ctlAddDrivers.end())
 	{
 		THREAD_LOG("IOEngine", "Bind epoll error, evt->socket:%d", evt->socket);
-		evt->bind = false;
+		return;
 	}
 	else
 	{
@@ -246,7 +296,9 @@ void IOEngineEpoll::BindEpoll(IKernel *kernel, DrivierEvent *evt)
 		if (epoll_ctl(_epFd, EPOLL_CTL_ADD, evt->socket, &epollEv) != 0)
 		{
 			THREAD_LOG("IOEngine", "epoll ctl add error, evt->socket:%d, error:%d", evt->socket, tools::GetSocketError());
-			evt->bind = false;
+			evt->type = UNBIND;
+			_mainQueue.TryPush(*evt);
+			return;
 		}
 		THREAD_LOG("IOEngine", "epoll ctl add ok, evt->socket:%d", evt->socket);
 		_ctlAddDrivers.emplace(evt->dirver->GetNetSocket(), evt->dirver);
@@ -255,7 +307,7 @@ void IOEngineEpoll::BindEpoll(IKernel *kernel, DrivierEvent *evt)
 
 	if (!evt->dirver->OnRead())
 	{
-		evt->bind = false;
+		evt->type = UNBIND;
 		UnBindEpoll(kernel, evt);
 	}
 }

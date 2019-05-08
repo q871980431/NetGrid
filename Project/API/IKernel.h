@@ -28,6 +28,7 @@
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[TRACE]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+	printf("%s\n", log);\
     kernel->AsyncLog(log); \
 }
 
@@ -49,6 +50,7 @@
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[%s]: %s:%d:%s | "#format, labl, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+	printf("%s\n", log);\
     kernel->ThreadLog(log); \
 }
 

@@ -7,6 +7,7 @@
 
 #include "NetIOEngine.h"
 #include "IOEngine_Epoll.h"
+#include "IOEngine_IOCP.h"
 
 
 IIODriver::IIODriver(TcpConnection *connection): _connetion(connection)
@@ -16,6 +17,7 @@ IIODriver::IIODriver(TcpConnection *connection): _connetion(connection)
 	_recvBuff = NEW CircluarBuffer(_connetion->GetRecvBuffSize());
 	_close = false;
 	_recvFin = false;
+	_activeClose = false;
 }
 
 IIODriver::~IIODriver()
@@ -43,15 +45,23 @@ NetIOEngine::NetIOEngine(s32 engineNum)
 
 bool NetIOEngine::Init(IKernel *kernel)
 {
+#ifdef LINUX
 	for (s32 i = 0; i < _engineNum; i++)
 	{
-#ifdef LINUX
 		IIOEngine *engine = NEW IOEngineEpoll(1024);
 		engine->SetId(i+1);
 		engine->Init(kernel);
 		_ioengines.push_back(engine);
-#endif
 	}
+#endif
+
+#ifdef WIN32
+	IIOEngine *engine = NEW IOEngineIocp(_engineNum);
+	engine->SetId(1);
+	engine->Init(kernel);
+	_ioengines.push_back(engine);
+#endif
+
 	return true;
 }
 
@@ -73,7 +83,7 @@ bool NetIOEngine::RemoveConnection(TcpConnection *connection)
 	IIOEngine *ioEngine = connection->GetIOEngine();
 	if ( ioEngine != nullptr)
 	{
-		ioEngine->RemoveIODriver(connection);
+		ioEngine->RemoveConnection(connection);
 		connection->SetIOEngine(nullptr);
 		return true;
 	}
@@ -90,6 +100,11 @@ void NetIOEngine::Process(IKernel *kernel, s64 tick)
 
 IIOEngine * NetIOEngine::GetExecIOEngine()
 {
+#ifdef WIN32
+	return _ioengines[0];
+#endif
+
+#ifdef LINUX
 	s32 index = 0;
 	s32 count = 0;
 	for (s32 i = 0; i < _engineNum; i++)
@@ -105,4 +120,5 @@ IIOEngine * NetIOEngine::GetExecIOEngine()
 	}
 
 	return _ioengines[index];
+#endif
 }

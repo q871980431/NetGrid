@@ -119,8 +119,10 @@ void NetService::RemoveConnection(s32 sessionId, bool recvFin)
 			tools::CloseSocket(netSocket);
 		else
 		{
-			auto ret = _froceCloseMap.insert(std::make_pair(netSocket, tools::GetTimeMillisecond()));
-			ASSERT(ret.second, "error");
+			tools::SocketFroceClose(netSocket);
+
+			//auto ret = _froceCloseMap.insert(std::make_pair(netSocket, tools::GetTimeMillisecond()));
+			//ASSERT(ret.second, "error");
 		}
 		_netIoEngine->RemoveConnection(iter->second);
 		DEL iter->second;

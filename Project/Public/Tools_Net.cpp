@@ -130,6 +130,16 @@ extern "C" {
 		CloseSocket(netSocket);
 	}
 
+	bool QuerySocketError(NetSocket netSocket, s32 &error)
+	{
+		socklen_t len = sizeof(error);
+#ifdef WIN32
+		getsockopt(netSocket, SOL_SOCKET, SO_ERROR, (char*)&error, &len);
+#endif
+#ifdef LINUX
+		getsockopt(netSocket, SOL_SOCKET, SO_ERROR, &error, &len);
+#endif
+	}
 
 
 	bool SetSocketNonlock(NetSocket netSocket)

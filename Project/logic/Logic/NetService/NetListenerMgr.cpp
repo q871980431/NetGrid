@@ -8,6 +8,7 @@
 #include "NetListenerMgr.h"
 #include "Tools.h"
 #include <set>
+#include "Tools_time.h"
 
 bool NetListenerMgr::CreateNetListener(IKernel *kernel, const char *ip, s32 port, INetTcpListener *listener)
 {
@@ -54,6 +55,7 @@ bool NetListenerMgr::CreateNetConnecter(IKernel *kernel, const char *ip, s32 por
 	if (tools::INVALID_NETSOCKET == ret)
 	{
 		TRACE_LOG("Connect Socket Error, ErrorCode:%d", tools::GetSocketError());
+		tcpsession->OnError(1, tools::GetSocketError());
 		return false;
 	}
 	if (ret == 0)
@@ -88,6 +90,10 @@ void NetListenerMgr::Process(IKernel *kernel, s64 tick)
 					tools::CloseSocket(iter->second.socket);
 					_listenSockMap.erase(iter);
 				}
+			}
+			if (evt->type == CONNECTER)
+			{
+				OnConnectFailed(kernel, evt->socket, evt->listSocket);
 			}
 
 		}
@@ -162,6 +168,17 @@ void NetListenerMgr::OnConnect(IKernel *kernel, NetSocket connectSocket)
 	}
 }
 
+void NetListenerMgr::OnConnectFailed(IKernel *kernel, NetSocket connectSocket, s32 error)
+{
+	auto iter = _connectSockMap.find(connectSocket);
+	ASSERT(iter != _connectSockMap.end(), "error");
+	if (iter != _connectSockMap.end())
+	{
+		iter->second.session->OnError(1, error);
+		_connectSockMap.erase(iter);
+	}
+}
+
 void NetListenerMgr::Run()
 {
 	IKernel *kernel = _kernel;
@@ -177,7 +194,7 @@ void NetListenerMgr::Run()
 	timeOut.tv_sec = 0;
 	timeOut.tv_usec = SELECT_TIME_OUT;
 
-	while (true)
+	while (!_terminate)
 	{
 		//THREAD_LOG("NetListener","NetListenerMgr Running");
 		ThreadEvent *evt = _threadQueue.Pop();
@@ -191,6 +208,7 @@ void NetListenerMgr::Run()
 					SocketNode *node = &(netSockets.sockets[netSockets.size++]);
 					node->socket = evt->socket;
 					node->type = evt->type;
+					node->size = 0;
 				}
 			}
 			else if (evt->opt == LISTEN_EVT_REMOVE)
@@ -209,32 +227,73 @@ void NetListenerMgr::Run()
 		FD_ZERO(&readFd);
 		FD_ZERO(&writFd);
 		maxFd = 0;
+		if (netSockets.size == 0)
+		{
+			MSLEEP(SELECT_TIME_OUT);
+			continue;
+		}
 		for (s32 i = 0; i < netSockets.size; i++)
 		{
 			FD_SET(netSockets.sockets[i].socket, &readFd);
 			if (netSockets.sockets[i].type == CONNECTER)
+			{
 				FD_SET(netSockets.sockets[i].socket, &writFd);
+			}
 			maxFd = max(maxFd, netSockets.sockets[i].socket);
 		}
 #ifdef LINUX
 		maxFd++;
 #endif
+		//s64 tick = tools::GetTimeMillisecond();
 		nSockets = select(maxFd, &readFd, &writFd, nullptr, &timeOut);
+		//THREAD_LOG("Select", "Select exp time:%lld ms", tools::GetTimeMillisecond() - tick);
 		std::vector<NetSocket> dels;
 		for (s32 i = 0; i < netSockets.size; i++)
 		{
-			if (FD_ISSET(netSockets.sockets[i].socket, &writFd))
-			{
 				if (netSockets.sockets[i].type == CONNECTER)
 				{
-					MainEvent evt;
-					evt.socket = netSockets.sockets[i].socket;
-					evt.opt = LISTEN_EVT_ADD;
-					evt.type = CONNECTER;
-					dels.push_back(evt.socket);
-					_mainQueue.TryPush(evt);
+					if (FD_ISSET(netSockets.sockets[i].socket, &writFd))
+					{
+						MainEvent evt;
+						evt.socket = netSockets.sockets[i].socket;
+						evt.type = CONNECTER;
+						evt.opt = LISTEN_EVT_ADD;
+						if (FD_ISSET(netSockets.sockets[i].socket, &readFd))
+						{
+							s32 error = -1;
+							tools::QuerySocketError(netSockets.sockets[i].socket, error);
+							THREAD_LOG("SocketError", "Query Socket error:%d", error);
+							if (error != 0)
+							{
+								evt.opt = LISTEN_EVT_REMOVE;
+								evt.listSocket = error;
+								tools::CloseSocket(evt.socket);
+							}
+						}
+						dels.push_back(evt.socket);
+						_mainQueue.TryPush(evt);
+					}
+					else
+					{
+						if (netSockets.sockets[i].size > CONNECT_TIME_OUT_SIZE)
+						{
+							MainEvent evt;
+							evt.socket = netSockets.sockets[i].socket;
+							evt.type = CONNECTER;
+							evt.opt = LISTEN_EVT_REMOVE;
+#ifdef LINUX
+							evt.listSocket = ETIME;
+#endif
+#ifdef WIN32
+							evt.listSocket = WSAETIMEDOUT;
+#endif
+							dels.push_back(evt.socket);
+							_mainQueue.TryPush(evt);
+						}
+						else
+							netSockets.sockets[i].size++;
+					}
 				}
-			}
 
 			if (FD_ISSET(netSockets.sockets[i].socket, &readFd))
 			{
@@ -242,27 +301,35 @@ void NetListenerMgr::Run()
 				if (netSockets.sockets[i].type == LISTENER)
 				{
 					NetSocket clientSocket;
-					if (!tools::AcceptSocket(netSockets.sockets[i].socket, stClient, clientSocket))
+					while (true)
 					{
-						THREAD_LOG("ACCEPT", "%d accept error, code:%d", netSockets.sockets[i].socket, tools::GetSocketError());
-						continue;
+						if (!tools::AcceptSocket(netSockets.sockets[i].socket, stClient, clientSocket))
+						{
+#ifdef WIN32
+							if (tools::GetSocketError() != WSAEWOULDBLOCK)
+#endif
+#ifdef LINUX
+							if (tools::GetSocketError() != EAGAIN)
+#endif
+								THREAD_LOG("ACCEPT", "%d accept error, code:%d", netSockets.sockets[i].socket, tools::GetSocketError());
+							break;
+						}
+						MainEvent evt;
+						evt.socket = clientSocket;
+						evt.opt = LISTEN_EVT_ADD;
+						evt.type = LISTENER;
+						evt.listSocket = netSockets.sockets[i].socket;
+						_mainQueue.TryPush(evt);
 					}
-					MainEvent evt;
-					evt.socket = clientSocket;
-					evt.opt = LISTEN_EVT_ADD;
-					evt.type = LISTENER;
-					evt.listSocket = netSockets.sockets[i].socket;
-					_mainQueue.TryPush(evt);
 				}
 
 			}
 		}
+
 		for (auto delSoeckt : dels)
 			DelSoeckt(netSockets, delSoeckt);
 
-		if (_terminate)
-			break;
-		MSLEEP(50);
+		MSLEEP(SELECT_TIME_OUT);
 	}
 }
 

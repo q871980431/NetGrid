@@ -17,6 +17,7 @@ class IIODriver;
 class IIOEngine
 {
 public:
+	const static s32 DELAY_SEND = 5;
 	IIOEngine() :_driverCount(0){};
 	virtual ~IIOEngine() {};
 
@@ -27,7 +28,7 @@ public:
 	virtual bool RemoveIODriver(IIODriver *ioDriver) = 0;
 
 	virtual IIODriver * CreateDriver(TcpConnection *connection) = 0;
-	virtual void RemoveIODriver(TcpConnection *connection) = 0;
+	virtual void RemoveConnection(TcpConnection *connection) = 0;
 public:
 	s32 GetDriverCount() { return _driverCount; }
 	inline void SetId(s32 id) { _id = id; };
@@ -51,6 +52,7 @@ public:
 	inline void RecvFin() { _recvFin = true; }
 	inline CircluarBuffer * GetRecvBuff() { return _recvBuff; };
 	inline CircluarBuffer * GetSendBuff() { return _sendBuff; };
+	inline void ActiveClose() { _activeClose = true; };
 protected:
 	TcpConnection *_connetion;
 
@@ -58,6 +60,7 @@ protected:
 	CircluarBuffer *_recvBuff;
 	bool _close;
 	bool _recvFin;
+	bool _activeClose;
 };
 
 class NetIOEngine
