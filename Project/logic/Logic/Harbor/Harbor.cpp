@@ -9,6 +9,7 @@
 #include "FrameworkDefine.h"
 #include "XmlReader.h"
 #include "Convert.h"
+#include "HarborSession.h"
 #ifdef LINUX
 #include <arpa/inet.h>
 #endif
@@ -93,9 +94,9 @@ void Harbor::SendMessage(s32 type, s32 nodeId, s32 messageId, const void *buff, 
         iter->second->SendMsg(messageId, (const char *)buff, len);
 }
 
-IMsgSession * Harbor::CreateSession()
+ITcpSession * Harbor::CreateSession()
 {
-    HarborSession *session = NEW HarborSession(this);
+    HarborSession *session = NEW HarborSession(this, s_kernel);
     return session;
 }
 
@@ -163,7 +164,7 @@ void Harbor::OnRecv(HarborSession *session, s32 messageId, const char *buff, s32
             const char *ip = session->GetRemoteIP();
             auto endIter = s_listeners.end();
 			IKernel *kernel = s_kernel;
-            DEBUG_LOG("Node OnOpen, type = %d, id = %d, ip = %s, port = %d", msg->nodeType, msg->nodeId, ip, msg->port);
+            TRACE_LOG("Node OnOpen, type = %d, id = %d, ip = %s, port = %d", msg->nodeType, msg->nodeId, ip, msg->port);
 			ECHO("Node OnOpen, type = %d, id = %d, ip = %s, port = %d", msg->nodeType, msg->nodeId, ip, msg->port);
 
 

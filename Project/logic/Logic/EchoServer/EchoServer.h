@@ -11,7 +11,7 @@
 #include "EchoSession.h"
 #include "TString.h"
 
-class EchoServer : public IEchoServer, public ITcpListener
+class EchoServer : public IEchoServer, public INetTcpListener
 {
 	struct ConfigInfo 
 	{
@@ -27,7 +27,8 @@ public:
     virtual bool Initialize(IKernel *kernel);
     virtual bool Launched(IKernel *kernel);
     virtual bool Destroy(IKernel *kernel);
-	virtual IMsgSession * CreateSession();
+	virtual ITcpSession * CreateSession();
+	virtual void OnRelease() {};
 
 protected:
 	inline s64 GetNewSessionId() { return ++s_sessionId; };

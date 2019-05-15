@@ -1,14 +1,5 @@
 #include "Tools.h"
 #include <string>
-#include <random>
-u32  Radnom()
-{
-	static std::random_device dev;
-	static std::default_random_engine eng(dev());
-	static std::uniform_int_distribution<u32> distribution;
-	return distribution(eng);
-}
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +46,7 @@ extern "C" {
 		if (nA == nB)return nA;
 
         if (nB < nA)std::swap(nA, nB);
-        return nA + Radnom() % (nB-nA);
+        return nA + tools::Random() % (nB-nA);
     }
 
 

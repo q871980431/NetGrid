@@ -9,8 +9,9 @@
 #include<libgen.h>
 #include<dlfcn.h>
 #endif
+#include <random>
 
-u32  Radnom();
+
 namespace tools{
 
 #pragma  pack (push, 4)             //按4字节对齐
@@ -33,6 +34,14 @@ namespace tools{
 		s32 val;
 	}KEYINT32;
 #pragma  pack (pop)                 //取消知道对齐, 恢复缺省对齐
+
+	inline u32  Random()
+	{
+		static std::random_device dev;
+		static std::default_random_engine eng(dev());
+		static std::uniform_int_distribution<u32> distribution;
+		return distribution(eng);
+	}
 
     inline void Mkdir(const char *path)
     {

@@ -4,7 +4,7 @@
 #include "StopWatch.h"
 #include "Configmgr.h"
 #include "Modulemgr.h"
-#include "NetEngine.h"
+#include "NetService.h"
 #include "TimerMgr.h"
 #include "FrameMgr.h"
 
@@ -14,7 +14,7 @@ bool Kernel::Ready()
 {
     return _logger.Ready()&&
            Configmgr::GetInstance()->Ready()&&
-           NetEngine::GetInstance()->Ready()&&
+           NetService::GetInstance()->Ready()&&
 		   TimerMgr::GetInstance()->Ready();
 }
 bool Kernel::Initialize(s32 argc, char **argv)
@@ -24,7 +24,7 @@ bool Kernel::Initialize(s32 argc, char **argv)
     return _logger.Initialize() 
         && Configmgr::GetInstance()->Initialize()
         && Modulemgr::GetInstance()->Initialize()
-        && NetEngine::GetInstance()->Initialize()
+        && NetService::GetInstance()->Initialize()
 		&& TimerMgr::GetInstance()->Initialize();
 }
 
@@ -32,7 +32,7 @@ void Kernel::Loop()
 {
     while (true)
     {
-        NetEngine::GetInstance()->Process(10);
+		NetService::GetInstance()->Process(this,10);
 		TimerMgr::GetInstance()->Process(10);
 		FrameMgr::GetInstance()->Process(10);
 		_logger.Process(10);
@@ -42,7 +42,7 @@ void Kernel::Loop()
 void Kernel::Destroy()
 {
 	TimerMgr::GetInstance()->Destroy();
-	NetEngine::GetInstance()->Destroy();
+	NetService::GetInstance()->Destroy();
     Modulemgr::GetInstance()->Destroy();
     Configmgr::GetInstance()->Destroy();
     _logger.Destroy(); 
@@ -97,14 +97,14 @@ IModule * Kernel::FindModule(const char *name)
     return Modulemgr::GetInstance()->FindModule(name);
 }
 
-void Kernel::CreateNetListener(const char *ip, s16 port, core::ITcpListener *listener)
+void Kernel::CreateNetListener(const char *ip, s16 port, core::INetTcpListener *listener)
 {
-    NetEngine::GetInstance()->CreateNetListener(ip, port, listener);
+    NetService::GetInstance()->CreateNetListener(ip, port, listener);
 }
 
-void Kernel::CreateNetSession(const char *ip, s16 port, core::IMsgSession *session)
+void Kernel::CreateNetSession(const char *ip, s16 port, core::ITcpSession *session)
 {
-    NetEngine::GetInstance()->CreateNetSession(ip, port, session);
+    NetService::GetInstance()->CreateNetSession(ip, port, session);
 }
 
 void Kernel::StartTimer(core::ITimer *timer, s32 delay, s32 count, s32 interval, const char *trace)

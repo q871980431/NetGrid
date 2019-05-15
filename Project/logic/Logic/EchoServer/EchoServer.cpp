@@ -40,7 +40,7 @@ bool EchoServer::Destroy(IKernel *kernel)
 }
 
 
-IMsgSession * EchoServer::CreateSession()
+ITcpSession * EchoServer::CreateSession()
 {
 	EchoSession *session = NEW EchoSession(s_kernel, GetNewSessionId());
 	return session;

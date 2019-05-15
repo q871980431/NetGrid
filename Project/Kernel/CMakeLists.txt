@@ -43,10 +43,18 @@ SET(KERNEL_MODULE
 
 SET(KERNEL_NET_DIR	"${KERNEL_DIR}/Net")
 SET(KERNEL_NET
-	"${KERNEL_NET_DIR}/NetEngine.cpp"
-	"${KERNEL_NET_DIR}/NetEngine.h"
-    "${KERNEL_NET_DIR}/NetConnection.cpp"
-	"${KERNEL_NET_DIR}/NetConnection.h"
+	"${KERNEL_NET_DIR}/TcpConnection.cpp"
+	"${KERNEL_NET_DIR}/TcpConnection.h"
+    "${KERNEL_NET_DIR}/NetService.cpp"
+	"${KERNEL_NET_DIR}/NetService.h"
+    "${KERNEL_NET_DIR}/NetListenerMgr.cpp"
+	"${KERNEL_NET_DIR}/NetListenerMgr.h"
+    "${KERNEL_NET_DIR}/NetIOEngine.cpp"
+	"${KERNEL_NET_DIR}/NetIOEngine.h"
+    "${KERNEL_NET_DIR}/IOEngine_IOCP.cpp"
+	"${KERNEL_NET_DIR}/IOEngine_IOCP.h"
+    "${KERNEL_NET_DIR}/IOEngine_Epoll.cpp"
+	"${KERNEL_NET_DIR}/IOEngine_Epoll.h"
 )
 
 SET( KERNEL_TIMER_DIR "${KERNEL_DIR}/Timer")
@@ -121,16 +129,10 @@ SOURCE_GROUP( Src FILES ${KERNEL})
 IF(WIN32)
 	SET(THIRD_LIB_DEBUG
 	debug "${THIRD_LIBRARIES_DEBUG_DIR}/DbgHelp.Lib"
-	debug "${THIRD_LIBRARIES_DEBUG_DIR}/libevent.lib"
-	debug "${THIRD_LIBRARIES_DEBUG_DIR}/libevent_core.lib"
-	debug "${THIRD_LIBRARIES_DEBUG_DIR}/libevent_extras.lib"
 	"ws2_32.lib"
 	"wsock32.lib"
 	)
 	SET(THIRD_LIB_RELEASE
-	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent.lib"
-	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent_core.lib"
-	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent_extras.lib"
 	    optimized "ws2_32.lib"
 	    optimized "wsock32.lib"
 	)
@@ -140,9 +142,6 @@ IF(LINUX)
 	SET(THIRD_LIB_DEBUG
 	)
 	SET(THIRD_LIB_RELEASE
-	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent.a"
-	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent_core.a"
-	    optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libevent_extra.a"
 	)
 ENDIF(LINUX)
 

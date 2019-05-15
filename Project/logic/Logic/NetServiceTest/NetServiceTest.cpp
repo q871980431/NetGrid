@@ -13,7 +13,6 @@
 
 NetServiceTest * NetServiceTest::s_self = nullptr;
 IKernel * NetServiceTest::s_kernel = nullptr;
-INetService * NetServiceTest::s_netService = nullptr;
 NetServiceTest::ConfigInfo NetServiceTest::s_configInfo;
 
 bool NetServiceTest::Initialize(IKernel *kernel)
@@ -27,7 +26,6 @@ bool NetServiceTest::Initialize(IKernel *kernel)
 
 bool NetServiceTest::Launched(IKernel *kernel)
 {
-	FIND_MODULE(s_netService, NetService);
 	if (s_configInfo.isServer)
 		StartServer();
 	else
@@ -52,7 +50,7 @@ void NetServiceTest::StartServer()
 {
 	IKernel *kernel = s_kernel;
 	TRACE_LOG("StartServer:%s, %d", s_configInfo.ip.GetString(), s_configInfo.port);
-	s_netService->CreateNetListener(s_configInfo.ip.GetString(), s_configInfo.port, this);
+	s_kernel->CreateNetListener(s_configInfo.ip.GetString(), s_configInfo.port, this);
 }
 
 void NetServiceTest::StartClient(core::IKernel *kernel)
@@ -60,7 +58,7 @@ void NetServiceTest::StartClient(core::IKernel *kernel)
 	auto onTimeFun = [](core::IKernel *kernel, s64 tick)
 	{
 		EchoClientSession *client = NEW EchoClientSession(s_kernel, s_configInfo.clientClose);
-		s_netService->CreateNetConnecter(s_configInfo.ip.GetString(), s_configInfo.port, client);
+		s_kernel->CreateNetSession(s_configInfo.ip.GetString(), s_configInfo.port, client);
 	};
 
 	SimpleTimer *timer = NEW SimpleTimer(nullptr, onTimeFun, nullptr);

@@ -8,9 +8,9 @@
 #ifndef __NetServer_h__
 #define __NetServer_h__
 #include "INetServer.h"
-class GameSession : public core::IMsgSession
+class GameSession : public core::ITcpSession
 {
-    virtual void  SetConnection(core::IMsgConnection *connection){ _connection = connection; };
+    virtual void  SetConnection(core::ITcpConnection *connection){ _connection = connection; };
     virtual void  OnEstablish(){
         if (_connection)
         {
@@ -18,22 +18,26 @@ class GameSession : public core::IMsgSession
             ECHO("\n*************OOnEstablish IP=%s******************", ip);
             s32 messageId = 1;
             char *msg = "HelloClient";
-            _connection->Send(messageId, msg, strlen(msg) + 1);
+            SendMsg(messageId, msg, strlen(msg) + 1);
         }
     };
     virtual void  OnTerminate(){};
     virtual void  OnError(s32 moduleErr, s32 sysErr){};
+	virtual void  OnRecv(const char *buff, s32 len);
+	virtual s32	  OnParsePacket(CircluarBuffer *recvBuff);
     virtual void  OnRecv(s32 messageId, const char *buff, s32 len);
+	void SendMsg(s32 msgId, const char *buff, s32 len);
 private:
-    core::IMsgConnection *_connection;
+    core::ITcpConnection *_connection;
 	s32					  _count;
 	s64					  _first;
 };
 
-class NetListener : public core::ITcpListener
+class NetListener : public core::INetTcpListener
 {
 public:
-    virtual IMsgSession * CreateSession(){ return NEW GameSession(); };
+    virtual ITcpSession * CreateSession(){ return NEW GameSession(); };
+	virtual void OnRelease() {};
 };
 
 class NetServer : public INetServer

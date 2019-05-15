@@ -7,8 +7,8 @@
 
 #ifndef __ServiceSession_h__
 #define __ServiceSession_h__
-#include "INetService.h"
-
+#include "IKernel.h"
+using namespace core;
 class EchoSession : public ITcpSession
 {
 public:

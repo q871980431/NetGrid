@@ -9,19 +9,24 @@
 #define __EchoSession_h__
 #include "IKernel.h"
 
-class EchoSession : public core::IMsgSession
+class EchoSession : public core::ITcpSession
 {
 public:
 	EchoSession(core::IKernel *kernel, s64 sessionId):_sessionId(sessionId),_kernel(kernel) {};
     virtual ~EchoSession(){};
 
-	virtual void  SetConnection(core::IMsgConnection *connection) { _connection = connection; };
+	virtual void  SetConnection(core::ITcpConnection *connection) { _connection = connection; };
 	virtual void  OnEstablish();
 	virtual void  OnTerminate();
 	virtual void  OnError(s32 moduleErr, s32 sysErr);
+	virtual s32	  OnParsePacket(CircluarBuffer *recvBuff);
+	virtual void  OnRecv(const char *buff, s32 len);
 	virtual void  OnRecv(s32 messageId, const char *buff, s32 len);
 protected:
-	core::IMsgConnection *_connection;
+	void SendMsg(s32 msgId, const char *buff, s32 len);
+
+protected:
+	core::ITcpConnection *_connection;
 	s64 _sessionId;
 	core::IKernel *_kernel;
 };

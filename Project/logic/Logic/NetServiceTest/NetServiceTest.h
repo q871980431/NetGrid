@@ -8,7 +8,6 @@
 #ifndef __NetServiceTest_h__
 #define __NetServiceTest_h__
 #include "INetServiceTest.h"
-#include "INetService.h"
 #include "TString.h"
 #include "ServiceSession.h"
 
@@ -40,8 +39,6 @@ protected:
 private:
     static NetServiceTest     * s_self;
     static IKernel  * s_kernel;
-	static INetService *s_netService;
-
 
 	static ConfigInfo s_configInfo;
 };

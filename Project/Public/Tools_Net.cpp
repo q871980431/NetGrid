@@ -130,7 +130,7 @@ extern "C" {
 		CloseSocket(netSocket);
 	}
 
-	bool QuerySocketError(NetSocket netSocket, s32 &error)
+	void QuerySocketError(NetSocket netSocket, s32 &error)
 	{
 		socklen_t len = sizeof(error);
 #ifdef WIN32
