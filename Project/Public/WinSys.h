@@ -36,6 +36,7 @@ typedef int64_t s64;
 
 
 #define CHECK_FMT(a, b)	__attribute__((format(printf, a, b)))
+#define GLOBAL_VAR_INT_MAX 
 
 #define ECHO(format, ...)\
 {\

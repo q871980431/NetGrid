@@ -101,6 +101,9 @@ private:
 
 IXmlObject * XmlReader::Root()
 {
+	if (_obj != nullptr)
+		return _obj;
+
 	_obj = new XmlObject(_doc.RootElement(), nullptr);
 
 	return _obj;

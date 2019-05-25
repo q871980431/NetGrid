@@ -4,8 +4,13 @@
 #include <chrono>
 
 #define GAME_FRESH_TIME  5
+
 namespace tools
 {
+	const static s64 DAY = 86400000;
+	const static s64 HOUR = 3600000;
+	const static s64 MINUTE = 60000;
+	const static s64 MILLISECONDS = 1000;
     extern const char *format;
 	inline s64 GetTimeSecond() { return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();}
     inline s64 GetTimeMillisecond(){ return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();}

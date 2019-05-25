@@ -40,7 +40,7 @@ public:
 
 	virtual void OnStart(IKernel *kernel, s64 tick) {};
 	virtual void OnTime(IKernel *kernel, s64 tick);
-	virtual void OnTerminate(IKernel *kernel, s64 tick) {};
+	virtual void OnTerminate(IKernel *kernel, s64 tick, bool isKill) {};
 	PlayerInfo * GetPlayerInfo( s64 playerId);
 	void Remove(s64 playerId);
 	void AddPlayerToMatch();

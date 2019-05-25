@@ -76,7 +76,7 @@ public:
 
 	virtual void OnStart(IKernel *kernel, s64 tick) {};
 	virtual void OnTime(IKernel *kernel, s64 tick);
-	virtual void OnTerminate(IKernel *kernel, s64 tick) { DEL this; };
+	virtual void OnTerminate(IKernel *kernel, s64 tick, bool isKill) { DEL this; };
 protected:
 private:
 	MachineInfo	*_machineInfo;

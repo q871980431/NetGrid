@@ -103,7 +103,10 @@ SET(PUBLIC
     "${PUBLIC_DIR}/Tools_file.cpp"
     "${PUBLIC_DIR}/TCallBack.h"	
     "${PUBLIC_DIR}/Tools_Net.h"
-    "${PUBLIC_DIR}/Tools_Net.cpp"	
+    "${PUBLIC_DIR}/Tools_Net.cpp"
+    "${PUBLIC_DIR}/MysqlBuilder.h"
+    "${PUBLIC_DIR}/MysqlBuilder.cpp"
+	
 )
 SET(TINYXML_DIR
 	"${PUBLIC_DIR}/tinyxml2"

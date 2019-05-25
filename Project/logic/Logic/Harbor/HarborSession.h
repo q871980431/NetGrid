@@ -73,7 +73,7 @@ public:
 		HostInfo *hostInfo = _session->GetHostInfo();
 		_session->GetKernel()->CreateNetSession(hostInfo->ip.GetString(), hostInfo->port, _session);
 	};
-	virtual void OnTerminate(IKernel *kernel, s64 tick) { _session->OnTimerTerminate(); DEL this; };
+	virtual void OnTerminate(IKernel *kernel, s64 tick, bool isKill) { _session->OnTimerTerminate(); DEL this; };
 protected:
 	HarborClientSession *_session;
 };

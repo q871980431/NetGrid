@@ -11,10 +11,10 @@ void TimerMgr::Process(s32 tick)
 	_timerWheel.Process(_kernel, tick);
 }
 
-void TimerMgr::StartTimer(core::ITimer *timer, s32 delay, s32 count, s32 interval, const char *trace)
+void TimerMgr::StartTimer(core::ITimer *timer, s64 delay, s32 count, s64 interval, const char *trace)
 {
 	ASSERT(timer->GetBase() == nullptr, "error");
-	TimerBase *base = TimerBase::Create(timer, count, interval, trace);
+	TimerBase *base = TimerBase::Create(timer, count, interval/TimerWheel::JIFFIES_TIME, trace);
 	timer->SetBase(base);
 
 	_timerWheel.AddTimer(base, delay);

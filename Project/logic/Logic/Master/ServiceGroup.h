@@ -60,7 +60,7 @@ public:
 
 	virtual void OnStart(core::IKernel *kernel, s64 tick) {};
 	virtual void OnTime(core::IKernel *kernel, s64 tick);
-	virtual void OnTerminate(core::IKernel *kernel, s64 tick) {};
+	virtual void OnTerminate(core::IKernel *kernel, s64 tick, bool isKill) {};
 public:
 	void AddService(ServiceConfig *config);
 	void StartService(core::IKernel *kernel);
@@ -85,7 +85,7 @@ public:
 
 	virtual void OnStart(core::IKernel *kernel, s64 tick) {};
 	virtual void OnTime(core::IKernel *kernel, s64 tick);
-	virtual void OnTerminate(core::IKernel *kernel, s64 tick);
+	virtual void OnTerminate(core::IKernel *kernel, s64 tick, bool isKill);
 protected:
 private:
 	const ServiceNodeInfo *_serviceNode;

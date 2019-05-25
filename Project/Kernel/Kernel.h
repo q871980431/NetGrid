@@ -6,7 +6,9 @@
 #include <string>
 #include <unordered_map>
 #include "Logger.h"
+#include <vector>
 
+class AsyncQueue;
 class Kernel    : public core::IKernel, public core::IApplication, public Singleton<Kernel>
 {
 public:
@@ -23,20 +25,28 @@ public:
     virtual IModule * FindModule(const char *name);
     virtual void CreateNetSession(const char *ip, s16 port, core::ITcpSession *session);
     virtual void CreateNetListener(const char *ip, s16 port, core::INetTcpListener *listener);
-	virtual void StartTimer(core::ITimer *timer, s32 delay, s32 count, s32 interval, const char *trace);
+	virtual void StartTimer(core::ITimer *timer, s64 delay, s32 count, s64 interval, const char *trace);
 	virtual void KillTimer(core::ITimer *timer);
 	virtual void AddFrame(core::IFrame *frame, u8 runLvl, const char *trace);
 	virtual void RemoveFrame(core::IFrame *frame);
+	virtual void StartAsync(const s64 threadId, core::IAsyncHandler * handler, const char * file, const s32 line);
+	virtual void StopAsync(core::IAsyncHandler * handler);
+	virtual core::IAsyncQueue * GetMainAsyncQueue();
+	virtual core::IAsyncQueue * CreateAsyncQueue(const s32 threadSize, const char *trace);
     virtual const char* GetCoreFile();
     virtual const char* GetConfigFile();
     virtual const  char* GetEnvirPath();
 protected:
 private:
     void ParseCommand(s32 argc, char **argv);
-
+	inline s32 GetNewQueueId() { return _asyncQueueId++; };
+	AsyncQueue * CreateAsyncQueue(s32 queueId, const s32 threadSize, const char *trace);
 private:
     std::unordered_map<std::string, std::string>    _cmdArgs;
     Logger                                          _logger;
+	s32											_asyncQueueId;
+	AsyncQueue								  * _mainQueue;
+	std::unordered_map<s32, AsyncQueue*>	    _asyncQueues;
 };
 
 #define KERNEL ((Kernel * )(Kernel::GetInstancePtr()))

@@ -2,6 +2,7 @@
 #define __IKernel_h__
 #include "MultiSys.h"
 #include "CircularBuffer.h"
+#include <set>
 
 #define  FIND_MODULE(module, name) {\
     module = (I##name * )(s_kernel->FindModule(#name));\
@@ -40,10 +41,10 @@
     kernel->AsyncLog(log); \
 }
 
-#define IMPORTANT_LOG(format, ...)\
+#define IMPORTANT_LOG(labl, format, ...)\
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
-    SafeSprintf(log, sizeof(log), "[IMPORTANT]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+    SafeSprintf(log, sizeof(log), "[%s]: %s:%d:%s | "#format, labl, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
     kernel->SyncLog(log); \
 }
 
@@ -79,10 +80,10 @@
 	kernel->AsyncLog(log); \
 }
 
-#define IMPORTANT_LOG(format, a...)\
+#define IMPORTANT_LOG(labl, format, a...)\
 {\
 	char log[LOG_BUFF_SIZE] = { 0 }; \
-	SafeSprintf(log, sizeof(log), "[IMPORTANT]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##a); \
+	SafeSprintf(log, sizeof(log), "[%s]: %s:%d:%s | "#format, labl, __FILE__, __LINE__, __FUNCTION__, ##a); \
 	kernel->SyncLog(log); \
 }
 
@@ -165,10 +166,37 @@ namespace core
     public:
         virtual void OnStart(IKernel *kernel, s64 tick) = 0;
         virtual void OnTime(IKernel *kernel, s64 tick) = 0;
-        virtual void OnTerminate(IKernel *kernel, s64 tick) = 0;
+        virtual void OnTerminate(IKernel *kernel, s64 tick, bool isKill) = 0;
     private:
         ITrace  *_base;
     };
+
+	class IAsyncHandler {
+	public:
+		IAsyncHandler():_base(nullptr){}
+		virtual ~IAsyncHandler() {}
+
+		inline void SetBase(ITrace * base) { _base = base; }
+		inline ITrace * GetBase() { return _base; }
+
+		virtual bool OnExecute(IKernel * kernel, s32 queueId, s32 threadIdx) = 0;
+		virtual void OnSuccess(IKernel * kernel) = 0;
+		virtual void OnFailed(IKernel * kernel, bool isExecuted) = 0;
+		virtual void OnRelease(IKernel * kernel) = 0;
+	private:
+		ITrace * _base;
+	};
+
+	class IAsyncQueue
+	{
+	public:
+		virtual ~IAsyncQueue() {};
+
+		virtual void StartAsync(const s64 threadId, IAsyncHandler * handler, const char * file, const s32 line) = 0;
+		virtual void StopAsync(IAsyncHandler * handler) = 0;
+		virtual s32  GetQueueId() = 0;
+		virtual void  GetQueueInfo(s32 &threadNum, std::set<s32> &threadIds) = 0;
+	};
 
 	class IFrame
 	{
@@ -183,20 +211,38 @@ namespace core
 		ITrace  *_base;
 	};
 
+
+
     class IKernel
     {
     public:
+		//Log
         virtual void SyncLog(const char *contens) = 0;
         virtual void AsyncLog(const char *contens) = 0;
 		virtual void ThreadLog(const char *contents) = 0;
+
+		//Module
         virtual IModule * FindModule(const char *name) = 0;
-        virtual void CreateNetSession(const char *ip, s16 port, core::ITcpSession *session) = 0;
+
+        //Net
+		virtual void CreateNetSession(const char *ip, s16 port, core::ITcpSession *session) = 0;
         virtual void CreateNetListener(const char *ip, s16 port, core::INetTcpListener *listener) = 0;
-		virtual void StartTimer(core::ITimer *timer, s32 delay, s32 count, s32 interval, const char *trace) = 0;
+		
+		//Timer
+		virtual void StartTimer(core::ITimer *timer, s64 delay, s32 count, s64 interval, const char *trace) = 0;
 		virtual void KillTimer(core::ITimer *timer) = 0;
+		
+		//Frame
 		virtual void AddFrame(core::IFrame *frame, u8 runLvl, const char *trace) = 0;
 		virtual void RemoveFrame(core::IFrame *frame) = 0;
-        virtual const char* GetCoreFile() = 0;
+        
+		//AsyncTask
+		virtual void StartAsync(const s64 threadId, IAsyncHandler * handler, const char * file, const s32 line) = 0;
+		virtual void StopAsync(IAsyncHandler * handler) = 0;
+		virtual IAsyncQueue * GetMainAsyncQueue() = 0;
+		virtual IAsyncQueue * CreateAsyncQueue(const s32 threadSize, const char *trace) = 0;
+
+		virtual const char* GetCoreFile() = 0;
         virtual const char* GetConfigFile() = 0;
         virtual const  char* GetEnvirPath() = 0;
         virtual const char * GetCmdArg(const char *name) = 0;
@@ -214,4 +260,5 @@ namespace core
 	SafeSprintf(trace, sizeof(trace), "trace: %s:%d", __FILE__, __LINE__);\
 	kernel->AddFrame(frame, runLvl, trace);\
 }
+
 #endif

@@ -51,6 +51,8 @@ namespace tools{
         mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif
     }
+
+
     inline void SafeMemset(void *__restrict dest, s32 size, s8 val, s32 num)
 	{
 		ASSERT(size >= num, "out of rang");
@@ -76,6 +78,22 @@ namespace tools{
         dest[n] = 0;
         return n;
     }
+
+	inline bool	 StrToBool(const char *val) { return (val != nullptr) ? (atoi(val) != 0) : false; }
+	inline s8	 StrToInt8(const char *val) { return (val != nullptr) ? (s8)atoi(val) : 0; };
+	inline s16	 StrToInt16(const char *val) { return (val != nullptr) ? (s16)atoi(val) : 0; };
+	inline s32	 StrToInt32(const char *val) { return (val != nullptr) ? atoi(val) : 0; };
+	inline s64   StrToInt64(const char *val) { return (val != nullptr) ? atoll (val) : 0; };
+	inline float StrToFloat(const char *val) { return (val != nullptr) ? (float)atof(val) : 0.0f; };
+
+	template< typename T>
+	void ValToStr(char *buff, s32 buffSize, const T &val){SafeSprintf(buff, buffSize, "%d", val);}
+	template<>
+	inline void ValToStr(char *buff, s32 buffSize, const float &val){SafeSprintf(buff, buffSize, "%f", val);}
+	template<>
+	inline void ValToStr<s64>(char *buff, s32 buffSize, const s64 &val){SafeSprintf(buff, buffSize, "%lld", val);}
+	template<>
+	inline void ValToStr<u64>(char *buff, s32 buffSize, const u64 &val) { SafeSprintf(buff, buffSize, "%lld", val); }
 
 	template<typename T>
 	inline void Zero(T &val)

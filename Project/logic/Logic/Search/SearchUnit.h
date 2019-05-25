@@ -102,7 +102,7 @@ public:
 
 	virtual void OnStart(IKernel *kernel, s64 tick) {};
 	virtual void OnTime(IKernel *kernel, s64 tick) { _searchUnit->ValExpand(); };
-	virtual void OnTerminate(IKernel *kernel, s64 tick) {};
+	virtual void OnTerminate(IKernel *kernel, s64 tick, bool isKill) {};
 protected:
 private:
 	SearchUnit *_searchUnit;
@@ -116,7 +116,7 @@ public:
 
 	virtual void OnStart(IKernel *kernel, s64 tick) {};
 	virtual void OnTime(IKernel *kernel, s64 tick) { _searchUnit->FlushSearch(); };
-	virtual void OnTerminate(IKernel *kernel, s64 tick) {};
+	virtual void OnTerminate(IKernel *kernel, s64 tick, bool isKill) {};
 protected:
 private:
 	SearchUnit *_searchUnit;

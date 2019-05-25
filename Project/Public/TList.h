@@ -1,6 +1,7 @@
 ﻿#ifndef __T_List_h__
 #define __T_List_h__
 #include "MultiSys.h"
+#include <mutex>
 namespace tlib
 {
     namespace linear{
@@ -151,6 +152,9 @@ namespace tlib
             inline ILinkNode * Tail(){ return _tail; };
 			inline void Swap(LinkList *lists)
 			{
+				if (this == lists)
+					return;
+
 				std::swap(_size, lists->_size);
 				ILinkNode *tmp = _head;
 				while (tmp != nullptr)
@@ -179,7 +183,98 @@ namespace tlib
             ILinkNode *_head;
             ILinkNode *_tail;
             s32        _size;
-        };
+		};
+
+		template<typename T>
+		struct SimpleList
+		{
+			T *head;
+			T *tail;
+			SimpleList() :head(nullptr), tail(nullptr) {};
+		};
+
+		template<typename L, typename T>
+		void PushHead(L &list, T *node)
+		{
+			if (list.head == nullptr) {
+				ASSERT(list.tail == nullptr, "wtf");
+				list.head = node;
+				list.tail = node;
+			}
+			else {
+				ASSERT(list.tail != nullptr, "wtf");
+				node->_next = list.head;
+				list.head = node;
+			}
+		};
+
+		template<typename L, typename T>
+		void PushTail(L &list, T *node)
+		{
+			if (list.head == nullptr) {
+				ASSERT(list.tail == nullptr, "wtf");
+				list.head = node;
+				list.tail = node;
+			}
+			else {
+				ASSERT(list.tail != nullptr, "wtf");
+				list.tail->next = node;
+				list.tail = node;
+			}
+		}
+
+		template<typename L>
+		void MergeList(L& to, L& from)
+		{
+			if (from.head == nullptr)
+				return;
+			else {
+				ASSERT(from.tail != nullptr, "wtf");
+				if (to.head == nullptr) {
+					to.head = from.head;
+					to.tail = from.tail;
+				}
+				else {
+					to.tail->next = from.head;
+					to.tail = from.tail;
+				}
+				from.head = from.tail = nullptr;
+			}
+		}
+
+		template<typename L, typename T>
+		void MergeListByLock(L& to, L& from, T &lock)
+		{
+			if (from.head == nullptr)
+				return;
+			else {
+				ASSERT(from.tail != nullptr, "wtf");
+				std::lock_guard<T> guard(lock);
+				if (to.head == nullptr) {
+					to.head = from.head;
+					to.tail = from.tail;
+				}
+				else {
+					to.tail->next = from.head;
+					to.tail = from.tail;
+				}
+				from.head = from.tail = nullptr;
+			}
+		}
+
+		template<typename L, typename T>
+		T * PopHead(L &list)
+		{
+			if (list.head == nullptr)
+				return nullptr;
+
+			T * first = list.head;
+			list.head = first->next;
+			if (list.head == nullptr)
+				list.tail = nullptr;
+
+			return first;
+		}
 
     }
 }

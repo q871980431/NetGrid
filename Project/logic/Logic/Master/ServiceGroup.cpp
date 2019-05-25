@@ -128,7 +128,7 @@ void StartServiceTimer::OnTime(core::IKernel *kernel, s64 tick)
 
 }
 
-void StartServiceTimer::OnTerminate(core::IKernel *kernel, s64 tick)
+void StartServiceTimer::OnTerminate(core::IKernel *kernel, s64 tick, bool isKill)
 {
 
 }
