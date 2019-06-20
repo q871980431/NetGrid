@@ -34,7 +34,7 @@ public:
 
 		memcpy(_buff + off, buffer,  l);
 		memcpy(_buff, (const char *)buffer + l, len - l);
-        std::atomic_signal_fence(std::memory_order_release);
+        std::atomic_thread_fence(std::memory_order_release);
 
 		_wcount += len;
 		return len;
@@ -103,7 +103,7 @@ public:
 
 		memcpy(buff, _buff + off, l);
 		memcpy((char*)buff + l, _buff, len - l);
-        std::atomic_signal_fence(std::memory_order_release);
+        std::atomic_thread_fence(std::memory_order_release);
 
 		_rcount += len;
 		return len;

@@ -1,4 +1,6 @@
 <root path="./">
-	<module	name="CacheDB"/>
-	<module name="Test"/>
+	<module	name="Cluster"/>
+	<module	name="EchoServer"/>	
+	<module	name="UnitTest"/>
+	<module	name="ObjectMgr"/>	
 </root>

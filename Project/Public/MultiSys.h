@@ -28,9 +28,10 @@ enum DATA_TYPE
     DATA_TYPE_S64       = 5,
     DATA_TYPE_FLOAT     = 6,
     DATA_TYPE_STR       = 7,
-    DATA_TYPE_BINARY    = 8,
-    DATA_TYPE_TABLE     = 9,
-    DATA_TYPE_OBJ       = 10,
+	DATA_TYPE_STRUCT	= 8,
+    DATA_TYPE_BINARY    = 9,
+    DATA_TYPE_TABLE     = 10,
+    DATA_TYPE_OBJ       = 11,
 };
 
 inline s32 __SafeSprintf(char *buf, s32 size, const char *fromat, ...)

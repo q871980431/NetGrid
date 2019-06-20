@@ -26,20 +26,20 @@ bool ObjectMgr::Initialize(IKernel *kernel)
     s_self = this;
     s_kernel = kernel;
 	tools::Zero(s_guidInfo);
+
     InitTypeMap();
     char path[MAX_PATH];
     SafeSprintf(path, sizeof(path), "%s/object", s_kernel->GetEnvirPath());
     if (!LoadObjDir(path))
         return false;
-       
+	ObjectMember::Init();
     return true;
 }
 
 bool ObjectMgr::Launched(IKernel *kernel)
 {
     const MemberProperty *propWingid = GetMemberProperty("logic::wing::wingid");
-    ObjectMember::Init();
-	TestObject();
+	TestObject(kernel);
 
     return true;
 }
@@ -182,6 +182,8 @@ bool ObjectMgr::LoadObjFiles(const char *path, const char *dirname, tools::FileM
 
 ObjectDes * ObjectMgr::LoadObjFile(const char *path, const char *fileName, const char *nameSpace, tools::FileMap *files, DependenceMap &dependence)
 {
+	ECHO("Load path:%s, fileName:%s, nameSpace:%s", path, fileName, nameSpace);
+
     char filePath[MAX_PATH];
     SafeSprintf(filePath, sizeof(filePath), "%s/%s", path, fileName);
     char simpleName[MAX_PATH] = { 0 };
@@ -195,7 +197,6 @@ ObjectDes * ObjectMgr::LoadObjFile(const char *path, const char *fileName, const
     auto iter = s_memeoryMap.find(fullName);
     if (iter != s_memeoryMap.end())
         return iter->second;
-
     XmlReader readr;
     if (!readr.LoadFile(filePath))
     {
@@ -248,7 +249,7 @@ void ObjectMgr::BuildMemberDes(const char *path, const char *fileName, const cha
     while (childMember != nullptr)
     {
         MemberDes des;
-		des.memeoryDes = nullptr;
+		des.memeoryDes = memeory;
         const char *name = childMember->GetAttribute_Str("name");
         const char *type = childMember->GetAttribute_Str("type");
         des.index = childMember->GetAttribute_S32("index");
@@ -403,19 +404,22 @@ s64 ObjectMgr::GetNewGUID(bool local)
 	return id;
 }
 
-void ObjectMgr::TestObject()
+void ObjectMgr::TestObject(IKernel *kernel)
 {
 	IObject *player = InnerCreateObject("logic::player");
 	s64 oldLevel = player->GetMemberS64(Logic::Player::lvl);
 	player->SetMemberS64(Logic::Player::lvl, oldLevel + 10);
 	s64 nowLevel = player->GetMemberS64(Logic::Player::lvl);
+	ASSERT(nowLevel == 10, "error");
 	InnerReleaseObject(player);
 	player = InnerCreateObject("logic::player");
 	oldLevel = player->GetMemberS64(Logic::Player::lvl);
 	player->SetMemberS64(Logic::Player::lvl, oldLevel + 10);
 	nowLevel = player->GetMemberS64(Logic::Player::lvl);
+	ASSERT(nowLevel == 10, "error");
 	ITable *bag = player->GetTable(Logic::Player::bag);
 	s32 count = bag->RowCount();
+	ASSERT(count == 0, "error");
 	IRow *row = bag->CreateRow();
 	row->SetMemberS32(Logic::Player::Bag::place, 1);
 	s32 place = row->GetMemberS32(Logic::Player::Bag::place);
@@ -423,6 +427,7 @@ void ObjectMgr::TestObject()
 	const char *name = player->GetMemberStr(Logic::Player::name);
 	player->SetMemberStr(Logic::Player::name, "test0test1test2test3");
 	name = player->GetMemberStr(Logic::Player::name);
+	ECHO("name:%s", name);
 	ITable *notic = player->GetTable(Logic::Player::notice);
 	s32 noticCount = notic->RowCount();
 	IRow *noticRow = nullptr;
@@ -433,11 +438,12 @@ void ObjectMgr::TestObject()
 	{
 		IKernel *kernel = s_kernel;
 		const char *content = row->GetMemberStr(Logic::Player::Notice::content);
-		DEBUG_LOG("notice, content:%s", content);
+		ECHO("notice, content:%s", content);
 	};
 	notic->ForEach(fun);
 	IRow *findRow = notic->FindRowByKey("test1");
 	findRow = notic->FindRowByKey("testt");
-	noticRow->SetMemberStr(Logic::Player::Notice::content, "test4");
-	noticRow->SetMemberStr(Logic::Player::name, "xuping");
+	//noticRow->SetMemberStr(Logic::Player::Notice::content, "test4");
+	//noticRow->SetMemberStr(Logic::Player::name, "xuping");
+	//TRACE_LOG("name:%s", noticRow->GetMemberStr(Logic::Player::name));
 }

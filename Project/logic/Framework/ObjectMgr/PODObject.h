@@ -46,12 +46,11 @@ protected:
 template< typename T>
 T PODObject::GetAttrT(const IMember *member)
 {
-	if (((const MemberProperty *)member)->des->memeoryDes != _des)
-	{
-		ASSERT(false, "error");
-		return T();
-	}
-	return _des->GetAttrT<T>(_memeroy.addr, (const MemberProperty *)member);
+	if (member && ((const MemberProperty *)member)->des->memeoryDes == _des)
+		return _des->GetAttrT<T>(_memeroy.addr, (const MemberProperty *)member);
+
+	ASSERT(false, "error");
+	return T();
 }
 
 #endif

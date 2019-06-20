@@ -58,16 +58,6 @@ void NetService::Process(core::IKernel *kernel, s32 exTick)
 	{
 		iter.second->OnRecv(kernel);
 	}
-	for (auto iter = _froceCloseMap.begin(); iter != _froceCloseMap.end(); )
-	{
-		if (tick - iter->second >= ITcpConnection::CLOSE_DELAY_TIME * 1000)
-		{
-			tools::SocketFroceClose(iter->first);
-			iter = _froceCloseMap.erase(iter);
-			continue;
-		}
-		iter++;
-	}
 }
 
 void NetService::CreateNetListener(const char *ip, s32 port, INetTcpListener *listener)
@@ -121,12 +111,8 @@ void NetService::RemoveConnection(s32 sessionId, bool recvFin)
 		if (recvFin)
 			tools::CloseSocket(netSocket);
 		else
-		{
 			tools::SocketFroceClose(netSocket);
 
-			//auto ret = _froceCloseMap.insert(std::make_pair(netSocket, tools::GetTimeMillisecond()));
-			//ASSERT(ret.second, "error");
-		}
 		_netIoEngine->RemoveConnection(iter->second);
 		DEL iter->second;
 		_connectionMap.erase(iter);

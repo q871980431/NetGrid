@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<echoserver server="true" ip="127.0.0.1" port="11011" clientNum="50"/>
+	<servicetest server="false" ip="192.168.139.243" port="11011" clientNum="1" clientclose="true" />	
+</root>

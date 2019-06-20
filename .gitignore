@@ -5,3 +5,4 @@ Project/Thridlibrary/windows/debug/libevent_core.lib
 Project/Thridlibrary/windows/debug/libevent_extras.lib
 Project/Thridlibrary/windows/debug/lualib.lib
 Project/Thridlibrary/windows/debug/*.lib
+Project/Thridlibrary/linux/*.a

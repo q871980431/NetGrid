@@ -68,21 +68,21 @@ bool NetListenerMgr::CreateNetConnecter(IKernel *kernel, const char *ip, s32 por
 void NetListenerMgr::Process(IKernel *kernel, s64 tick)
 {
 
-	MainEvent *evt = _mainQueue.Pop();
-	while (evt)
+	MainEvent evt;
+	while (_mainQueue.Pop(evt))
 	{
-		if (evt->opt == LISTEN_EVT_ADD)
+		if (evt.opt == LISTEN_EVT_ADD)
 		{
-			if (evt->type == LISTENER)
-				OnAccept(kernel, evt->listSocket, evt->socket);
-			if (evt->type == CONNECTER)
-				OnConnect(kernel, evt->socket);
+			if (evt.type == LISTENER)
+				OnAccept(kernel, evt.listSocket, evt.socket);
+			if (evt.type == CONNECTER)
+				OnConnect(kernel, evt.socket);
 		}
-		if (evt->opt == LISTEN_EVT_REMOVE)
+		if (evt.opt == LISTEN_EVT_REMOVE)
 		{
-			if (evt->type == LISTENER)
+			if (evt.type == LISTENER)
 			{
-				auto iter = _listenSockMap.find(evt->socket);
+				auto iter = _listenSockMap.find(evt.socket);
 				ASSERT(iter != _listenSockMap.end(), "error");
 				if (iter != _listenSockMap.end())
 				{
@@ -91,13 +91,12 @@ void NetListenerMgr::Process(IKernel *kernel, s64 tick)
 					_listenSockMap.erase(iter);
 				}
 			}
-			if (evt->type == CONNECTER)
+			if (evt.type == CONNECTER)
 			{
-				OnConnectFailed(kernel, evt->socket, evt->listSocket);
+				OnConnectFailed(kernel, evt.socket, evt.listSocket);
 			}
 
 		}
-		evt = _mainQueue.Pop();
 	}
 }
 
@@ -197,28 +196,28 @@ void NetListenerMgr::Run()
 	while (!_terminate)
 	{
 		//THREAD_LOG("NetListener","NetListenerMgr Running");
-		ThreadEvent *evt = _threadQueue.Pop();
-		if (evt != nullptr)
+		ThreadEvent evt;
+		if (_threadQueue.Pop(evt))
 		{
-			if (evt->opt == LISTEN_EVT_ADD)
+			if (evt.opt == LISTEN_EVT_ADD)
 			{
 				//上层逻辑保护 不会有超过LISTEN_SOCKET_SIZE 数量
 				if (netSockets.size < LISTEN_SOCKET_SIZE)
 				{
 					SocketNode *node = &(netSockets.sockets[netSockets.size++]);
-					node->socket = evt->socket;
-					node->type = evt->type;
+					node->socket = evt.socket;
+					node->type = evt.type;
 					node->size = 0;
 				}
 			}
-			else if (evt->opt == LISTEN_EVT_REMOVE)
+			else if (evt.opt == LISTEN_EVT_REMOVE)
 			{
-				if (DelSoeckt(netSockets, evt->socket))
+				if (DelSoeckt(netSockets, evt.socket))
 				{
 					MainEvent mainEvt;
-					mainEvt.opt = evt->opt;
-					mainEvt.socket = evt->socket;
-					mainEvt.type = evt->type;
+					mainEvt.opt = evt.opt;
+					mainEvt.socket = evt.socket;
+					mainEvt.type = evt.type;
 					_mainQueue.TryPush(mainEvt);
 				}
 			}
@@ -303,6 +302,7 @@ void NetListenerMgr::Run()
 					NetSocket clientSocket;
 					while (true)
 					{
+						break;
 						if (!tools::AcceptSocket(netSockets.sockets[i].socket, stClient, clientSocket))
 						{
 #ifdef WIN32

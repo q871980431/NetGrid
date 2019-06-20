@@ -58,6 +58,8 @@ void ObjectDes::Fix()
         _podsSize += pod.des.size;
         if (pod.des.type == DATA_TYPE::DATA_TYPE_STR)
             _podsSize += 1;
+		if (pod.des.type == DATA_TYPE::DATA_TYPE_BINARY)
+			_podsSize += sizeof(s32);
     }
     _allSize += _podsSize;
 

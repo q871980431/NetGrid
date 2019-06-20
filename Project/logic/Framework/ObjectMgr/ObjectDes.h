@@ -106,13 +106,42 @@ public:
 	template <typename T>
 	T GetAttrT(void *addr, const MemberProperty *member)const;
 
+	inline void SetAttrBlob(void *addr, const MemberProperty *member, void *val, s32 size) const
+	{
+		ASSERT(member->host == this, "error");
+		ASSERT(member->type == DATA_TYPE::DATA_TYPE_BINARY, "error");
+		ASSERT(member->size >= size, "error");
+		ASSERT(member->offset + size <= _allSize, "error");
+		if (member->size < size)
+			size = member->size;
+		memcpy((char *)addr + member->offset, val, size);
+		*(s32*)((char*)addr + member->offset + member->size) = size;
+	}
+
+	inline void * GetAttrBlob(void *addr, const MemberProperty *member, s32& size) const
+	{
+		ASSERT(member->host == this, "error");
+		ASSERT(member->type == DATA_TYPE::DATA_TYPE_BINARY, "error");
+		ASSERT(member->offset + member->size <= _allSize, "error");
+		size = *(s32*)((char*)addr + member->offset + member->size);
+		return (char*)addr + member->offset;
+	}
+
+	inline void * GetAttrData(void *addr, const MemberProperty *member, s32 size) const
+	{
+		ASSERT(member->host == this, "error");
+		ASSERT(member->offset + member->size <= _allSize, "error");
+		ASSERT(member->size == size, "error");
+		if (member->host == this && member->size == size)
+			return (char*)addr + member->offset;
+		return nullptr;
+	}
+private:
     inline void SetAttrStruct(void *addr, const MemberProperty *member, void *conext, s32 size)const
     {
         ASSERT(member->offset + size <= _allSize, "error");
         if (member->size == size)
-        {
             memcpy((char *)addr + member->offset, conext, size);
-        }
     }
 
 	template <typename T>
@@ -156,6 +185,7 @@ void ObjectDes::SetAttrT(void *addr, const MemberProperty *member, T val)const
 template<>
 inline void ObjectDes::SetAttrT<const char *>(void *addr, const MemberProperty *member, const char * val) const
 {
+	printf("setAttr string, filename:%s", member->name);
 	ASSERT(member->host == this, "error");
 	ASSERT(member->type == DATA_TYPE::DATA_TYPE_STR, "error");
 	s32 size = strlen(val);
@@ -169,13 +199,14 @@ inline void ObjectDes::SetAttrT<const char *>(void *addr, const MemberProperty *
 template <typename T>
 T ObjectDes::GetAttrT(void *addr, const MemberProperty *member)const
 {
-	ASSERT(member->size == sizeof(T), "error");
-	return *(T *)((char *)addr + member->offset);
+	void *ret = GetAttrData(addr, member, sizeof(T));
+	return ret ? *(T*)ret : T();
 }
 
 template<>
 inline const char * ObjectDes::GetAttrT<const char *>(void *addr, const MemberProperty *member) const
 {
+	printf("GetAttr string, filename:%s", member->name);
 	ASSERT(member->type == DATA_TYPE::DATA_TYPE_STR, "error");
 	return(char *)addr + member->offset;
 }

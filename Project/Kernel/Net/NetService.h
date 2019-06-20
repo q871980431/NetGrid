@@ -49,6 +49,5 @@ private:
 	s32				  _sessionId;
 	ConnectionMap	  _connectionMap;
 	NetIOEngine		  *_netIoEngine;
-	FroceCloseMap	  _froceCloseMap;
 };
 #endif

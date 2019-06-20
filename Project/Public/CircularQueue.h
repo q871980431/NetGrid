@@ -2,6 +2,7 @@
 #define __Circluar_Queue_h__
 #include "MultiSys.h"
 #include <limits>
+#include <atomic>
 
 template< typename T >
 class CircluarQueue
@@ -18,15 +19,20 @@ public:
 		SAFE_DELETE_ARRAY(_queue);
 	}
 
-	inline T * Pop()
+	inline bool Pop(T &val)
 	{
-		if (_front == _tail)return nullptr;
-		return &_queue[_front++&(_size - 1)];
+		if (_front == _tail)return false;
+		val = _queue[_front&(_size - 1)];
+		std::atomic_thread_fence(std::memory_order_release);
+		_front++;
+		return true;
 	}
 	inline bool Push(const T &t)
 	{
 		if (_tail - _front >= _size)return false;
-		_queue[_tail++ &(_size - 1)] = t;
+		_queue[_tail&(_size - 1)] = t;
+		std::atomic_thread_fence(std::memory_order_release);
+		_tail++;
 		return true;
 	}
 

@@ -22,7 +22,7 @@ IF(LINUX)
 	LINK_DIRECTORIES("${PROJECT_BINARY_DIR}/linux")
 	#SET(CMAKE_C_FLAGS	"-std=c++0x -Wall -lpthread -rdynamic -ldl -Dlinux -lcurl -lmysqlclient -lTNavigation")
 		SET(CMAKE_C_FLAGS "-fPIC")
-        SET(CMAKE_CXX_FLAGS " -std=c++11 -Wall -DLINUX -pthread -rdynamic -ldl -lrt -g")
+        SET(CMAKE_CXX_FLAGS " -std=c++11 -Wall -DLINUX -pthread -rdynamic -ldl -lrt -g -Wl,-rpath,./")
 	#SET(CMAKE_C_FLAGS_DEBUG	"-g -D_DEBUG -o0 -pg -L${PROJECT_SOURCE_DIR}/Thridlibrary/debug/linux")
         SET(CMAKE_C_FLAGS_DEBUG "-g -D_DEBUG -O -pg -L${PROJECT_SOURCE_DIR}/Thridlibrary/linux")
 	#SET(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O2 _L${PROJECT_SOURCE_DIR}/Thridlibrary/release/linux")
@@ -47,6 +47,16 @@ SET(OBJECT_LIB
 	optimized "${PROJECT_BINARY_DIR}/windows/Release/ObjectMgr.lib"
 )
 
+SET(NODEPROTO_LIBD
+	debug "${PROJECT_BINARY_DIR}/windows/debug/NodeProto.lib"
+	debug "${THIRD_LIBRARIES_DEBUG_DIR}/libprotobufd.lib"
+)
+SET(NODEPROTO_LIB
+	optimized "${PROJECT_BINARY_DIR}/windows/Release/NodeProto.lib"
+	optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libprotobufd.lib"
+)
+
+
 ENDIF(WIN32)
 
 IF(LINUX)
@@ -63,6 +73,17 @@ SET(OBJECT_LIBD
 SET(OBJECT_LIB
 	optimized "${PROJECT_BINARY_DIR}/linux/libObjectMgr.so"
 )
+
+SET(NODEPROTO_LIBD
+	debug "${PROJECT_BINARY_DIR}/linux/libNodeProto.so"
+	debug "${THIRD_LIBRARIES_DEBUG_DIR}/libprotobuf.a"
+)
+SET(NODEPROTO_LIB
+	optimized "${PROJECT_BINARY_DIR}/linux/libNodeProto.so"
+	optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libprotobuf.a"
+)
+
+
 ENDIF(LINUX)
 
 SET(API_DIR
@@ -106,7 +127,7 @@ SET(PUBLIC
     "${PUBLIC_DIR}/Tools_Net.cpp"
     "${PUBLIC_DIR}/MysqlBuilder.h"
     "${PUBLIC_DIR}/MysqlBuilder.cpp"
-	
+	"${PUBLIC_DIR}/AtomicIntrusiveLinkedList.h"			
 )
 SET(TINYXML_DIR
 	"${PUBLIC_DIR}/tinyxml2"

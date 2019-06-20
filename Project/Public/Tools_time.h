@@ -28,6 +28,19 @@ namespace tools
 		return &tmp;
 	}
 
+	inline s32 GetTimeZoneNow()
+	{
+#ifdef WIN32
+		TIME_ZONE_INFORMATION zoneInfo;
+		GetSystemTime(&zoneInfo.StandardDate);
+		GetTimeZoneInformation(&zoneInfo);
+		return zoneInfo.Bias / -60;
+#endif
+#ifdef LINUX
+		return timezone / -3600;
+#endif
+	}
+
 #ifdef __cplusplus
     extern "C"{
 #endif

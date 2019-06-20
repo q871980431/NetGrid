@@ -33,6 +33,13 @@ extern "C" {
 	{
 		return ntohs(st.sin_port);
 	}
+
+	s32 GetIpV4Addr(const char *ip)
+	{
+		s32 ret = 0;
+		inet_pton(AF_INET, ip, &ret);
+		return ret;
+	}
 	
 	NetSocket InitTcpSocket()
 	{
@@ -65,7 +72,7 @@ extern "C" {
 		if (listen(netSocket, SOMAXCONN) == SOCKET_ERROR)
 #endif
 #ifdef LINUX
-		if (listen(netSocket, 128) != 0)
+		if (listen(netSocket, 1) != 0)
 #endif
 				return false;
 		return true;
@@ -179,6 +186,19 @@ extern "C" {
 	{
 		socklen_t len = sizeof(sockAddr);
 		getpeername(romoteSocket, (sockaddr*)&sockAddr, &len);
+	}
+
+	void SetTcpNodely(NetSocket netSocket)
+	{
+#ifdef WIN32
+		BOOL on = TRUE;
+		setsockopt(netSocket, IPPROTO_TCP, TCP_NODELAY, (const char *)&on, sizeof(on));
+#endif
+
+#ifdef LINUX
+		int on = 1;
+		setsockopt(netSocket, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
+#endif
 	}
 
 	//===================================END======================================

@@ -68,7 +68,7 @@ private:
     static void InitType(const char *type, s8 val, s16 size);
 	static s64  GetNewGUID(bool local);
 private:
-	void TestObject();
+	void TestObject(IKernel *kernel);
 
 private:
     static ObjectMgr		* s_self;

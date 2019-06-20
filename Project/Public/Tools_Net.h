@@ -15,6 +15,7 @@
 
 #ifdef LINUX
 #include<netinet/in.h>
+#include <netinet/tcp.h>
 #include<sys/socket.h>
 #include <arpa/inet.h>
 #endif
@@ -49,6 +50,7 @@ namespace tools
 		//NO Cache
 		const char * GetSocketIp(sockaddr_in &st);
 		s32			 GetSocketPort(sockaddr_in &st);
+		s32			 GetIpV4Addr(const char *ip);
 
 		NetSocket	InitTcpSocket();
 		bool BindSocket(NetSocket netSocket, sockaddr_in &stAddr);
@@ -63,6 +65,7 @@ namespace tools
 		void SetSocketReuseAddr(NetSocket netSocket);
 		void GetLocalSocketInfo(NetSocket localSocket, sockaddr_in &sockAddr);
 		void GetRomoteSocketInfo(NetSocket romoteSocket, sockaddr_in &sockAddr);
+		void SetTcpNodely(NetSocket netSocket);
 		//=============================END===================================
 #ifdef __cplusplus
 	}

@@ -12,9 +12,6 @@ namespace core
 
     enum NODE_MSG_ID
     {
-        NODE_MSG_LOGIN_MASTER   =  1,
-        NODE_MSG_CONNECT_HARBOR = 2,
-		NODE_MSG_NODE_STATUS_UPDATE = 3,
     };
 
     enum NODE_TYPE
@@ -22,7 +19,22 @@ namespace core
         NODE_TYPE_SLAVE = -1,
         NODE_TYPE_MASTER = 0,
 		NODE_TYPE_GATE = 1,
+		NODE_TYPE_LOGIC = 2,
+		NODE_TYPE_RELATION = 3,
+		NODE_TYPE_DB = 4,
     };
+
+	enum CLUSTER_STATEUS
+	{
+		CLUSTER_STATEUS_NONE = 0,
+		CLUSTER_STATEUS_RUNNING = 1,
+	};
+
+	enum TYPE_SERVER_STATUS
+	{
+		TYPE_SERVER_STATUS_NONE = 0,
+		TYPE_SERVER_STATUS_RUNNING = 1,
+	};
 
 	enum NODE_STATUS
 	{
@@ -33,7 +45,6 @@ namespace core
 		NODE_STATUS_BUSY = 4,
 		NODE_STATUS_REFUSE = 5,
 	};
-
 
 	enum FRAMEWORK_EVENT_ID
 	{

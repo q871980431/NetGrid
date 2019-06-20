@@ -2,15 +2,24 @@ SET(LOGIC_INTERFACE_DIR
 	"${PROJECT_SOURCE_DIR}/logic/Interface"
 )
 
-SET(LOGIC_DEFINE_DIR
+SET(LOGIC_DEFINE_DDIR
 	"${PROJECT_SOURCE_DIR}/logic/Define"
 )
 
+SET(LOGIC_DEFINE_DIR
+	"${PROJECT_SOURCE_DIR}/logic/Define"
+	"${PROJECT_SOURCE_DIR}/logic/Define/Proto"
+	"${THIRD_LIBRARIES_INCLUDE_DIR}/google"
+)
+
+
 SET(LOGIC_DEFINE
-	"${LOGIC_DEFINE_DIR}/FrameworkDefine.h"
-	"${LOGIC_DEFINE_DIR}/MemberDefine.h"
-	"${LOGIC_DEFINE_DIR}/MemberDef.h"
-	"${LOGIC_DEFINE_DIR}/Game_tools.h"	
+	"${LOGIC_DEFINE_DDIR}/FrameworkDefine.h"
+	"${LOGIC_DEFINE_DDIR}/MemberDefine.h"
+	"${LOGIC_DEFINE_DDIR}/MemberDef.h"
+	"${LOGIC_DEFINE_DDIR}/Game_tools.h"	
+	"${LOGIC_DEFINE_DDIR}/CommonMsgDefine.h"
+	"${LOGIC_DEFINE_DDIR}/Proto/test.pb.h"
 )
 
 FILE(GLOB LOGIC_INTERFACE "${PROJECT_SOURCE_DIR}/logic/Interface/*.*")

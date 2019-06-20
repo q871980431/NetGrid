@@ -25,7 +25,7 @@ public:
 
 	virtual s32 GetMemberS32(const IMember *member) { return GetAttrT<s32>(member); };
 	virtual s64 GetMemberS64(const IMember *member) { return GetAttrT<s64>(member); };
-	virtual const char * GetMemberStr(const IMember *member) { return GetAttrT<const char *>(member); };
+	virtual const char * GetMemberStr(const IMember *member) { return GetAttrStr(member); };
 
 	virtual void SetMemberS32(const IMember *member, s32 val) { SetAttrT<s32>(member, val); };
 	virtual void SetMemberS64(const IMember *member, s64 val) { SetAttrT<s64>(member, val); };;
@@ -38,13 +38,10 @@ public:
 	void RegisterMemberChangeCallBack(void *object, const IMember *member, MEMBER_ONCHANGE_CB callBack, const char *debug);
 	void UnRegisterMemberChangeCallBack(void *object, const IMember *member, MEMBER_ONCHANGE_CB callBack);
 
-private:
-	template< typename T>
-	inline T GetAttrT(const IMember *member)
-	{
-		return _des->GetAttrT<T>(_memeroy.addr, (const MemberProperty *)member);
-	}
 
+private:
+	template<typename T>
+	T GetAttrT(const IMember *member) const;
 	template< typename T>
 	inline void SetAttrT(const IMember *member, T val)
 	{
@@ -52,10 +49,29 @@ private:
 		_callPool->Call(member, this, member, &val, sizeof(T));
 		_callPool->Call(nullptr, this, member, &val, sizeof(T));
 	}
+	const char * GetAttrStr(const IMember *member) const
+	{
+		if (member && ((const MemberProperty *)member)->des->memeoryDes == _des)
+			return _des->GetAttrT<const char *>(_memeroy.addr, (const MemberProperty *)member);
+
+		ASSERT(false, "error");
+		return "";
+	}
 private:
 	s64					_GUID;
 	MemberChangeCallPool *_callPool;
 	const ObjectDes	*_des;
 	Memeroy				_memeroy;
 };
+
+template< typename T>
+T CommonObject::GetAttrT(const IMember *member) const
+{
+	if (member && ((const MemberProperty *)member)->des->memeoryDes == _des)
+		return _des->GetAttrT<T>(_memeroy.addr, (const MemberProperty *)member);
+
+	ASSERT(false, "error");
+	return T();
+}
+
 #endif

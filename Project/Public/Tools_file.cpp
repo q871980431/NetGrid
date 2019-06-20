@@ -149,16 +149,18 @@ void GetDirName(const char *dirpath, char name[MAX_PATH])
             return;
         }
 
-        chdir(dirpath); 
         /* read all the files in the dir ~ */
         while ((filename = readdir(dirPtr)) != NULL)
         {
-            lstat(filename->d_name, &statbuf);
+			char fullPath[MAX_PATH];
+			SafeSprintf(fullPath, sizeof(fullPath), "%s/%s", dirpath, filename->d_name);
+			//ECHO("FullPath:%s", fullPath);
+            lstat(fullPath, &statbuf);
 
             tools::FileAttr attr;
             if (strcmp(filename->d_name, "..") == 0)
                 continue;
-            ECHO("file %s", filename->d_name);                           //这行语句会输出所有符合条件的文件名 
+            ECHO("file %s, type:%d, mode:%d", filename->d_name, filename->d_type, statbuf.st_mode);                           //这行语句会输出所有符合条件的文件名 
             attr.attrib = 0;
             if (S_ISDIR(statbuf.st_mode))
                 attr.attrib |= _A_SUBDIR;
@@ -196,7 +198,6 @@ void GetDirName(const char *dirpath, char name[MAX_PATH])
                 }
             }
         }
-        chdir("..");
         closedir(dirPtr);
     }
 #endif

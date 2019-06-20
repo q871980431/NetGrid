@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<root parent="root" startindex="100" special="true">
-	<member name="name" type="str" size="32" index="101" mark=""/>
+<root parent="root" startindex="100" >
+	<member name="name" type="str"  size="8" index="101" mark=""/>
 	<member name="lvl" type="s64" index="102" mark=""/>
 	
-	<member name="bag" type="array" index="103" mark="">
+	<member name="bag" type="array" index="200" mark="">
 		<member name="place" type="s32" />
 	</member>
+
+	<member name="skill" type="array" index="201" mark="" key="skillId" des="true">
+		<member name="skillId" type="s32" />
+	</member>
+
+	<member name="notice" type="array" index="202" mark="" key="content" des="false">
+		<member name="content" type="str" size="64" />
+	</member>
+	
 </root>

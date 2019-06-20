@@ -120,19 +120,18 @@ bool IOEngineEpoll::Stop(IKernel *kernel)
 
 void IOEngineEpoll::Process(IKernel *kernel, s64 tick)
 {
-	DrivierEvent *evt = _mainQueue.Pop();
-	while (evt)
+	DrivierEvent evt; ;
+	while (_mainQueue.Pop(evt))
 	{
-		if (evt->type == BIND)	
-			evt->dirver->OnEstablish();
-		if (evt->type == UNBIND)
+		if (evt.type == BIND)
+			evt.dirver->OnEstablish();
+		if (evt.type == UNBIND)
 		{
-			auto iter = _readyDelDriver.find(evt->dirver->GetNetSocket());
+			auto iter = _readyDelDriver.find(evt.dirver->GetNetSocket());
 			if (iter != _readyDelDriver.end())
 				_readyDelDriver.erase(iter);
-			evt->dirver->OnClose();
+			evt.dirver->OnClose();
 		}
-		evt = _mainQueue.Pop();
 	}
 
 	for (auto iter = _readyDelDriver.begin(); iter != _readyDelDriver.end(); )
@@ -237,19 +236,18 @@ void IOEngineEpoll::Run()
 	while (true)
 	{
 		FlushData();
-		DrivierEvent *evt = _threadQueue.Pop();
-		while (evt)
+		DrivierEvent evt;
+		while (_threadQueue.Pop(evt))
 		{
-			THREAD_LOG("EpollEvent", "Rcv evt: socket:%d, optType:%d", evt->socket, evt->type);
-			if (evt->type == BIND)
-				BindEpoll(_kernel, evt);
-			if (evt->type == UNBIND)
-				UnBindEpoll(_kernel, evt);
-			if (evt->type == SHUT_DWON)
+			THREAD_LOG("EpollEvent", "Rcv evt: socket:%d, optType:%d", evt.socket, evt.type);
+			if (evt.type == BIND)
+				BindEpoll(_kernel, &evt);
+			if (evt.type == UNBIND)
+				UnBindEpoll(_kernel, &evt);
+			if (evt.type == SHUT_DWON)
 			{
-				shutdown(evt->socket, SHUT_WR);
+				shutdown(evt.socket, SHUT_WR);
 			}
-			evt = _threadQueue.Pop();
 		}
 		s32 count = epoll_wait(_epFd, _events, _size, TIME_OUT);
 		if (count == -1)
@@ -323,7 +321,7 @@ void IOEngineEpoll::UnBindEpoll(IKernel *kernel, DrivierEvent *evt)
 	}
 	else
 		_ctlAddDrivers.erase(iter);
-	shutdown(evt->socket, SHUT_WR);
+	//shutdown(evt->socket, SHUT_WR);
 	//evt->dirver->RecvFin();
 	if (epoll_ctl(_epFd, EPOLL_CTL_DEL, evt->socket, nullptr) != 0)
 	{

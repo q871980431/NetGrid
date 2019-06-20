@@ -10,6 +10,7 @@
 #include "XmlReader.h"
 #include "Convert.h"
 #include "HarborSession.h"
+#include "CommonMsgDefine.h"
 #ifdef LINUX
 #include <arpa/inet.h>
 #endif

@@ -37,6 +37,7 @@ public:
 	virtual s32 GetMemberS32(const IMember *member) = 0;
 	virtual s64 GetMemberS64(const IMember *member) = 0;
 	virtual const char * GetMemberStr(const IMember *member) = 0;
+	//virtual void * GetMemberBlob(const IMember *member, s32 &size) = 0;
 	virtual void SetMemberS32(const IMember *member, s32 val) = 0;
 	virtual void SetMemberS64(const IMember *member, s64 val) = 0;
 	virtual void SetMemberStr(const IMember *member, const char *val) = 0;

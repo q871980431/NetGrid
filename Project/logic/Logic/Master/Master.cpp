@@ -9,9 +9,8 @@
 #include "Tools.h"
 #include "XmlReader.h"
 #include "ServiceGroup.h"
-#ifdef LINUX
-#include <arpa/inet.h>
-#endif
+#include "Tools_Net.h"
+#include "CommonMsgDefine.h"
 
 Master * Master::s_self = nullptr;
 IKernel * Master::s_kernel = nullptr;
@@ -65,7 +64,7 @@ void Master::OnOpen(s32 type, s32 nodeId, const char *ip, s16 port)
 	}
 
     core::NODE_MSG_NODE_DISCOVER discover;
-    discover.ipAddr = inet_addr(ip);
+    discover.ipAddr = tools::GetIpV4Addr(ip);
     discover.port = port;
 
     for (auto iter = s_nodeMap.begin(); iter != s_nodeMap.end(); iter++)
