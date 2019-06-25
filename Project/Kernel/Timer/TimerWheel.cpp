@@ -1,6 +1,8 @@
 #include "TimerWheel.h"
 #include "Tools_time.h"
 #include "TimerMgr.h"
+#include "../Exception/ExceptionMgr.h"
+
 using namespace tlib::linear;
 tlib::TDynPool<TimerBase> TimerBase::s_pool;
 
@@ -9,11 +11,17 @@ void TimerBase::Exec(core::IKernel *kernel, s64 tick)
 	_canRelease = false;
 	if (_frist)
 	{
+		TRY_BEGIN
 		_timer->OnStart(kernel, tick);
+		TRY_END
 		_frist = false;
 	}
 	else
+	{
+		TRY_BEGIN
 		_timer->OnTime(kernel, tick);
+		TRY_END
+	}
 	_canRelease = true;
 	if (0 != _count)
 	{
@@ -41,7 +49,9 @@ void TimerBase::End(core::IKernel *kernel, s64 tick, bool isKill)
 	{
 		_remove = true;
 		_timer->SetBase(nullptr);
+		TRY_BEGIN
 		_timer->OnTerminate(kernel, tick, isKill);
+		TRY_END
 		_host->Remove(this);
 	}
 	if (_canRelease)

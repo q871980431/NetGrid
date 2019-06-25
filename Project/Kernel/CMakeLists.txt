@@ -79,6 +79,15 @@ SET( KERNEL_ASYNC
 	"${KERNEL_ASYNC_DIR}/AsyncThread.h"	
 )
 
+SET( KERNEL_SEH_DIR "${KERNEL_DIR}/Exception")
+SET( KERNEL_SEH
+	"${KERNEL_SEH_DIR}/ExceptionMgr.h"
+	"${KERNEL_SEH_DIR}/ExceptionMgr.cpp"
+	"${KERNEL_SEH_DIR}/i386-signal.h"
+	"${KERNEL_SEH_DIR}/x86_64-signal.h"	
+	"${KERNEL_SEH_DIR}/segvcatch.cpp"
+	"${KERNEL_SEH_DIR}/segvcatch.h"	
+)
 
 
 IF(WIN32)
@@ -87,8 +96,7 @@ IF(WIN32)
 		${PUBLIC_DIR}
 		${KERNEL_INTERFACE_DIR}
 		${KERNEL_LOG_DIR}
-		${THIRD_LIBRARIES_INCLUDE_DIR}/DbgHelp.h
-		${THIRD_LIBRARIES_INCLUDE_DIR}/libevent/include
+		${THIRD_LIBRARIES_INCLUDE_DIR}/DbgHelp.h		
 		${KERNEL_CONFIG_DIR}
         ${2D_DIR}
 		${COMMON_TIME_DIR}
@@ -98,6 +106,8 @@ IF(WIN32)
 		${KERNEL_TIMER_DIR}
 		${KERNEL_FRAME_DIR}
 		${KERNEL_ASYNC_DIR}
+		${KERNEL_SEH_DIR}
+		
 	)
 ENDIF(WIN32)
 
@@ -107,7 +117,7 @@ IF(LINUX)
                 ${PUBLIC_DIR}
                 ${KERNEL_INTERFACE_DIR}
                 ${KERNEL_LOG_DIR}
-				${THIRD_LIBRARIES_INCLUDE_DIR}/libevent/include				
+				${THIRD_LIBRARIES_INCLUDE_DIR}/unwind
                 ${KERNEL_CONFIG_DIR}
 				${KERNEL_MODULE_DIR}
 				${COMMON_TIME_DIR}
@@ -116,7 +126,8 @@ IF(LINUX)
 				${KERNEL_NET_DIR}
 				${KERNEL_TIMER_DIR}
 				${KERNEL_FRAME_DIR}
-			    ${KERNEL_ASYNC_DIR}				
+			    ${KERNEL_ASYNC_DIR}		
+				${KERNEL_SEH_DIR}				
         )
 ENDIF(LINUX)
 MESSAGE("test")
@@ -134,6 +145,7 @@ SOURCE_GROUP( Src\\Net FILES ${KERNEL_NET})
 SOURCE_GROUP( Src\\Timer FILES ${KERNEL_TIMER})
 SOURCE_GROUP( Src\\Frame FILES ${KERNEL_FRAME})
 SOURCE_GROUP( Src\\Async FILES ${KERNEL_ASYNC})
+SOURCE_GROUP( Src\\SEH 	 FILES ${KERNEL_SEH})
 
 SOURCE_GROUP( Src FILES ${KERNEL})
 
@@ -154,7 +166,13 @@ IF(LINUX)
 	SET(THIRD_LIB_DEBUG
 	)
 	SET(THIRD_LIB_RELEASE
+#		optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libunwind.a"
+#		optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libunwind-setjmp.a"
+#		optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libunwind-x86_64.a"
+#		optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libunwind-generic.a"
+
 	)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lunwind-x86_64 -lunwind-setjmp")
 ENDIF(LINUX)
 
 ADD_EXECUTABLE( NetGrid
@@ -168,6 +186,7 @@ ADD_EXECUTABLE( NetGrid
 				${KERNEL_TIMER}
 				${KERNEL_FRAME}
 				${KERNEL_ASYNC}
+				${KERNEL_SEH}
 				${KERNEL}
 				${TINYXML}
                 ${2D}

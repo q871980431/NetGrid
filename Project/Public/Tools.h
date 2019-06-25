@@ -3,11 +3,12 @@
 #include "MultiSys.h"
 #ifdef WIN32
 #include <shlwapi.h>
+#include<process.h>
 #endif
-
 #ifdef LINUX
 #include<libgen.h>
 #include<dlfcn.h>
+#include <sys/types.h>
 #endif
 #include <random>
 
@@ -42,6 +43,7 @@ namespace tools{
 		static std::uniform_int_distribution<u32> distribution;
 		return distribution(eng);
 	}
+	inline s32 GetPid() { return getpid(); };
 
     inline void Mkdir(const char *path)
     {
@@ -116,7 +118,7 @@ namespace tools{
 #ifdef __cplusplus
     extern "C"{
 #endif
-        const char * GetAppPath();
+        const char * GetAppPath();		
         s32 HashKey(const char *content);
         s32 GetRandom(s32 nA, s32 nB);
 #ifdef __cplusplus

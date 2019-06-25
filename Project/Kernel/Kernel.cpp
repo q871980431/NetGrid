@@ -9,6 +9,7 @@
 #include "FrameMgr.h"
 #include "AsyncQueue.h"
 #include "XmlReader.h"
+#include "ExceptionMgr.h"
 
 template<> Kernel * Singleton<Kernel>::_instance = nullptr;
 
@@ -58,6 +59,7 @@ bool Kernel::Initialize(s32 argc, char **argv)
 
 void Kernel::Loop()
 {
+	ExceptionMgr::Init();
     while (true)
     {
 		s32 execTime = 10 / _asyncQueues.size();

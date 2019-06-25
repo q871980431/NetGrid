@@ -8,6 +8,7 @@
 #include "TcpConnection.h"
 #include "NetService.h"
 #include "NetIOEngine.h"
+#include "../Exception/ExceptionMgr.h"
 
 TcpConnection::TcpConnection(s32 sessionId, bool passive, NetSocket netSocket, ITcpSession *session, NetService *service)
 {
@@ -126,11 +127,15 @@ void TcpConnection::OnRecv(IKernel *kernel)
 			buff = (char *)alloca(packetLen);
 			len = rcvBuff->Read(buff, packetLen);
 			ASSERT(len == packetLen, "error");
+			TRY_BEGIN
 			_tcpSession->OnRecv(buff, packetLen);
+			TRY_END
 		}
 		else
 		{
+			TRY_BEGIN
 			_tcpSession->OnRecv(buff, packetLen);
+			TRY_END
 			rcvBuff->Read(packetLen);
 		}
 	}

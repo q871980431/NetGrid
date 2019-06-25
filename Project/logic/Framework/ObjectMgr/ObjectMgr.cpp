@@ -406,6 +406,7 @@ s64 ObjectMgr::GetNewGUID(bool local)
 
 void ObjectMgr::TestObject(IKernel *kernel)
 {
+	return;
 	IObject *player = InnerCreateObject("logic::player");
 	s64 oldLevel = player->GetMemberS64(Logic::Player::lvl);
 	player->SetMemberS64(Logic::Player::lvl, oldLevel + 10);

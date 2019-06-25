@@ -133,6 +133,17 @@ namespace tlib{
             return *this;
         }
 
+		TString & AppendFormat(const char *format, ...)
+		{
+			va_list argList;
+			va_start(argList, format);
+			s32 ret = vsnprintf(_buffer + _len, _size - _len, format, argList);
+			va_end(argList);
+			_len = strlen(_buffer);
+
+			return *this;
+		}
+
         operator size_t() const
         {
             size_t hash = 0;

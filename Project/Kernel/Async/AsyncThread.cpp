@@ -2,6 +2,7 @@
 #include "tools.h"
 #include "Tools_time.h"
 #include "TList.h"
+#include "../Exception/ExceptionMgr.h"
 #include <mutex>
 
 
@@ -35,8 +36,12 @@ void AsyncThread::Loop(s64 overtime) {
 	AsyncBase * base = tlib::linear::PopHead<AsyncBaseLinkChain, AsyncBase>(_complete.main);
 	while (base)
 	{
+		TRY_BEGIN
 		base->OnComplete();
+		TRY_END
+		TRY_BEGIN
 		base->Release();
+		TRY_END
 		if (tools::GetTimeMillisecond() - tick >= overtime)
 			break;
 		base = tlib::linear::PopHead<AsyncBaseLinkChain, AsyncBase>(_complete.main);
@@ -52,8 +57,9 @@ void AsyncThread::ThreadProc() {
 		}
 
 		if (base) {
+			TRY_BEGIN
 			base->OnExecute(_queueId, _threadIdx);
-
+			TRY_END
 			tlib::linear::PushTail(_complete.work, base);
 			if (_complete.swap.head == nullptr)
 				tlib::linear::MergeListByLock(_complete.swap, _complete.work, _complete.lock);
