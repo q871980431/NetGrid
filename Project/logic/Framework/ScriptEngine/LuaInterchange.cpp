@@ -1,18 +1,34 @@
 #include "LuaInterchange.h"
 #include "ScriptEngine.h"
 #include "lua.hpp"
-LuaInputStream::LuaInputStream(lua_State *state)
+LuaInputStream::LuaInputStream(lua_State *state, bool callStack /* =false */)
 {
     _luaState = state;
     _index = 0;
-    _count = lua_gettop(_luaState);
+	if (!callStack)
+	{
+		_start = 0;
+		_count = lua_gettop(_luaState);
+	}
+	else
+	{
+		_count = 0;
+		for (s32 i = 0; i < LUA_RESULT_COUNT; i++)
+		{
+			if (lua_isnil(_luaState, -LUA_RESULT_COUNT+i))
+				break;
+			_count++;
+		}
+		_start = lua_gettop(_luaState) - LUA_RESULT_COUNT;
+	}
 }
+
 IDataInputStream * LuaInputStream::ReadBool(bool &val)
 {
     ASSERT(_index < _count, "error");
     if (_index < _count)
     {
-        int tmp = lua_toboolean(_luaState, ++_index);
+        int tmp = lua_toboolean(_luaState, ++_index+_start);
         val = (tmp == 0)?false : true;
     }
     return this;
@@ -23,7 +39,7 @@ IDataInputStream * LuaInputStream::ReadInt8(s8 &val)
     ASSERT(_index < _count, "error");
     if (_index < _count)
     {
-        LUA_INTEGER tmp = lua_tointeger(_luaState, ++_index);
+        LUA_INTEGER tmp = lua_tointeger(_luaState, ++_index+_start);
         val = (s8)tmp;
     }
 
@@ -35,7 +51,7 @@ IDataInputStream * LuaInputStream::ReadInt16(s16 &val)
     ASSERT(_index < _count, "error");
     if (_index < _count)
     {
-        LUA_INTEGER tmp = lua_tointeger(_luaState, ++_index);
+        LUA_INTEGER tmp = lua_tointeger(_luaState, ++_index+_start);
         val = (s16)tmp;
     }
     return this;
@@ -46,7 +62,7 @@ IDataInputStream * LuaInputStream::ReadInt32(s32 &val)
     ASSERT(_index < _count, "error");
     if (_index < _count)
     {
-        LUA_INTEGER tmp = lua_tointeger(_luaState, ++_index);
+        LUA_INTEGER tmp = lua_tointeger(_luaState, ++_index+_start);
         val = (s32)tmp;
     }
 
@@ -58,7 +74,7 @@ IDataInputStream * LuaInputStream::ReadInt64(s64 &val)
     ASSERT(_index < _count, "error");
     if (_index < _count)
     {
-        LUA_INTEGER tmp = lua_tointeger(_luaState, ++_index);
+        LUA_INTEGER tmp = lua_tointeger(_luaState, ++_index+_start);
         val = tmp;
     }
 
@@ -70,8 +86,8 @@ IDataInputStream * LuaInputStream::ReadStr(const char *&val)
     ASSERT(_index < _count, "error");
     if (_index < _count)
     {
-        val = lua_tostring(_luaState, ++_index);
-		lua_len(_luaState, _index);
+        val = lua_tostring(_luaState, ++_index+_start);
+		lua_len(_luaState, _index+_start);
 		size_t len = lua_tointeger(_luaState, -1);
 		lua_pop(_luaState, 1);
 		ASSERT(val[len] == 0, "error");
@@ -93,12 +109,12 @@ IDataInputStream * LuaInputStream::ReadPtr(void *&val, const char *type)
     ASSERT(_index < _count, "error");
     if (_index < _count)
     {
-        ASSERT(lua_istable(_luaState, _index + 1), "error");
-        lua_getfield(_luaState, _index + 1, PTR_INDEX);
+        ASSERT(lua_istable(_luaState, _index + 1+_start), "error");
+        lua_getfield(_luaState, _index + 1+_start, PTR_INDEX);
         void *ptr = lua_touserdata(_luaState, -1);
         lua_pop(_luaState, 1);
 
-        lua_getfield(_luaState, _index + 1, TYPE_INDEX);
+        lua_getfield(_luaState, _index + 1+_start, TYPE_INDEX);
         const char *luaType = lua_tostring(_luaState, -1);
         lua_pop(_luaState, 1);
         if (strcmp(luaType, type) != 0 || strcmp(type, "") == 0)
@@ -108,7 +124,7 @@ IDataInputStream * LuaInputStream::ReadPtr(void *&val, const char *type)
         else{
             val = ptr;
         }
-
+		_index++;
     }
     return this;
 }

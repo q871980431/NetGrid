@@ -11,7 +11,7 @@ class ScriptEngine;
 class LuaInputStream : public IDataInputStream
 {
 public:
-    LuaInputStream(lua_State *state);
+    LuaInputStream(lua_State *state, bool callStack =false);
     virtual ~LuaInputStream(){};
 
     virtual IDataInputStream * ReadBool(bool &val);
@@ -28,6 +28,7 @@ protected:
 private:
     lua_State   *_luaState;
     s32         _index;
+	s32			_start;
     s32         _count;
 };
 

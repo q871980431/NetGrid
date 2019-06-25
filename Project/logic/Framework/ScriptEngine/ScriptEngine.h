@@ -45,6 +45,7 @@ private:
     static int Log(lua_State *state);
     static void TestAdd(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out);
 	static void TestFunc(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out);
+	static void TestNest(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out);
 private:
     static ScriptEngine     * s_self;
     static IKernel  * s_kernel;

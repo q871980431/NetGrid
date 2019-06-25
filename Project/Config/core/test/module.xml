@@ -1,6 +1,7 @@
 <root path="./">
-	<module	name="Cluster"/>
-	<module	name="EchoServer"/>	
+	<!--<module	name="Cluster"/>-->
+	<!--<module	name="EchoServer"/>	
 	<module	name="UnitTest"/>
-	<module	name="ObjectMgr"/>	
+	<module	name="ObjectMgr"/>	-->
+	<module	name="ScriptEngine"/>	
 </root>

@@ -31,8 +31,8 @@ bool ScriptEngine::Initialize(IKernel *kernel)
     ExecScriptFile(LINK_FILE_NAME);
     topIndex = lua_gettop(s_luaState);
 
-    //ReplacePrint();
-    lua_getglobal(s_luaState, LUA_TRACE_NAME);
+    ReplacePrint();
+    //lua_getglobal(s_luaState, LUA_TRACE_NAME);
 
 
     return true;
@@ -43,6 +43,7 @@ bool ScriptEngine::Launched(IKernel *kernel)
 	ECHO("Script Engine Launched***************");
     s_self->RegModuleFunc("test", "TestAdd", TestAdd, "**************");
 	s_self->RegModuleFunc("test", "TestFunc", TestFunc, "**************");
+	s_self->RegModuleFunc("test", "TestNest", TestNest, "**************");
 	
     //s_self->RegModuleFunc("test", "TestAdd", TestAdd, "**************");
 
@@ -59,14 +60,17 @@ bool ScriptEngine::Launched(IKernel *kernel)
 
 	auto f = [](IKernel *kernel, IDataOutputStream &output)
 	{
-		output.WriteInt32(2);
+		//s32 *p = NEW s32();
+		//*p = 5;
+		//output.WritePtr(p, "s32");
+		output.WriteInt32(3);
 	};
 	s32 ret = 0;
 	auto callFun = [&ret](IKernel *kernel, IDataInputStream &input)
 	{
 		input.ReadInt32(ret);
 	};
-	CallScriptFunc("npc.xuping", "test", f, callFun);
+	CallScriptFunc("npc.xuping", "testNest", f, callFun);
 
     return true;
 }
@@ -129,7 +133,9 @@ void ScriptEngine::RegModuleFunc(const char *module, const char *func, const IDa
 
 void ScriptEngine::CallScriptFunc(const char *module, const char *func, const IDataOutputFuncType &outPutFunc, const IDataCallBackFuncType &callBackFun)
 {
+	s32 top = lua_gettop(s_luaState);
 	LuaInterchangeCaller caller(this, s_luaState);
+	top = lua_gettop(s_luaState);
 	caller.PreCall(module, func);
 	if (outPutFunc != nullptr)
 	{
@@ -255,7 +261,25 @@ void ScriptEngine::PrintLuaStack()
 	for(nIdx = stackTop; nIdx > 0; --nIdx)
 	{		
 		nType = lua_type(pLuaState, nIdx);
-		TRACE_LOG("(i:%d) %s(%s)", nIdx, lua_typename(pLuaState,nType), lua_tostring(pLuaState,nIdx));
+		switch (nType)
+		{
+		case LUA_TBOOLEAN:
+		case LUA_TNUMBER: {
+			if (lua_isinteger(pLuaState, nIdx))
+			{
+				s64 val = lua_tonumber(pLuaState, nIdx);
+				TRACE_LOG("(i:%d) %s(%lld)", nIdx, lua_typename(pLuaState, nType), val);
+			}
+			else
+			{
+				TRACE_LOG("(i:%d) %s(%f)", nIdx, lua_typename(pLuaState, nType), lua_tonumber(pLuaState, nIdx));
+			}
+
+		}
+			break;
+		default:
+			TRACE_LOG("(i:%d) %s(%s)", nIdx, lua_typename(pLuaState, nType), lua_tostring(pLuaState, nIdx));
+		}
 	} 
 	TRACE_LOG("--Õ»µ×--");
 }
@@ -294,7 +318,7 @@ bool ScriptEngine::ExecFunction(s8 argc, const IDataCallBackFuncType callback)
             lua_pop(s_luaState, 2);
         return false;
     }
-    LuaInputStream ack(s_luaState);
+    LuaInputStream ack(s_luaState, true);
     if (callback != nullptr)
         callback(s_kernel, ack);
 	TRACE_LOG("************Exe PCallEnd**************");
@@ -347,4 +371,29 @@ void ScriptEngine::TestFunc(IKernel *kernel, IDataInputStream &input, IDataOutpu
 		s_self->CallScriptFunc("npc.xuping", "test", f, callBack);
 		out.WriteInt32(ret);
 	}
+}
+
+void ScriptEngine::TestNest(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out)
+{
+	s32 tmp = 0;
+	//s32 *p = nullptr;
+	input.ReadInt32(tmp);
+	//input.ReadPtr((void * &)p, "s32");
+	if (tmp == 1)
+	{
+		out.WriteInt32(1);
+		return;
+	}
+	auto f = [tmp](IKernel *kernel, IDataOutputStream &output)
+	{
+		output.WriteInt32(tmp);
+	};
+	s32 ret = 0;
+	auto callFun = [&ret](IKernel *kernel, IDataInputStream &input)
+	{
+		input.ReadInt32(ret);
+	};
+	s_self->CallScriptFunc("npc.xuping", "testNest", f, callFun);
+
+	out.WriteInt32(ret);
 }
