@@ -3,3 +3,7 @@ ITimer
 ADT
 
 	
+A 被拒绝
+Apply记录移除
+
+上线

@@ -1,0 +1,85 @@
+1, 对外接口
+
+面向Session接口
+
+模型
+
+监听器 			Listener	单独线程
+
+IO管理器		
+
+应用
+
+
+将网络引擎
+
+主线程面临的事件回调
+NetEvent
+
+	3.1、int epoll_create(int size)
+         创建一个epoll的句柄，自从Linux2.6.8以后size是忽略的。 当创建好epoll句柄之后，它就会占用一个fd值。所以在使用完epoll之后，调用close关闭，否则可能导致fd不够用。          
+     
+    3.2、int epoll_ctl(int epfd,int op,int fd,struct epoll_event *event)
+         epoll的事件注册函数，要先注册需要监听的事件。
+         epfd： epoll_create()的返回值。
+         op：表示动作，有三个宏
+             EPOLL_CTL_ADD ：注册新的fd到epfd当中。
+             EPOLL_CTL_MOD ：修改已经注册的fd的监听事件。
+             EPOLL_CTL_DEL ：从epfd中删除一个fd。
+         fd ：需要监听的I/O流的fd。
+         event：告诉内核需要监听的事件。
+
+	 3.3、int epoll_wait(int epfd,struct epoll_event* events,int maxevents,int timeout)
+	          收集在epoll监控的时间中已经发生的事件。
+	          epfd：创建的epoll的fd。
+	          events： 分配好的epoll_event结构体数组，epoll将会把发生的时间赋值到events数组中。
+	          maxevents: 告诉内核这个events有多大，这个大小不能超过epoll_create()时传入的size。
+	          timeout: 超时设置单位ms.可设置如下三种
+	               0： 会立即返回。
+	               -1：将会阻塞。
+	               timeout ： 阻塞timeout个时长，如果在这期间发生则返回，如果超过时间则返回。
+	          如果函数调用成功就返回对应I/O上已经准备好的文件描述符的数目。返回0表示已超时。
+	
+     3.4、epoll的两种工作方式。
+           LT level triggered 水平触发模式，
+              同时支持阻塞和非阻塞的socket。在这种模式中，内核告诉你一个文件描述符是否就绪了，然后你可以对这个就绪            的fd进行I/O操作，如果你不做任何操作，讷河还是会继续通知你。（没处理这个流还是一直通知你）
+           ET edge triggered 边缘触发模式
+              只支持非阻塞的socket。效率比LT高。这种工作模式下，当从epoll_wait调用获取到事件后，如果没有把这次事件            对应的套接字处理完，那么在这个套接字中没有心的时间再次到来时，ET模式下是无法再次从epoll_wait调用中获取这            个事件的。而LT只要有数据就总可以获取。
+
+epoll的根本
+派发事件
+可读
+	
+可写
+
+
+
+
+
+TcpSession
+
+
+监听和链接线程 
+IOEngine
+TcpConnection
+
+投递一个TcpConnection
+
+
+销毁流程
+被动销毁 -> 关闭句柄 -> Driver->OnClose(主线程) -> Connection->OnTerminate -> 是否主动关闭 
+ -> RemoveConnection() hadclose() -> RemoveIODriver(TcpConnection *connection)() -> delDriver -> delConnection
+
+主动关闭->Close() ->	_tcpSession->SetConnection(nullptr);
+	_tcpSession->OnTerminate();	->RemoveConnection() ->IOEngine() -> RemoveIODriver(IIODriver *ioDriver)->投递 转被动关闭
+	
+
+始终由被动关闭 销毁内存
+
+	
+	
+	
+
+
+
+

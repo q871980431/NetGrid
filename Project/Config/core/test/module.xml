@@ -3,5 +3,5 @@
 	<!--<module	name="EchoServer"/>	
 	<module	name="UnitTest"/>
 	<module	name="ObjectMgr"/>	-->
-	<module	name="ScriptEngine"/>	
+	<module	name="TextCommand"/>	
 </root>

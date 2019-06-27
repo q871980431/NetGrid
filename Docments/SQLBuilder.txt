@@ -1,0 +1,20 @@
+制定统一得Mysql SQL语句生成器
+
+QueryCommand().
+query.table("")
+
+select n1, n2...n from table where exp1 and exp2 or exp3 
+	oder by 
+	group by
+	limit
+
+update table set 
+
+0x0000028eb24ecc20 "SELECT `accountid`, `platform` FROM ` WHERE `username` == 1964731588;"
+
+0x000002e93c7015f0 "SELECT `accountid`, `platform` FROM `Account` WHERE `username` == -2022609724;"
+
+
+0x0000011fdd06c7b0 {_kernel=0x0000001ce60ff620 {_cmdArgs={ size=2 } _logger={_logPath={_len=34 _buffer=...} ...} ...} ...}
+
+0x000001f2f7474ab0 "SELECT `accountid`, `platform` FROM `Account` WHERE `username` = 'dfgew';"

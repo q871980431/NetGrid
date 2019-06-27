@@ -1,0 +1,23 @@
+消息号定义
+enum LOGIC_RCV_MSG
+{
+	RELATION_SYNC_TEAM_STATUS = 1,
+	
+}
+
+对每种进程定义可接收的消息文件, 文件名为 进程名MsgDefine.h 诸如LogicMsgDefine.h
+消息号定义为
+enum 进程名_RCV_MSG
+{
+	MSG_BEGIN = 8K,
+	发送进程名_业务消息名 = MSG_BEGIN + 消息编号,
+}
+
+即进程的业务消息编号在[16K, 64K)间
+
+集群通用协议 由 CommonMsgDefine.h文件进行统一定义 消息编号为[0, 16K) 区间
+COMMON_MSG
+{
+	
+}
+

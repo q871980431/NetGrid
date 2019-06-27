@@ -219,6 +219,29 @@ namespace tools{
         }
     };
 
+	inline u8 ToHex(u8 x) { return x > 9 ? x + 55 : x + 48; };
+	inline std::string UrlEncode(const char *context, const s32 size, char *dst)
+	{
+		std::string temp("");
+		for (s32 i = 0; i < size; i++)
+		{
+			if (isalnum((u8)context[i])||
+				(context[i] == '-') ||
+				(context[i] == '_') ||
+				(context[i] == '.') ||
+				(context[i] == '~') )
+				temp += context[i];
+			else
+			{
+				temp += '%';
+				temp += ToHex((u8)context[i] >> 4);
+				temp += ToHex((u8)context[i] % 16);
+			}
+		}
+
+		return temp;
+	}
+
 }
 
 #endif 

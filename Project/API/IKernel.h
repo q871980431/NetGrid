@@ -261,4 +261,8 @@ namespace core
 	kernel->AddFrame(frame, runLvl, trace);\
 }
 
+#define  START_ASYNC(id, handler){\
+	kernel->StartAsync(id, handler, __FILE__, __LINE__);\
+}
+
 #endif

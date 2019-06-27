@@ -18,3 +18,9 @@
 	typedef void(*end_call_back)();
 	
 	void Flush( handler *);
+
+空间索引	R树
+
+
+邻近对
+
