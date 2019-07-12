@@ -6,7 +6,7 @@
 #include <mutex>
 
 
-AsyncThread::AsyncThread(s32 ququeId, s32 threadIdx) :_queueId(ququeId), _terminate(false), _threadIdx(threadIdx) {
+AsyncThread::AsyncThread(s32 ququeId, s32 threadIdx) :_terminate(false), _queueId(ququeId),  _threadIdx(threadIdx) {
 
 	tools::Zero(_readyExec.main);
 	tools::Zero(_readyExec.swap);

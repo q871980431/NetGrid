@@ -1,7 +1,7 @@
 #include "TableObject.h"
 void TableObject::DelRow(s32 index)
 {
-	if (index < _members.size())
+	if (index < (s32)_members.size())
 		InnerDelRow(index);
 }
 
@@ -29,8 +29,8 @@ RowObject * TableObject::TableAddRow()
 
 RowObject * TableObject::GetRow(s32 index) const
 {
-	ASSERT(index < _members.size(), "error");
-	if (index < _members.size())
+	ASSERT(index < (s32)_members.size(), "error");
+	if (index < (s32)_members.size())
 	{
 		ASSERT(_members[index]->GetIndex() == index, "error");
 		return _members[index];
@@ -60,7 +60,7 @@ TableObectInt64Key::TableObectInt64Key(const TableDes *des, S64_COMPARE_FUN fun)
 
 void TableObectInt64Key::DelRow(s32 index)
 {
-	if (index < _members.size())
+	if (index < (s32)_members.size())
 	{
 		s64 key = GetRowKey(_members[index]);
 		_index.erase(key);
@@ -116,7 +116,7 @@ void TableObectInt64Key::SetRowKey(RowObject *row, s64 key)
 
 void TableObectStrKey::DelRow(s32 index)
 {
-	if (index < _members.size())
+	if (index < (s32)_members.size())
 	{
 		const char * key = GetRowKey(_members[index]);
 		_index.erase(key);

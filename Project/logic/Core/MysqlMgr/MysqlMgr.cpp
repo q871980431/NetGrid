@@ -47,7 +47,7 @@ void MysqlMgr::OnTime(IKernel *kernel, s64 tick)
 		for (const auto &connecterIter: iter.second)
 		{
 			ConnectionTraceInfo *traceInfo = connecterIter->GetTraceInfo();
-			TRACE_LOG("Connecter[%d], execute count:%lld, failed count:%lld,  min exec time:%d ms, max exec time:%d ms", i++, traceInfo->_execCount, traceInfo->_failCount, traceInfo->_minExecTime, traceInfo->_maxExecTime)
+			TRACE_LOG("Connecter[%d], execute count:%ld, failed count:%ld,  min exec time:%d ms, max exec time:%d ms", i++, traceInfo->_execCount, traceInfo->_failCount, traceInfo->_minExecTime, traceInfo->_maxExecTime)
 		}
 	}
 	TRACE_LOG("MysqlProfile End.");

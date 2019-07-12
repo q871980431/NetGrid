@@ -57,8 +57,8 @@ private:
 class LuaInterchangeCaller : public IDataInterchangeCaller
 {
 public:
-    LuaInterchangeCaller(ScriptEngine *scriptEngine, lua_State *state) : _scriptEngine(scriptEngine), 
-    _input(state){
+    LuaInterchangeCaller(ScriptEngine *scriptEngine, lua_State *state) : _input(state), _scriptEngine(scriptEngine)
+    {
         _use = false;
         _luaState = state;
     };

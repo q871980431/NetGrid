@@ -5,13 +5,15 @@
 class HarborSession : public core::ITcpSession
 {
 public:
-	HarborSession(Harbor *harbor, IKernel *kernel) :_harbor(harbor), _type(0), _nodeId(0), _connection(nullptr), _kernel(kernel) {};
+	HarborSession(Harbor *harbor, IKernel *kernel) :_harbor(harbor), _kernel(kernel), _connection(nullptr), _type(0), _nodeId(0) {};
+	virtual ~HarborSession() {};
 	virtual void  SetConnection(ITcpConnection *connection) { _connection = connection; };
 	virtual void  OnEstablish() { _harbor->OnOpen(this); };
-	virtual void  OnTerminate() { _harbor->OnClose(this); DEL this; };
+	virtual void  OnTerminate() { _harbor->OnClose(this); };
 	virtual void  OnError(s32 moduleErr, s32 sysErr) {};
 	virtual s32	  OnParsePacket(CircluarBuffer *recvBuff);
 	virtual void  OnRecv(const char *buff, s32 len);
+	virtual void  OnRelease() { DEL this; }
 
 public:
 	inline void SetNodeInfo(s32 type, s32 nodeId) { _type = type; _nodeId = nodeId; };

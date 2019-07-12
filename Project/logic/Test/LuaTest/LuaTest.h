@@ -35,10 +35,9 @@ void unpack(T&& t)
 template <typename ... Args>
 void debugLogImpl(Args&& ... args)
 {
-	int dummy1[] = { 0, (0, 0) };
 	int dummy[] = { 0 , (unpack(args), 0)... };
 
-	int size = sizeof(dummy);
+	//int size = sizeof(dummy);
 	//int dummy[] = { 0 , (unpack(std::forward<Args>(args)), 0)... };
 	std::cout << '\n';
 }

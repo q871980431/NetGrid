@@ -24,7 +24,6 @@ void TimerTest::StartTest(core::IKernel *kernel)
 				TRACE_LOG("timer:%d, exec kill", i);
 				kernel->KillTimer(timers[i]);
 				timers[i] = nullptr;
-				timers[i]->SetBase(nullptr);
 			}
 		};
 

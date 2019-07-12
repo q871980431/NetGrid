@@ -27,9 +27,7 @@ bool ScriptEngine::Initialize(IKernel *kernel)
     SafeSprintf(scriptPath, sizeof(scriptPath), "%s/script", envi);
 	ECHO("LUA PATH:%s", scriptPath);
     SetSearchPath(scriptPath);
-    s32 topIndex = lua_gettop(s_luaState);
     ExecScriptFile(LINK_FILE_NAME);
-    topIndex = lua_gettop(s_luaState);
 
     ReplacePrint();
     //lua_getglobal(s_luaState, LUA_TRACE_NAME);
@@ -133,9 +131,9 @@ void ScriptEngine::RegModuleFunc(const char *module, const char *func, const IDa
 
 void ScriptEngine::CallScriptFunc(const char *module, const char *func, const IDataOutputFuncType &outPutFunc, const IDataCallBackFuncType &callBackFun)
 {
-	s32 top = lua_gettop(s_luaState);
+	//s32 top = lua_gettop(s_luaState);
 	LuaInterchangeCaller caller(this, s_luaState);
-	top = lua_gettop(s_luaState);
+	//top = lua_gettop(s_luaState);
 	caller.PreCall(module, func);
 	if (outPutFunc != nullptr)
 	{
@@ -268,7 +266,7 @@ void ScriptEngine::PrintLuaStack()
 			if (lua_isinteger(pLuaState, nIdx))
 			{
 				s64 val = lua_tonumber(pLuaState, nIdx);
-				TRACE_LOG("(i:%d) %s(%lld)", nIdx, lua_typename(pLuaState, nType), val);
+				TRACE_LOG("(i:%d) %s(%ld)", nIdx, lua_typename(pLuaState, nType), val);
 			}
 			else
 			{

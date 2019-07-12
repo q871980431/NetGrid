@@ -10,6 +10,9 @@
 #include "INetServer.h"
 class GameSession : public core::ITcpSession
 {
+public:
+	virtual ~GameSession() {};
+
     virtual void  SetConnection(core::ITcpConnection *connection){ _connection = connection; };
     virtual void  OnEstablish(){
         if (_connection)
@@ -17,8 +20,8 @@ class GameSession : public core::ITcpSession
             const char *ip = _connection->GetRemoteIP();
             ECHO("\n*************OOnEstablish IP=%s******************", ip);
             s32 messageId = 1;
-            char *msg = "HelloClient";
-            SendMsg(messageId, msg, strlen(msg) + 1);
+            const char *msg = "HelloClient";
+            SendMsg(messageId, msg, (s32)strlen(msg) + 1);
         }
     };
     virtual void  OnTerminate(){};
@@ -26,6 +29,7 @@ class GameSession : public core::ITcpSession
 	virtual void  OnRecv(const char *buff, s32 len);
 	virtual s32	  OnParsePacket(CircluarBuffer *recvBuff);
     virtual void  OnRecv(s32 messageId, const char *buff, s32 len);
+	virtual void  OnRelease() { DEL this; };
 	void SendMsg(s32 msgId, const char *buff, s32 len);
 private:
     core::ITcpConnection *_connection;

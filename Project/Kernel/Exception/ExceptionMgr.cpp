@@ -3,7 +3,6 @@
 #include <signal.h>
 #include <setjmp.h>
 #include "Tools.h"
-#include "Tools_time.h"
 #include "../Kernel.h"
 #ifdef LINUX
 #include "libunwind.h"
@@ -16,7 +15,7 @@ void ExceptionMgr::Init()
 	//segvcatch::init_segv(nullptr);
 	//segvcatch::init_fpe(nullptr);
 
-	//segvcatch::init_segv(ExceptionHandFun);
+	//segvcatch::init_segv(ExceptionHandFun);	//可以采用 在linux回调过程中 打印dump文件, 达到和原生捕获信号量一致的效果
 	//segvcatch::init_fpe(ExceptionHandFun);
 	signal(SIGFPE, CatchSignal);
 	signal(SIGSEGV, CatchSignal);

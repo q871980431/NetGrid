@@ -7,7 +7,6 @@
 template<  > Logger * Singleton<Logger>::_instance = nullptr;
 bool Logger::Ready()
 {
-	
     _logPath << tools::GetAppPath() << DIR_DELIMITER << "log";
 	_syncFile.SetFilePrefixName("sync");
 	_asyncFile.SetFilePrefixName("async");
@@ -41,6 +40,7 @@ bool Logger::Destroy()
     }
     _asyncFile.Close();
     _syncFile.Close();
+	_asyncThreadFile.Close();
 
     return true;
 }
@@ -133,21 +133,12 @@ void Logger::Process(s32 tick)
 
 const char * Logger::GetLogTimeString()
 {
-    //static char buffer[64];
-    //time_t t;
-
-    //tm *tm = nullptr;
-    //t = time(NULL);
-    //tm = localtime(&t);
-    //SafeSprintf(buffer, sizeof(buffer), "%4d_%02d_%02d_%02d_%02d_%02d", tm->tm_year + 1900, tm->tm_mon + 1, \
-    //    tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
-    //return buffer;
 	return tools::GetCurrentTimeString("%4d_%02d_%02d_%02d_%02d_%02d");
 }
+
 void Logger::ThreadRun()
 {
     LogNode *logNode = nullptr;
-    s32 mark = 0;
     s32 delay = 0;
 	s32 delay1 = 0;
     while (true)
@@ -173,7 +164,6 @@ void Logger::ThreadRun()
             if (delay > DELAY_FLUSH_COUNT)
             {
                 _asyncFile.Flush();
-                mark = 0;
                 delay = 0;
             }
 		}

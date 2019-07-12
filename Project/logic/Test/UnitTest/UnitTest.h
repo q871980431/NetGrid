@@ -36,7 +36,7 @@ struct UnitTestRegister
 		printf("this UnitTest Register 1\n");
 		TestList &list = UnitTest::GetTestList();
 		list.push_back(NEW T());
-		printf("list size:%d", list.size());
+		printf("list size:%ld", list.size());
 	}
 };
 #endif

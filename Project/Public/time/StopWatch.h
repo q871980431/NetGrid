@@ -13,11 +13,11 @@ public:
         s64 time = Interval();
         if (nullptr != content)
         {
-            ECHO("%s interval time = %lld ms", content, time);
+            ECHO("%s interval time = %ld ms", content, time);
         }
         else
         {
-            ECHO("interval time = %lld ms", time);
+            ECHO("interval time = %ld ms", time);
         }
     }
 protected:

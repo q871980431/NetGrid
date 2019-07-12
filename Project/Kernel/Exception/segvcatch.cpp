@@ -8,6 +8,7 @@
 
 #include <string>
 #include <stdexcept>
+#include "ExceptionMgr.h"
 
 using namespace std;
 
@@ -73,6 +74,7 @@ static void unblock_signal(int signum __attribute__((__unused__)))
 SIGNAL_HANDLER(catch_segv)
 {
     unblock_signal(SIGSEGV);
+	DUMP_BACK_TRACE(SIGSEGV);	//新增ExceptionMgr对于信号量处理
     MAKE_THROW_FRAME(nullp);
     handle_segv();
 }
@@ -83,6 +85,7 @@ SIGNAL_HANDLER(catch_segv)
 SIGNAL_HANDLER(catch_fpe)
 {
     unblock_signal(SIGFPE);
+	DUMP_BACK_TRACE(SIGFPE);	//新增ExceptionMgr对于信号量处理
 #ifdef HANDLE_DIVIDE_OVERFLOW
     HANDLE_DIVIDE_OVERFLOW;
 #else

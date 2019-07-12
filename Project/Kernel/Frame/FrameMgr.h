@@ -8,6 +8,7 @@ class FrameBase : public core::ITrace
 {
 public:
 	FrameBase(const char *debug):_trace(debug){}
+	virtual ~FrameBase() {};
 	virtual const char * GetTraceInfo() { return _trace.GetString(); };
 
 	void Release() { DEL this; };

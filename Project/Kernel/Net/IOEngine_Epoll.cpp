@@ -90,9 +90,8 @@ bool EpollDriver::OnRead()
 	return true;
 }
 
-IOEngineEpoll::IOEngineEpoll(s32 size):_mainQueue(QUEUE_SIZE), _threadQueue(QUEUE_SIZE)
+IOEngineEpoll::IOEngineEpoll(s32 size):_size(size),_epFd(-1), _terminate(false), _mainQueue(QUEUE_SIZE), _threadQueue(QUEUE_SIZE)
 {
-	_size = size;
 	_events = (epoll_event *)malloc(sizeof(epoll_event) * _size);
 }
 
@@ -164,7 +163,11 @@ bool IOEngineEpoll::AddIODriver(IIODriver *ioDriver)
 		evt.dirver = driver;
 		evt.socket = driver->GetNetSocket();
 		_threadQueue.TryPush(evt);
+
+		return true;
 	}
+
+	return false;
 }
 
 bool IOEngineEpoll::RemoveIODriver(IIODriver *ioDriver)
@@ -191,7 +194,11 @@ bool IOEngineEpoll::RemoveIODriver(IIODriver *ioDriver)
 			node.tick = tools::GetTimeMillisecond();
 			_readyDelDriver.insert(std::make_pair(driver->GetNetSocket(), node));
 		}
+
+		return true;
 	}
+
+	return false;
 }
 
 IIODriver * IOEngineEpoll::CreateDriver(TcpConnection *connection)

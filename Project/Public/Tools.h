@@ -93,10 +93,9 @@ namespace tools{
 	template<>
 	inline void ValToStr(char *buff, s32 buffSize, const float &val){SafeSprintf(buff, buffSize, "%f", val);}
 	template<>
-	inline void ValToStr<s64>(char *buff, s32 buffSize, const s64 &val){SafeSprintf(buff, buffSize, "%lld", val);}
+	inline void ValToStr<s64>(char *buff, s32 buffSize, const s64 &val){SafeSprintf(buff, buffSize, "%ld", val);}
 	template<>
-	inline void ValToStr<u64>(char *buff, s32 buffSize, const u64 &val) { SafeSprintf(buff, buffSize, "%lld", val); }
-
+	inline void ValToStr<u64>(char *buff, s32 buffSize, const u64 &val) { SafeSprintf(buff, buffSize, "%lu", val); }
 	template<typename T>
 	inline void Zero(T &val)
 	{

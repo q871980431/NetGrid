@@ -58,7 +58,7 @@ namespace tlib{
         }
         TString & operator = (s64 value)
         {
-            SafeSprintf(_buffer, sizeof(_buffer), "%lld", value);
+            SafeSprintf(_buffer, sizeof(_buffer), "%ld", value);
             _len = strlen(_buffer);
             return *this;
         }
@@ -85,7 +85,6 @@ namespace tlib{
 
         TString & operator << (const char *val)
         {
-            s32 len = strlen(val);
             SafeSprintf(_buffer + _len, sizeof(_buffer)-_len, "%s", val);
             _len = strlen(_buffer);
             return *this;
@@ -94,8 +93,8 @@ namespace tlib{
         TString & operator << (const TString &val)
         {
             s32 len = _size - _len;
-            if (len > val)
-                len = val;
+            if (len < val._len)
+                len = val._len;
             memcpy(_buffer + _len, val._buffer, len);
             _len += len;
             _buffer[_len] = 0;
@@ -111,7 +110,7 @@ namespace tlib{
 
         TString & operator << (s64 val)
         {
-            SafeSprintf(_buffer + _len, sizeof(_buffer)-_len, "%lld", val);
+            SafeSprintf(_buffer + _len, sizeof(_buffer)-_len, "%ld", val);
             _len = strlen(_buffer);
             return *this;
         }
@@ -137,7 +136,7 @@ namespace tlib{
 		{
 			va_list argList;
 			va_start(argList, format);
-			s32 ret = vsnprintf(_buffer + _len, _size - _len, format, argList);
+			vsnprintf(_buffer + _len, _size - _len, format, argList);
 			va_end(argList);
 			_len = strlen(_buffer);
 

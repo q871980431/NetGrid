@@ -84,9 +84,9 @@ namespace tlib
         {
             auto iter = _callMap.find(id);
             if (iter != _callMap.end())
-            {
                 iter->second.clear();
-            }
+
+			return true;
         }
 
         bool CallWithCondition(const T &id, bool condition, Args ...args)

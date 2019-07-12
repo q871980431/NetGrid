@@ -18,7 +18,6 @@ bool Cluster::Initialize(IKernel *kernel)
 	searchRequest.set_query("actor");
 	searchRequest.set_page_num(1);
 	std::string content;
-	IKernel *_kernel = kernel;
 	if (!searchRequest.SerializePartialToString(&content))
 	{
 		ASSERT(false, "error");

@@ -22,6 +22,8 @@ public:
 	virtual s32	  OnParsePacket(CircluarBuffer *recvBuff);
 	virtual void  OnRecv(const char *buff, s32 len);
 	virtual void  OnRecv(s32 messageId, const char *buff, s32 len);
+	virtual void  OnRelease() { DEL this; };
+
 protected:
 	void SendMsg(s32 msgId, const char *buff, s32 len);
 

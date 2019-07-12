@@ -85,7 +85,7 @@ bool NetServiceTest::LoadConfigFile()
 		s_configInfo.clientNum = echoServer->GetAttribute_S32("clientNum");
 		s_configInfo.clientClose = echoServer->GetAttribute_Bool("clientclose");
 	}
-	TRACE_LOG("Config Server:%d, ip:%s, port:%d, clientNum:%d, clientclose:%d", s_configInfo.isServer, s_configInfo.ip, s_configInfo.port, s_configInfo.clientNum, s_configInfo.clientClose);
+	TRACE_LOG("Config Server:%d, ip:%s, port:%d, clientNum:%d, clientclose:%d", s_configInfo.isServer, s_configInfo.ip.GetString(), s_configInfo.port, s_configInfo.clientNum, s_configInfo.clientClose);
 
 	return true;
 }

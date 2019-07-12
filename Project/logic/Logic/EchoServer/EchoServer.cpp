@@ -84,7 +84,7 @@ bool EchoServer::LoadConfigFile()
 		s_configInfo.port = echoServer->GetAttribute_S32("port");
 		s_configInfo.clientNum = echoServer->GetAttribute_S32("clientNum");
 	}
-	TRACE_LOG("Config Server:%d, ip:%s, port:%d, clientNum:%d", s_configInfo.isServer, s_configInfo.ip, s_configInfo.port, s_configInfo.clientNum);
+	TRACE_LOG("Config Server:%d, ip:%s, port:%d, clientNum:%d", s_configInfo.isServer, s_configInfo.ip.GetString(), s_configInfo.port, s_configInfo.clientNum);
 
 	return true;
 }

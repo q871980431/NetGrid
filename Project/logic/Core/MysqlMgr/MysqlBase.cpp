@@ -8,10 +8,10 @@ void MysqlResult::Init(MYSQL *mysql)
 	{
 		_fieldCount = mysql_num_fields(_result);
 		s32 _rowCount = mysql_num_rows(_result);
-		MYSQL_ROW row = nullptr;
-		RowFieldLenType *_curRowFieldLengths = nullptr;
 
-		while (row = mysql_fetch_row(_result))
+		MYSQL_ROW row = mysql_fetch_row(_result);
+		RowFieldLenType *_curRowFieldLengths = nullptr;
+		while (row)
 		{
 			_curRowFieldLengths = mysql_fetch_lengths(_result);
 			if (_curRowFieldLengths == nullptr)
@@ -19,6 +19,7 @@ void MysqlResult::Init(MYSQL *mysql)
 				ASSERT(false, "error");
 			}
 			_rows.emplace_back(row, _curRowFieldLengths, _fieldCount);
+			row = mysql_fetch_row(_result);
 		}
 	}
 }

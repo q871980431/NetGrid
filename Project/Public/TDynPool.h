@@ -82,8 +82,7 @@ namespace tlib
         typedef TListNode<Chunk> ChunkNode;
         typedef TListNode<Block> BlockNode;
     public:
-        TDynPool() :_chunkRoot(nullptr), _blokRoot(nullptr), _currentAllocs(0),
-            _maxAllocs(0), _blockCount(0)
+		TDynPool() :_currentAllocs(0), _maxAllocs(0), _blockCount(0), _chunkRoot(nullptr), _blokRoot(nullptr)
         {
             AllocBlock(block_count);
         }

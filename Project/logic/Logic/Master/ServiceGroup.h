@@ -56,7 +56,7 @@ class ServiceGroup : public core::ITimer
 {
 public:
 	ServiceGroup():_kernel(nullptr) {};
-	~ServiceGroup() {};
+	virtual ~ServiceGroup() {};
 
 	virtual void OnStart(core::IKernel *kernel, s64 tick) {};
 	virtual void OnTime(core::IKernel *kernel, s64 tick);

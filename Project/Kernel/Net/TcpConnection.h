@@ -46,8 +46,6 @@ public:
 	inline void SetRecvBuffSize(s32 recvBuffSize) { _recvBuffSize = recvBuffSize; };
 	inline s32	GetRecvBuffSize() { return _recvBuffSize; };
 
-public:
-
 private:
 	s32	 _sessionId;
 	bool _passive;

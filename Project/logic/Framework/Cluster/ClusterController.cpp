@@ -15,6 +15,7 @@ bool ClusterConntroller::InitClusterNode(s8 type, const char *name)
 	ClusterTypeNodes *node = NEW ClusterTypeNodes(type, name);
 	_clusterNodeMap.emplace(type, node);
 	_typebits.set(type);
+	return true;
 }
 
 bool ClusterConntroller::InitCompelate()

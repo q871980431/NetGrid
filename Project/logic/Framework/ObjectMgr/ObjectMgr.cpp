@@ -435,6 +435,7 @@ void ObjectMgr::TestObject(IKernel *kernel)
 	noticRow = notic->AddRowByKey("test2");
 	noticRow = notic->AddRowByKey("test1");
 	noticRow = notic->AddRowByKey("test3");
+	const char *content = noticRow->GetMemberStr(Logic::Player::Notice::content);
 	auto fun = [](IRow *row)
 	{
 		IKernel *kernel = s_kernel;
@@ -444,6 +445,11 @@ void ObjectMgr::TestObject(IKernel *kernel)
 	notic->ForEach(fun);
 	IRow *findRow = notic->FindRowByKey("test1");
 	findRow = notic->FindRowByKey("testt");
+	if (findRow != nullptr)
+	{
+		content = findRow->GetMemberStr(Logic::Player::Notice::content);
+		TRACE_LOG("content:%s", content);
+	}
 	//noticRow->SetMemberStr(Logic::Player::Notice::content, "test4");
 	//noticRow->SetMemberStr(Logic::Player::name, "xuping");
 	//TRACE_LOG("name:%s", noticRow->GetMemberStr(Logic::Player::name));

@@ -10,6 +10,7 @@
 }
 #define FOREVER	-1
 
+
 #define LUA_LOG(content)\
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
@@ -21,24 +22,33 @@
 
 #define DEBUG_LOG(format, ...)\
 {\
-    char log[LOG_BUFF_SIZE] = { 0 }; \
-    SafeSprintf(log, sizeof(log), "[DEBUG]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-    kernel->AsyncLog(log);\
+	if(  core::LOG_LEVEL_DEBUG >= kernel->GetLogLevel())\
+	{\
+		char log[LOG_BUFF_SIZE] = { 0 }; \
+		SafeSprintf(log, sizeof(log), "[DEBUG]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+		kernel->AsyncLog(log);\
+	}\
 }
 
 #define TRACE_LOG(format, ...)\
 {\
-    char log[LOG_BUFF_SIZE] = { 0 }; \
-    SafeSprintf(log, sizeof(log), "[TRACE]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-	printf("%s\n", log);\
-    kernel->AsyncLog(log); \
+	if(  core::LOG_LEVEL_TRACE >= kernel->GetLogLevel())\
+	{\
+		char log[LOG_BUFF_SIZE] = { 0 }; \
+		SafeSprintf(log, sizeof(log), "[TRACE]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+		printf("%s\n", log);\
+		kernel->AsyncLog(log); \
+	}\
 }
 
 #define ERROR_LOG(format, ...)\
 {\
-    char log[LOG_BUFF_SIZE] = { 0 }; \
-    SafeSprintf(log, sizeof(log), "[ERROR]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
-    kernel->AsyncLog(log); \
+	if(  core::LOG_LEVEL_DEBUG >= kernel->GetLogLevel())\
+	{\
+		char log[LOG_BUFF_SIZE] = { 0 }; \
+		SafeSprintf(log, sizeof(log), "[ERROR]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+		kernel->AsyncLog(log); \
+	}\
 }
 
 #define IMPORTANT_LOG(labl, format, ...)\
@@ -107,6 +117,12 @@ class IModule;
 namespace core
 {
     class IKernel;
+	enum LOG_LEVEL
+	{
+		LOG_LEVEL_DEBUG = 0,
+		LOG_LEVEL_TRACE = 1,
+		LOG_LEVEL_ERROR = 2,
+	};
     struct MessageHead
     {
         s32 messageId;
@@ -141,6 +157,7 @@ namespace core
 		virtual void  OnError(s32 moduleErr, s32 sysErr) = 0;
 		virtual void  OnRecv(const char *buff, s32 len) = 0;
 		virtual s32	  OnParsePacket(CircluarBuffer *recvBuff) = 0;
+		virtual void  OnRelease() = 0;
 	};
 
 	class INetTcpListener
@@ -153,7 +170,7 @@ namespace core
     class ITrace
     {
     public:
-        ITrace(){};
+        virtual ~ITrace(){};
         virtual const char * GetTraceInfo() = 0;
     };
 
@@ -220,6 +237,7 @@ namespace core
         virtual void SyncLog(const char *contens) = 0;
         virtual void AsyncLog(const char *contens) = 0;
 		virtual void ThreadLog(const char *contents) = 0;
+		virtual s32  GetLogLevel() = 0;
 
 		//Module
         virtual IModule * FindModule(const char *name) = 0;

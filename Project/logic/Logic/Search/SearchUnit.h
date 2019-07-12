@@ -9,6 +9,7 @@
 #define __SearchUnit_h__
 #include "Search.h"
 #include <list>
+#include "IKernel.h"
 
 struct SearchArgs
 {
@@ -50,7 +51,6 @@ typedef std::list<IndividualInfo *> IndividualMatch;
 typedef std::unordered_map<s64, IndividualInfo *> IndividualMap;
 typedef std::list<TeamInfo *> TeamMatch;
 typedef std::unordered_map<s64, TeamInfo *> TeamMap;
-class core::IKernel;
 class TransforTimer;
 class FlushSearchTimer;
 class SearchUnit

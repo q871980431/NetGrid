@@ -30,8 +30,8 @@ public:
 		return 0;
 	};
 private:
-	RowFieldLenType *_rowFieldLengths;
 	MYSQL_ROW _row;
+	RowFieldLenType *_rowFieldLengths;
 	s32		_filedCount;
 };
 
@@ -40,7 +40,7 @@ class MysqlResult : public IDBResult
 public:
 	MysqlResult() :_result(nullptr){}
 	virtual s32 RowCount() { return (s32)_rows.size(); };
-	virtual IRowData * GetRow(s32 index) {return index < _rows.size() ? (&_rows[index]) : nullptr;};
+	virtual IRowData * GetRow(s32 index) {return index < (s32)_rows.size() ? (&_rows[index]) : nullptr;};
 
 public:
 	void Init(MYSQL *mysql);

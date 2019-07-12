@@ -128,6 +128,11 @@ void Kernel::ThreadLog(const char *contents)
 	_logger.ThreadLog(contents);
 }
 
+s32 Kernel::GetLogLevel()
+{
+	return _logger.LogLevel();
+}
+
 IModule * Kernel::FindModule(const char *name)
 {
     ASSERT(name != nullptr, "errpr");

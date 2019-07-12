@@ -23,6 +23,8 @@ private:
 typedef std::string NameSet;
 typedef std::string ConditionSet;
 typedef std::string FinalSQL;
+typedef std::string OrderByExp;
+typedef std::string SetFiledSQL;
 
 const static s32 MYSQL_TABLE_NAME_LEN = 64;
 const static char MYSQL_ESCAPE_CHAR = '`';
@@ -34,7 +36,45 @@ const static s32 MYSQL_ESCAPE_STR_ADD = 1;
 const static char *MYSQL_KEYWORD_SELECT = "SELECT ";
 const static char *MYSQL_KEYWORD_FROM = " FROM ";
 const static char *MYSQL_KEYWORD_WHERE = " WHERE ";
-typedef s32 (*ESCAPE_STR_FUN)(const void *context, s32 len, const char* pszSrc, int nSize, char* pszDest);
+const static char *MYSQL_KEYWORD_ORDERBY = " ORDER BY ";
+const static char *MYSQL_KEYWORD_DESC = " DESC ";
+const static char *MYSQL_KEYWORD_ASC = " ASC ";
+const static char *MYSQL_KEYWORD_LIMIT = " LIMIT ";
+
+
+typedef s32(*ESCAPE_STR_FUN)(const void *context, s32 len, const char* pszSrc, int nSize, char* pszDest);
+
+#define WHERE_LOGIC_EXP_DEC(H, name)\
+	template< class T>\
+SQLCommand & H##name(const char *filedName, SYMBOL symbol, T val)\
+
+#define WHERE_LOGIC_EXP_DEF(H, name)\
+template< class T>\
+inline SQLCommand & SQLCommand::H##name(const char *filedName, SYMBOL symbol, T val)\
+{\
+	if (!_whereConditions.empty())\
+	{\
+		_whereConditions.append(" "#H#name" ");\
+		AddFiledName(_whereConditions, filedName);\
+		AddSymbol(_whereConditions, symbol);\
+		AddFiledVal(_whereConditions, val);\
+	}\
+	return *this;\
+}\
+template<>\
+inline SQLCommand & SQLCommand::H##name<const char *>(const char *filedName, SYMBOL symbol, const char *val)\
+{\
+	if (!_whereConditions.empty())\
+	{\
+		_whereConditions.append(" "#H#name" "); \
+		AddFiledName(_whereConditions, filedName);\
+		AddSymbol(_whereConditions, symbol);\
+		AddFiledVal(_whereConditions, val, strlen(val));\
+	}\
+	return *this;\
+}
+
+
 class SQLCommand
 {
 public:
@@ -53,6 +93,8 @@ public:
 	virtual const char * ToStr() = 0;
 	template< class T>
 	SQLCommand & Where(const char *filedName, SYMBOL symbol, T val);
+	WHERE_LOGIC_EXP_DEC(A,nd);
+	WHERE_LOGIC_EXP_DEC(O,r);
 protected:
 	void AddFiledName(std::string &src, const char *filedName)
 	{
@@ -72,7 +114,7 @@ protected:
 	void AddFiledVal(std::string &src, const char *val, s32 len)
 	{
 		char *dst = (char *)alloca(GetEscapeBuffSize(len));
-		s32 escapeLen = EscapeStr(val, len, dst);
+		EscapeStr(val, len, dst);
 		src.push_back(MYSQL_STR_SPLIT);
 		src.append(dst);
 		src.push_back(MYSQL_STR_SPLIT);
@@ -112,12 +154,13 @@ inline SQLCommand & SQLCommand::Where<const char *>(const char *filedName, SYMBO
 	}
 	return *this;
 }
-
+WHERE_LOGIC_EXP_DEF(A, nd)
+WHERE_LOGIC_EXP_DEF(O, r)
 
 class Query : public SQLCommand
 {
 public:
-	Query(void *context, s32 size, ESCAPE_STR_FUN fun, const char *table) : SQLCommand(context, size, fun, table){}
+	Query(void *context, s32 size, ESCAPE_STR_FUN fun, const char *table) : SQLCommand(context, size, fun, table), _rowCount(0), _offSet(0){}
 
 	virtual const char * ToStr();
 	Query & Select(const char *name){
@@ -127,9 +170,81 @@ public:
 		return *this;
 	}
 
+	template<typename... Args>
+	Query & Select(Args... args)
+	{
+		s32 a[] = { (Select(args),0)... };
+		return *this;
+	}
+
+	Query & OrderBy(const char *name, bool desc = true)
+	{
+		if (_orderBy.empty())
+			_orderBy.append(MYSQL_KEYWORD_ORDERBY);
+		else
+			_orderBy.append(MYSQL_SPILT_STR);
+		AddFiledName(_orderBy, name);
+		if (desc)
+			_orderBy.append(MYSQL_KEYWORD_DESC);
+		else
+			_orderBy.append(MYSQL_KEYWORD_ASC);
+		return *this;
+	}
+
+	template<typename... Args>
+	Query & OrderBy(const char *name, bool second, Args... args)
+	{
+		OrderBy(name, second);
+		OrderBy(args...);
+		return *this;
+	}
+
+	template<typename... Args>
+	Query & OrderBy(const char *name, Args... args)
+	{
+		OrderBy(name);
+		OrderBy(args...);
+		return *this;
+	}
+
+	Query & Limit(s32 count, s32 offset = 0)
+	{
+		if (_rowCount == 0)
+		{
+			_rowCount = count;
+			_offSet = offset;
+		}
+		return *this;
+	}
+
 protected:
 	NameSet	_selects;
 	FinalSQL _final;
+	OrderByExp _orderBy;
+	s32 _rowCount;
+	s32 _offSet;
 };
 
+
+class Update : public SQLCommand
+{
+public:
+	Update(void *context, s32 size, ESCAPE_STR_FUN fun, const char *table) : SQLCommand(context, size, fun, table){}
+
+	template<typename T>
+	struct SetFiled 
+	{
+		SetFiled(const char *name, T val)
+		{
+
+		}
+		const char *_name;
+		T val;
+	};
+
+	//void Set()
+protected:
+private:
+	SetFiledSQL	_setFiledSQL;
+};
 #endif

@@ -19,6 +19,6 @@ void HarborSession::OnRecv(const char *buff, s32 len)
 	MessageHead *head = (MessageHead*)buff;
 	ASSERT(head->len == len, "error");
 	core::IKernel *kernel = _kernel;
-	TRACE_LOG("Session:%d, Recv MsgId:%d, content:%s len:%d", _connection->GetSessionId(), head->messageId, buff + sizeof(MessageHead), len - sizeof(MessageHead));
+	TRACE_LOG("Session:%d, Recv MsgId:%d, content:%s len:%d", _connection->GetSessionId(), head->messageId, buff + sizeof(MessageHead), len - (s32)sizeof(MessageHead));
 	OnRecv(head->messageId, buff + sizeof(MessageHead), len - sizeof(MessageHead));
 }

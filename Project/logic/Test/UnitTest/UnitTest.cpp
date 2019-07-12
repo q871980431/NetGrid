@@ -21,7 +21,7 @@ bool UnitTest::Initialize(IKernel *kernel)
 bool UnitTest::Launched(IKernel *kernel)
 {
 	TRACE_LOG("UnitTest 111111");
-	printf("TestList Size,%d", s_testList.size());
+	printf("TestList Size,%ld", s_testList.size());
 	for (auto &test : s_testList)
 	{
 		test->StartTest(kernel);

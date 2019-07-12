@@ -174,6 +174,7 @@ void NetListenerMgr::OnConnectFailed(IKernel *kernel, NetSocket connectSocket, s
 	if (iter != _connectSockMap.end())
 	{
 		iter->second.session->OnError(1, error);
+		iter->second.session->OnRelease();
 		_connectSockMap.erase(iter);
 	}
 }
@@ -243,9 +244,11 @@ void NetListenerMgr::Run()
 #ifdef LINUX
 		maxFd++;
 #endif
-		//s64 tick = tools::GetTimeMillisecond();
+		s64 tick = tools::GetTimeMillisecond();
 		nSockets = select(maxFd, &readFd, &writFd, nullptr, &timeOut);
-		//THREAD_LOG("Select", "Select exp time:%lld ms", tools::GetTimeMillisecond() - tick);
+		if (nSockets < 0)
+			THREAD_LOG("Select", "Select exp time:%ld ms, errorcode:%d", tools::GetTimeMillisecond() - tick, tools::GetSocketError());
+
 		std::vector<NetSocket> dels;
 		for (s32 i = 0; i < netSockets.size; i++)
 		{
@@ -296,7 +299,7 @@ void NetListenerMgr::Run()
 
 			if (FD_ISSET(netSockets.sockets[i].socket, &readFd))
 			{
-				TRACE_LOG("Listen", "Listen socket:%d, type:%d", netSockets.sockets[i].socket, netSockets.sockets[i].type);
+				THREAD_LOG("Listen", "Listen socket:%d, type:%d", netSockets.sockets[i].socket, netSockets.sockets[i].type);
 				if (netSockets.sockets[i].type == LISTENER)
 				{
 					NetSocket clientSocket;

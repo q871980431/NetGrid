@@ -94,7 +94,7 @@ public:
             ++_h;
         s64 count = _w * _h;
         ECHO("*******W=%d, H=%d***********", _w, _h);
-        ASSERT(count <= 0xFFFF, "count is big = %lld, w = %d, h = %d", count, _w, _h);
+        ASSERT(count <= 0xFFFF, "count is big = %ld, w = %d, h = %d", count, _w, _h);
         _size = _w * _h;
         _grids = NEW Grid[_size];
         ASSERT(_grids, "grids is null");

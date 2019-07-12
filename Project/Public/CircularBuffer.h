@@ -8,7 +8,7 @@
 class CircluarBuffer
 {
 public:
-	CircluarBuffer(s32 size) :_size(size), _buff(nullptr), _wcount(0), _rcount(0)
+	CircluarBuffer(s32 size) :_buff(nullptr), _size(size), _wcount(0), _rcount(0)
 	{
 		if (_size&(_size - 1))_size = RoundupPowerOf2(_size);
         _buff = NEW char[_size];

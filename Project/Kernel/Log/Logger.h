@@ -52,13 +52,13 @@ public:
     virtual void AsyncLog(const char *contents);
 	virtual void ThreadLog(const char *contents);
 	virtual void Process(s32 tick);
-protected:
-private:
-    const char *GetLogTimeString();
 
+	s32	LogLevel() { return _logLevel; };
+private:
     void ThreadRun();
 
 private:
+	const char *GetLogTimeString();
 	bool CreateLogFile(LogFile &logFile);
 	bool WriteLogNode(LogFile &logFile, const LogNode *logNode);
 
@@ -80,6 +80,7 @@ private:
 	LogListThreadData					_dels;
 	LogListThreadData					_threadLog;
 	std::mutex							_threadLogMutex;
+	s32	_logLevel;
 };
 
 #define LOGGER  (Logger::GetInstancePtr())

@@ -78,7 +78,7 @@ void TimerWheel::Process(core::IKernel *kernel, s32 tick)
 {
 	s64 now = tools::GetTimeMillisecond();
 
-	s64 jiffies = GetJiffies(now);
+	auto jiffies = GetJiffies(now);
 	while (jiffies > _jiffies)
 	{
 		LinkList workList;

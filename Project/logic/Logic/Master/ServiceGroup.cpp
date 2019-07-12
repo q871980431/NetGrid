@@ -12,7 +12,6 @@ void ServiceGroup::AddService(ServiceConfig *config)
 	ServiceInfo info;
 	info.config = *config;
 	info.count = 0;
-	info.serviceNode;
 	info.state = core::NODE_STATUS_NONE;
 
 	auto ret = _serviceMap.insert(std::make_pair(config->type, info));
@@ -106,11 +105,12 @@ void ServiceGroup::OnAllServiceReady()
 
 ServiceNodeInfo * ServiceGroup::CreateServiceNode(ServiceInfo *service)
 {
-	if (service->config.max != -1 && service->serviceNode.size() >= service->config.max)
+	if (service->config.max != -1 && (s16)service->serviceNode.size() >= service->config.max)
 	{
 		ASSERT(false, "error");
+		return nullptr;
 	}
-	if (service->config.max == -1 || service->serviceNode.size() < service->config.max)
+	if (service->config.max == -1 || (s16)service->serviceNode.size() < service->config.max)
 	{
 		ServiceNodeInfo *nodeInfo = NEW ServiceNodeInfo();
 		nodeInfo->nodeId = ++service->count;

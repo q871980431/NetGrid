@@ -31,7 +31,7 @@ bool Slave::Initialize(IKernel *kernel)
 	char path[MAX_PATH] = { 0 };
 	char path1[MAX_PATH] = { 0 };
 	SafeSprintf(path, sizeof(path), "%s,%d", "xuping", 1);
-	SafeSprintf(path1, sizeof(path1), "%s,", "xuping", 1);
+	SafeSprintf(path1, sizeof(path1), "%s,", "xuping");
 
 	ECHO("path = %s", path);
 	ECHO("path = %s", path1);

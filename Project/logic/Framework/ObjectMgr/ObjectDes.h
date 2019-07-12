@@ -185,7 +185,7 @@ void ObjectDes::SetAttrT(void *addr, const MemberProperty *member, T val)const
 template<>
 inline void ObjectDes::SetAttrT<const char *>(void *addr, const MemberProperty *member, const char * val) const
 {
-	printf("setAttr string, filename:%s", member->name);
+	printf("setAttr string, filename:%s", member->name.GetString());
 	ASSERT(member->host == this, "error");
 	ASSERT(member->type == DATA_TYPE::DATA_TYPE_STR, "error");
 	s32 size = strlen(val);
@@ -206,7 +206,7 @@ T ObjectDes::GetAttrT(void *addr, const MemberProperty *member)const
 template<>
 inline const char * ObjectDes::GetAttrT<const char *>(void *addr, const MemberProperty *member) const
 {
-	printf("GetAttr string, filename:%s", member->name);
+	printf("GetAttr string, filename:%s", member->name.GetString());
 	ASSERT(member->type == DATA_TYPE::DATA_TYPE_STR, "error");
 	return(char *)addr + member->offset;
 }

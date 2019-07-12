@@ -24,7 +24,7 @@ public:
 	virtual void  OnError(s32 moduleErr, s32 sysErr);
 	virtual void  OnRecv(const char *buff, s32 len);
 	virtual s32	  OnParsePacket(CircluarBuffer *recvBuff);
-
+	virtual void  OnRelease() { DEL this; };
 protected:
 	void SendMsg(s32 msgId, const char *buff, s32 len);
 

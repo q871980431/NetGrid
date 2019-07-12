@@ -20,19 +20,19 @@ IKernel * Test::s_kernel = nullptr;
 
 void MyTimer::OnStart(IKernel *kernel, s64 tick)
 {
-	ECHO("Call Start, time = %dms", (tick - _tick));
+	ECHO("Call Start, time = %ld ms", (tick - _tick));
 }
 
 void MyTimer::OnTime(IKernel *kernel, s64 tick)
 {
-	ECHO("Call Time, time = %dms", (tick - _tick));
+	ECHO("Call Time, time = %ld ms", (tick - _tick));
     const IMember *meber = Root::id;
     _tick = tick;
 }
 
 void MyTimer::OnTerminate(IKernel *kernel, s64 tick)
 {
-	ECHO("Call Terminate, time = %dms", tick - _tick);
+	ECHO("Call Terminate, time = %ld ms", tick - _tick);
 	kernel->StartTimer(this, 274, 10, 995, "on Terminate");
 }
 bool Test::Initialize(IKernel *kernel)
@@ -45,6 +45,7 @@ bool Test::Initialize(IKernel *kernel)
     name[3] = '\0';
     s32 size = name.size();
     ECHO("%s", name.c_str());
+	ECHO("buff:%s", buff);
     TestPtr();
     TestCallBack();
 
@@ -168,7 +169,7 @@ void Test::TestHmacSha1()
     hmac_sha1((const unsigned char *)key, strlen(key), (const unsigned char *)data, strlen(data), (unsigned char *)buff, &size);
     std::string tmp("");
     CreateStr(buff, size, tmp);
-    ECHO("%s,%d", tmp.c_str(), tmp.length());
+    ECHO("%s,%ld", tmp.c_str(), tmp.length());
 }
 
 void Test::TestKey()
@@ -199,11 +200,12 @@ void Test::TestPtr()
     char buff[256];
     int a = 5;
     int b = 6;
-    ECHO("Size ptr = %d, size ptr ptr = %d", sizeof(int*), sizeof(int **));
+    ECHO("Size ptr = %ld, size ptr ptr = %ld", sizeof(int*), sizeof(int **));
     int *p = (int*)buff;
     p = &a;
     int *q = (int*)buff;
     ECHO("%d", *q);
+	ECHO("%d", *p);
 }
 
 void PrintfDirInfo(tools::DirInfo *dir)

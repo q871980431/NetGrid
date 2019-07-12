@@ -19,6 +19,14 @@ const char * Query::ToStr()
 		_final.append(_table.GetString());
 		_final.append(MYSQL_KEYWORD_WHERE);
 		_final.append(_whereConditions);
+		_final.append(_orderBy);
+		if (_rowCount != 0)
+		{
+			_final.append(MYSQL_KEYWORD_LIMIT);
+			AddFiledVal(_final, _offSet);
+			_final.append(MYSQL_SPILT_STR);
+			AddFiledVal(_final, _rowCount);
+		}
 		_final.push_back(MYSQL_END_CHAR);
 	}
 	return _final.c_str();

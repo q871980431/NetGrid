@@ -6,6 +6,8 @@
 #include <libunwind.h>
 #endif
 #include "TString.h"
+#include "Tools_time.h"
+
 typedef tlib::TString<8 * 1024> DumpBuff;
 
 struct ExceptionJump
@@ -22,13 +24,13 @@ public:
 	static void PushJumpNode(ExceptionJump &expJump);
 	static void PopJumpNode();
 	static void DumpException(std::exception &e);
+	static FILE  * OpenExceptionFile();
+	static void DumpBackTrace(DumpBuff &dumpBuff);
 protected:
 private:
 	static void CatchSignal(s32 sig);
 	static void ExceptionHandFun();
 	static void DumpBackTrace();
-	static void DumpBackTrace(DumpBuff &dumpBuff);
-	static FILE  * OpenExceptionFile();
 private:
 };
 
@@ -56,9 +58,9 @@ private:
 #define DUMP_BACK_TRACE(code) \
 DumpBuff dumpBuff;\
 dumpBuff.AppendFormat("Catch Exception:%d,Time:%s\n", (code), tools::GetCurrentTimeString());\
-DumpBackTrace(dumpBuff);\
+ExceptionMgr::DumpBackTrace(dumpBuff);\
 dumpBuff << "Exception Data End\n";\
-FILE *dumpFile = OpenExceptionFile();\
+FILE *dumpFile = ExceptionMgr::OpenExceptionFile();\
 if (dumpFile)\
 {\
 	fwrite(dumpBuff.GetString(), dumpBuff.Length(), 1, dumpFile);\

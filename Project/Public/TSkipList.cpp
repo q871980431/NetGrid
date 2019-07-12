@@ -163,7 +163,7 @@ namespace tlib {
 			IRankNode * x = _header;
 			while (x->_level[i]._next)
 			{
-				ECHO("Node[%lld], score:%lld, span:%d", x->_level[i]._next->_id, x->_level[i]._next->_score, x->_level[i]._next->_level[i].span);
+				ECHO("Node[%ld], score:%ld, span:%d", x->_level[i]._next->_id, x->_level[i]._next->_score, x->_level[i]._next->_level[i].span);
 				x = x->_level[i]._next;
 			}
 		}

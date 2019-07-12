@@ -70,6 +70,7 @@ void TcpConnection::Close()
 	{
 		_tcpSession->SetConnection(nullptr);
 		_tcpSession->OnTerminate();
+		_tcpSession->OnRelease();
 		_tcpSession = nullptr;
 		_ioEngine->RemoveIODriver(_ioDriver);
 	}
@@ -92,6 +93,7 @@ void TcpConnection::OnTerminate(bool recvFin)
 	{
 		_tcpSession->SetConnection(nullptr);
 		_tcpSession->OnTerminate();
+		_tcpSession->OnRelease();
 		_tcpSession = nullptr;
 	}
 

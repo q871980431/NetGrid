@@ -43,7 +43,7 @@ public:
 		{
 			char *dst = (char*)alloca((size / 3 + 1) * 4 + 1);
 			//Base64Encode(context, size, dst, (size / 3 + 1) * 4 + 1);
-			FixFiled(key, dst);
+			FixFiled(key, (const char *)dst);
 		}
 	};
 
@@ -71,6 +71,7 @@ inline void ReqArgsField::FixFiled(const char *key, T val )
 	else
 		_offSet += SafeSprintf(_buff + _offSet, _size - _offSet, "&%s=%d", key, val);
 }
+
 inline void ReqArgsField::FixFiled(const char *key, const char *val)
 {
 	if (_first)
@@ -97,11 +98,11 @@ inline void ReqArgsField::FixFiled(const char *key, s64 val)
 {
 	if (_first)
 	{
-		_offSet += SafeSprintf(_buff + _offSet, _size - _offSet, "%s=%lld", key, val);
+		_offSet += SafeSprintf(_buff + _offSet, _size - _offSet, "%s=%ld", key, val);
 		_first = false;
 	}
 	else
-		_offSet += SafeSprintf(_buff + _offSet, _size - _offSet, "&%s=%lld", key, val);
+		_offSet += SafeSprintf(_buff + _offSet, _size - _offSet, "&%s=%ld", key, val);
 }
 
 class CookieField : public IHttpField
@@ -119,7 +120,7 @@ public:
 		{
 			char *dst = (char*)alloca((size / 3 + 1) * 4 + 1);
 			//Base64Encode(context, size, dst, (size / 3 + 1) * 4 + 1);
-			FixFiled(key, dst);
+			FixFiled(key, (const char *)dst);
 		}
 	};
 
@@ -173,11 +174,11 @@ inline void CookieField::FixFiled(const char *key, s64 val)
 {
 	if (_first)
 	{
-		_offSet += SafeSprintf(_buff + _offSet, _size - _offSet, "%s=%lld", key, val);
+		_offSet += SafeSprintf(_buff + _offSet, _size - _offSet, "%s=%ld", key, val);
 		_first = false;
 	}
 	else
-		_offSet += SafeSprintf(_buff + _offSet, _size - _offSet, "; %s=%lld", key, val);
+		_offSet += SafeSprintf(_buff + _offSet, _size - _offSet, "; %s=%ld", key, val);
 }
 
 #endif //__HTTPMGR_H__

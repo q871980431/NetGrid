@@ -36,7 +36,7 @@ void MatchBack(s32 count, const ISearch::SetInfo *setInfo)
 		for (s32 j = 0; j < setInfo[i].num; j++)
 		{
 			s32 offset = setInfo[i].id[j] - 1;
-			ECHO("id = %2lld, score = %2d", g_ids[offset], g_scores[offset]);
+			ECHO("id = %2ld, score = %2d", g_ids[offset], g_scores[offset]);
 		}
 	}
 }
@@ -118,7 +118,7 @@ bool MatchTask::Initialize(IKernel *kernel)
 				ASSERT(info != nullptr, "error");
 				ASSERT(info->match == false, "error");
 				info->match = true;
-				printf("PlayerId:%lld, Score:%d     ", info->id, info->score);
+				printf("PlayerId:%ld, Score:%d     ", info->id, info->score);
 				if (info->count >= 1)
 				{
 					selef->Remove(id);
@@ -156,7 +156,7 @@ void MatchTask::OnTime(IKernel *kernel, s64 tick)
 			s32 randomId = tools::GetRandom(1, _id);
 			//_search->LeaveIndividualSearchChannel(_channelId, randomId);
 		}
-		DEBUG_LOG("Task %d, Match Count = %lld", _taskId, _players.size());
+		DEBUG_LOG("Task %d, Match Count = %ld", _taskId, _players.size());
 	}
 	else
 	{

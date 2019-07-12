@@ -46,7 +46,7 @@ void GameSession::OnRecv(s32 messageId, const char *buff, s32 len)
 	++_count;
 	if (_count % 100000 == 0)
 	{
-		ECHO("%lld ms", now - _first);
+		ECHO("%ld ms", now - _first);
 		_first = now;
 	}
 }

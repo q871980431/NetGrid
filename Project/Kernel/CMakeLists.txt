@@ -172,7 +172,7 @@ IF(LINUX)
 #		optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libunwind-generic.a"
 
 	)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lunwind-x86_64 -lunwind-setjmp")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lunwind -lunwind-x86_64 -lunwind-setjmp")
 ENDIF(LINUX)
 
 ADD_EXECUTABLE( NetGrid

@@ -34,11 +34,9 @@ public:
 	inline TimerWheel * GetTimerWheel() { return _wheel; };
 	inline void SetTimerWheel(TimerWheel *timerWheel) { _wheel = timerWheel; };
 private:
-	TimerBase(core::ITimer *timer, s32 count, s32 interval, const char *trace) :_trace(trace),_expires(0)
-		,_wheel(nullptr), _frist(true), _canRelease(true), _remove(false){
-		_timer = timer;
-		_count = count;
-		_interval = interval;
+	TimerBase(core::ITimer *timer, s32 count, s32 interval, const char *trace) : _timer(timer),
+		_expires(0), _interval(interval),_wheel(nullptr), _count(count),
+		_frist(true), _canRelease(true), _remove(false), _trace(trace){
 	};
 private:
 	core::ITimer *_timer;

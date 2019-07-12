@@ -18,10 +18,11 @@ class HttpBase : public IHttpBase, public IAsyncHandler {
 public:
 	HttpBase(CURL * curl)
 		: _curl(curl)
-		, _type(HT_NONE)
+		, _https(false)
 		, _handler(nullptr)
-		, _errCode(0),
-		_https(false){
+		, _type(HT_NONE)
+		, _errCode(0)
+		{
 		_content.reserve(DEFAULT_CONTENT_SIZE);
 		_cookie[0] = 0;
 		_field[0] = 0;

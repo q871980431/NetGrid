@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
 	<echoserver server="true" ip="127.0.0.1" port="11011" clientNum="50"/>
-	<servicetest server="false" ip="192.168.139.243" port="11011" clientNum="1" clientclose="true" />	
+	<servicetest server="false" ip="192.168.139.243" port="11011" clientNum="1" clientclose="true" />
+	<!--登陆排队信息 
+		limitMax	排队最大人数, 即系统最高负载值
+		limitVal 	进入排队阈值, 即系统负载大于limitVal值后, 进入速率开始下降
+		rateMax     系统每秒可通过人数
+		stageNum    速率阶段, 速率变化从rateMax *(1 - nowStage/stageNum) 诸如rateMax为200 stageNum=10 那么速率为200 180 160……0
+		updateTime	诸如多久同步更新 客户端排队状态和系统阶段更新 ms
+	-->
+	<loginctl limitMax="500" limitVal="300" rateMax="30" stageNum="10" updateTime="1000" />	
 </root>

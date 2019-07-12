@@ -1,7 +1,9 @@
 <root path="./">
 	<!--<module	name="Cluster"/>-->
 	<!--<module	name="EchoServer"/>	
-	<module	name="UnitTest"/>
 	<module	name="ObjectMgr"/>	-->
-	<module	name="TextCommand"/>	
+	<module	name="UnitTest"/>	
+	<module	name="MysqlMgr"/>
+	<module	name="TextCommand"/>
+	<module	name="LoginControl"/>	
 </root>

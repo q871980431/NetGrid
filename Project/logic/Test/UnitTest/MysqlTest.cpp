@@ -3,7 +3,7 @@
 #include "Game_tools.h"
 #include "MysqlBuilder.h"
 
-//UnitTestRegister<MysqlTest> mysqlTest;
+UnitTestRegister<MysqlTest> mysqlTest;
 void MysqlTest::StartTest(core::IKernel *kernel)
 {
 	core::IKernel *s_kernel = kernel;
@@ -29,7 +29,8 @@ void MysqlTest::MainThreadSQLBuilder(core::IKernel *kernel)
 	if (hander)
 	{
 		MYSQL_QUERY(query, hander, "Account");
-		query.Select("accountid").Select("platform").Where("username", SQLCommand::EQ, "dfgew");
+		query.Select("accountid").Select("platform", "username").Where("username", SQLCommand::EQ, "dfgew").And("username", SQLCommand::EQ, "dfgew");
+		query.OrderBy("username", false, "platform", "accountid", true).Limit(10);
 		const char *sql = query.ToStr();
 		TRACE_LOG("SQL:%s", sql);
 	}

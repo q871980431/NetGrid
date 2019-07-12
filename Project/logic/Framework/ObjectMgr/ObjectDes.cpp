@@ -154,7 +154,7 @@ void * ObjectDes::CreateMemeory(s32 &size)const
 void ObjectDes::DestoryMemeory(void *memeory) const
 {
     ReleaseMemeory(memeory, _allSize);
-    DEL[] memeory;
+    DEL[] (char*)memeory;
 }
 
 void ObjectDes::ReleaseMemeory(void *addr, s32 size) const

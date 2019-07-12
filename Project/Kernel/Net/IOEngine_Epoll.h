@@ -74,8 +74,8 @@ private:
 	bool _terminate;
 	IKernel *_kernel;
 
-	CircluarQueue<DrivierEvent>	_threadQueue;
 	CircluarQueue<DrivierEvent> _mainQueue;
+	CircluarQueue<DrivierEvent>	_threadQueue;
 	epoll_event	*_events;
 	std::unordered_map<s32, EpollDriver *> _driversMain;
 	std::unordered_map<s32, EpollDriver *> _ctlAddDrivers;

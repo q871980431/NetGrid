@@ -22,6 +22,7 @@ public:
     virtual void SyncLog(const char *contens);
     virtual void AsyncLog(const char *contens);
 	virtual void ThreadLog(const char *contents);
+	virtual s32  GetLogLevel();
     virtual IModule * FindModule(const char *name);
     virtual void CreateNetSession(const char *ip, s16 port, core::ITcpSession *session);
     virtual void CreateNetListener(const char *ip, s16 port, core::INetTcpListener *listener);

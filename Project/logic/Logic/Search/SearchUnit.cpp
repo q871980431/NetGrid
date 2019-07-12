@@ -7,7 +7,6 @@
 
 #include "SearchUnit.h"
 #include "Tools.h"
-#include "IKernel.h"
 #include<algorithm> 
 #define TASSERT	ASSERT
 
@@ -177,7 +176,7 @@ void SearchUnit::FlushSearch()
 								tmp.push_back(*last);
 								num = _config.num;
 							}
-							if (tmp.size() >= num)
+							if ((s32)tmp.size() >= num)
 							{
 								OnMatchSuccess(&tmp);
 								tmp.clear();
@@ -206,7 +205,7 @@ void SearchUnit::FlushSearch()
 								tmp.push_back(*next);
 								num = _config.num;
 							}
-							if (tmp.size() >= num)
+							if ((s32)tmp.size() >= num)
 							{
 								OnMatchSuccess(&tmp);
 								tmp.clear();
@@ -217,7 +216,7 @@ void SearchUnit::FlushSearch()
 				}
 			}
 
-			if (tmp.size() >= box.num)
+			if ((s32)tmp.size() >= box.num)
 			{
 				OnMatchSuccess(&tmp);
 				break;
