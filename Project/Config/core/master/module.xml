@@ -1,4 +1,5 @@
 <root path="./">
+	<module name="EventEngine"/>	
 	<module name="Harbor"/>
-	<module name="Master"/>
+	<module name="Cluster"/>
 </root>

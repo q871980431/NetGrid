@@ -17,6 +17,8 @@
 #define  SafeSprintf __SafeSprintf
 #define TMALLOC	malloc
 #define TFREE	free
+#define CAST_DATA_PTR(dsttype, data, size) (size == sizeof(dsttype)) ? (const dsttype *)data : nullptr
+
 
 enum DATA_TYPE
 {

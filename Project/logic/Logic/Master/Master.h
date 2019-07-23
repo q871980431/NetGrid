@@ -40,8 +40,8 @@ public:
     virtual bool Launched(IKernel *kernel);
     virtual bool Destroy(IKernel *kernel);
 
-    virtual void OnOpen(s32 type, s32 nodeId, const char *ip, s16 port);
-    virtual void OnClose(s32 type, s32 nodeId);
+    virtual void OnOpen(s8 type, s8 nodeId, const char *ip, s32 port);
+    virtual void OnClose(s8 type, s8 nodeId);
 
 public:
 	static bool StartServiceNode(s32 slave, const char *name, s8 type, s32 id, const char *cmd);

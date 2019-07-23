@@ -28,4 +28,7 @@ public:
 	virtual bool ActiveJudge(s32 eventid, const void *context, s32 size, void *userdata) = 0;
 	//virtual void AddTriggerListener(s32 eventid, EVENT_CALL_BACK callback, const char *debug = nullptr) = 0;
 };
+
+#define REG_EVENT_LISTENER(eventEngine, eventId, callBack) eventEngine->AddEventListener(eventId, callBack, __FILE__)
+
 #endif

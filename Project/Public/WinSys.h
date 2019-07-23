@@ -3,6 +3,7 @@
 
 #ifdef WIN32
 
+#define NOMINMAX
 #ifndef _WINSOCK2API_
 #include <WinSock2.h>
 #endif
@@ -37,6 +38,9 @@ typedef int64_t s64;
 
 #define CHECK_FMT(a, b)	__attribute__((format(printf, a, b)))
 #define GLOBAL_VAR_INT_MAX 
+using std::max;
+using std::min;
+
 
 #define ECHO(format, ...)\
 {\

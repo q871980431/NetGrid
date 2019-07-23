@@ -7,14 +7,15 @@ namespace core
     const static s32 NODE_NAME_LEN = 32;
 	const static s32 EVENT_LOCK_NUM_MAX = 128;
 	const static s32 NODE_CMD_LEN = 256;
-	const static s16 NODE_TYPE_MAX = 4096;
+	const static s16 NODE_TYPE_MAX = 16;
+	const static s8	 NODE_ID_MAX = 16;
 	const static s32 INVALID = -1;
 
     enum NODE_MSG_ID
     {
     };
 
-    enum NODE_TYPE
+    enum NODE_TYPE	: s8
     {
         NODE_TYPE_SLAVE = -1,
         NODE_TYPE_MASTER = 0,
@@ -22,6 +23,7 @@ namespace core
 		NODE_TYPE_LOGIC = 2,
 		NODE_TYPE_RELATION = 3,
 		NODE_TYPE_DB = 4,
+		//NODE_TYPE_MAX = 16 define
     };
 
 	enum CLUSTER_STATEUS
@@ -48,16 +50,17 @@ namespace core
 
 	enum FRAMEWORK_EVENT_ID
 	{
-		FRAMEWORK_EVENT_ID_MIN = 0,
-		FRAMEWORK_EVENT_CREATE_EVENTLOCK = 1,
+		FE_ID_MIN = 0,
+		FE_CREATE_EVENTLOCK = 1,
+		FE_CLUSTERNODE_STATE_CHANGE = 2,
 
-		FRAMEWORK_EVENT_ID_MAX,
+		FE_ID_MAX,
 	};
 
     struct NODE_MSG_HANDSHAKE
     {
-        s32 nodeId;
-        s32 nodeType;
+        s8  nodeId;
+        s8  nodeType;
         s16 port;
     };
 
@@ -66,11 +69,6 @@ namespace core
         s64 tick;
     };
 
-    struct NODE_MSG_NODE_DISCOVER
-    {
-        s32 ipAddr;
-        s16 port;
-    };
 
 	struct NODE_STATUS_UPDATE 
 	{
@@ -85,12 +83,17 @@ namespace core
 		char cmd[NODE_CMD_LEN];
 	};
 
-	namespace event {
-		struct CreateEventLock {
-			s32 eventId;
-		};
-	}
+	struct CreateEventLock 
+	{
+		s32 eventId;
+	};
 
+	struct ClusterNodeStatesChangeEvt 
+	{
+		s8 type;
+		s8 oldState;
+		s8 nowState;
+	};
 }
 
 #endif

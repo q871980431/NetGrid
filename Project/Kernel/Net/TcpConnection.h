@@ -22,17 +22,18 @@ public:
 
 	virtual bool  IsPassiveConnection(void) { return _passive; };
 	virtual void  Send(const char *buff, s32 len);      
-	virtual void  Close();                              //关闭连接
+	virtual void  Close(const char *reason);                              //关闭连接
 	virtual const char * GetRemoteIP();
 	virtual s32   GetRemoteIpAddr();
-	virtual void SettingBuffSize(s32 recvSize, s32 sendSize);
+	virtual bool  SettingBuffSize(s32 recvSize, s32 sendSize);
 	virtual s32   GetSessionId() { return _sessionId; };
+	virtual const char * GetCloseReason();
 
 public:
 	void Init();
 	inline NetSocket GetNetSocket() { return _netSocket; }
 	void OnEstablish();
-	void OnTerminate( bool recvFin);
+	void OnTerminate(bool recvFin, s32 errorCode);
 	void OnRecv(IKernel *kernel);
 
 public:
@@ -58,6 +59,7 @@ private:
 
 	ITcpSession *_tcpSession;
 	NetService	*_service;
-	sockaddr_in	_romoteAddr;
+	sockaddr_in	 _romoteAddr;
+	std::string	 _closeReason;
 };
 #endif

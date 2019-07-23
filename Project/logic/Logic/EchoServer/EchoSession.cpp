@@ -84,7 +84,7 @@ void EchoClientSession::SendContent()
 {
 	if (_sendCount >= 500000)
 	{
-		_connection->Close();
+		_connection->Close("sendcount > 500000");
 		return;
 	}
 	char buff[256] = { 0 };

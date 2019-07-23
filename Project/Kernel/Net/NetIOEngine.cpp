@@ -10,7 +10,7 @@
 #include "IOEngine_IOCP.h"
 
 
-IIODriver::IIODriver(TcpConnection *connection): _connetion(connection)
+IIODriver::IIODriver(TcpConnection *connection): _connetion(connection), _errorCode(0)
 {
 	_connetion->SetIODriver(this);
 	_sendBuff = NEW CircluarBuffer(_connetion->GetSendBuffSize());
@@ -26,17 +26,6 @@ IIODriver::~IIODriver()
 	DEL _sendBuff;
 	DEL _recvBuff;
 }
-
-void IIODriver::SettingBuffSize(s32 recvSize, s32 sendSize)
-{
-	CircluarBuffer *tempSendBuff = NEW CircluarBuffer(recvSize);
-	CircluarBuffer *tempRecvBuff = NEW CircluarBuffer(sendSize);
-	std::swap(_sendBuff, tempSendBuff);
-	std::swap(_recvBuff, tempRecvBuff);
-	DEL tempSendBuff;
-	DEL tempRecvBuff;
-}
-
 
 NetIOEngine::NetIOEngine(s32 engineNum)
 {

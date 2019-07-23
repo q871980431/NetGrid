@@ -10,11 +10,26 @@
 #include "Tools_time.h"
 #include <signal.h>
 
+bool EpollDriver::SettingBuffSize(s32 recvSize, s32 sendSize)
+{
+	CircluarBuffer *tempSendBuff = NEW CircluarBuffer(recvSize);
+	CircluarBuffer *tempRecvBuff = NEW CircluarBuffer(sendSize);
+	std::swap(_sendBuff, tempSendBuff);
+	std::swap(_recvBuff, tempRecvBuff);
+	DEL tempSendBuff;
+	DEL tempRecvBuff;
+
+	return true;
+}
+
 bool EpollDriver::OnEvent(IKernel *kernel, u32 events)
 {
 	ASSERT(!_close, "error");
 	if (events & (EPOLLERR))
+	{
+		_errorCode = tools::GetSocketError();
 		return false;
+	}
 	if (events & (EPOLLHUP | EPOLLRDHUP))
 	{
 		_recvFin = true;

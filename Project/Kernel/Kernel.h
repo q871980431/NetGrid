@@ -1,6 +1,7 @@
 #ifndef __Kernel_h__
 #define __Kernel_h__
 #include "Singleton.h"
+#define KERNEL_EXPORT
 #include "IKernel.h"
 #include "IApplication.h"
 #include <string>

@@ -19,6 +19,7 @@ class EpollDriver : public IIODriver
 public:
 	EpollDriver(TcpConnection *connection) : IIODriver(connection) {};
 
+	virtual bool SettingBuffSize(s32 recvSize, s32 sendSize);
 	bool OnEvent(IKernel *kernel, u32 events);
 	bool OnSend();
 	bool OnRead();

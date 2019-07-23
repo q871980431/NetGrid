@@ -27,6 +27,7 @@ private:
 	static s32 TestCommand1(IKernel *kernel, s32 id, const char *content);
 	static s32 TestCommand2(IKernel *kernel);
 	static void ExecCommand(IKernel *kernel, const char *command, const char *args);
+
 protected:
 private:
     static TextCommand     * s_self;

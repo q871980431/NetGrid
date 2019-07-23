@@ -19,6 +19,27 @@ IocpDriver::IocpDriver(TcpConnection *connection, HANDLE complatPort):IIODriver(
 	_recvPerData.opType = RECV;
 	_sending = false;
 	_recving = false;
+	_nextRecvBuff = nullptr;
+}
+
+bool IocpDriver::SettingBuffSize(s32 recvSize, s32 sendSize)
+{
+	if (_nextRecvBuff != nullptr)
+		return false;
+
+	{
+		std::lock_guard<std::mutex> lock(_sendMutex);
+		if (_sending == true)
+			return false;
+	}
+
+	CircluarBuffer *tempSendBuff = NEW CircluarBuffer(recvSize);
+	std::swap(_sendBuff, tempSendBuff);
+	DEL tempSendBuff;
+
+	_nextRecvBuff = NEW CircluarBuffer(sendSize);
+
+	return true;
 }
 
 void IocpDriver::OnError(IKernel *kernel, OVERLAPPED *perIoOperation)
@@ -54,7 +75,6 @@ bool IocpDriver::OnSend(s32 transferSize)
 		EnterClose();
 		return false;
 	}
-
 	_sendBuff->Read(transferSize);
 	if (_sendBuff->DataSize() == 0)
 	{
@@ -78,6 +98,7 @@ bool IocpDriver::OnRead(IKernel *kernel, s32 transferSize)
 		EnterClose();
 		return false;
 	}
+	THREAD_LOG("NetWork", "receive data size:%d", transferSize);
 	_recvBuff->WriteBuff(transferSize);
 	PostRecv(kernel);
 	return true;
@@ -91,6 +112,7 @@ bool IocpDriver::PostSend()
 			return true;
 		_sending = true;
 	}
+
 	s32 len = 0;
 	_sendPerData.dataBuff.buf = _sendBuff->GetCanReadBuff(len);
 	if (len == 0)
@@ -114,6 +136,17 @@ bool IocpDriver::PostSend()
 
 bool IocpDriver::PostRecv(IKernel *kernel)
 {
+	if (_nextRecvBuff)
+	{
+		s32 canWritLen = 0;
+		char *canWritBuff = _nextRecvBuff->GetCanWriteBuff(canWritLen);
+		s32 readLen = _recvBuff->Read(canWritBuff, canWritLen);
+		_nextRecvBuff->WriteBuff(readLen);
+		DEL _recvBuff;
+		_recvBuff = _nextRecvBuff;
+		_nextRecvBuff = nullptr;
+	}
+
 	ASSERT(_recving == false, "error");
 	s32 len = 0;
 	_recvPerData.dataBuff.buf = _recvBuff->GetCanWriteBuff(len);
@@ -158,6 +191,7 @@ void IocpDriver::EnterClose()
 	if (!_close)
 	{
 		_close = true;
+		_errorCode = tools::GetSocketError();
 		IOEngineIocp *engine = dynamic_cast<IOEngineIocp*>(_connetion->GetIOEngine());
 		ASSERT(engine != nullptr, "error");
 		if (engine)

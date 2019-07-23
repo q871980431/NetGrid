@@ -48,12 +48,24 @@ s32 TcpConnection::GetRemoteIpAddr()
 	return 0;
 }
 
-void TcpConnection::SettingBuffSize(s32 recvSize, s32 sendSize)
+const char * TcpConnection::GetCloseReason()
 {
-	if (_ioDriver)
-		_ioDriver->SettingBuffSize(recvSize, sendSize);
+	return _closeReason.c_str();
+}
+
+bool TcpConnection::SettingBuffSize(s32 recvSize, s32 sendSize)
+{
+	ASSERT(recvSize != 0 && sendSize != 0, "size error");
+	if (recvSize == 0 || sendSize == 0)
+		return false;
+
+	if (_ioDriver) {
+		if (!_ioDriver->SettingBuffSize(recvSize, sendSize))
+			return false;
+	}
 	_sendBuffSize = recvSize;
 	_recvBuffSize = recvSize;
+	return true;
 }
 
 void TcpConnection::Init()
@@ -63,11 +75,14 @@ void TcpConnection::Init()
 }
 
 
-void TcpConnection::Close()
+void TcpConnection::Close(const char *reason)
 {
 	ASSERT(_tcpSession, "error");
 	if (_tcpSession)
 	{
+		if (reason != nullptr)
+			_closeReason = reason;
+
 		_tcpSession->SetConnection(nullptr);
 		_tcpSession->OnTerminate();
 		_tcpSession->OnRelease();
@@ -86,11 +101,15 @@ void TcpConnection::OnEstablish()
 	}
 }
 
-void TcpConnection::OnTerminate(bool recvFin)
+void TcpConnection::OnTerminate(bool recvFin, s32 errorCode)
 {
 	//tcpsession == null 标志着已经主动close了
 	if (_tcpSession)
 	{
+		char buff[256];
+		SafeSprintf(buff, sizeof(buff), "remote close, fin:%d, error code:%d", recvFin, errorCode);
+		_closeReason = buff;
+
 		_tcpSession->SetConnection(nullptr);
 		_tcpSession->OnTerminate();
 		_tcpSession->OnRelease();
@@ -116,8 +135,8 @@ void TcpConnection::OnRecv(IKernel *kernel)
 			break;
 		if (packetLen == ITcpSession::INVALID_PACKET_LEN)
 		{
-			ERROR_LOG("Parse Packet error, socket:%d", _netSocket);
-			Close();
+			ERROR_LOG("parse packet error, socket:%d", _netSocket);
+			Close("parse packet error");
 			return;
 		}
 		if (packetLen > rcvBuff->DataSize())

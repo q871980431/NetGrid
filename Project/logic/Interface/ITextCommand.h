@@ -130,6 +130,7 @@ public:
 private:
 	call_fun _f;
 };
+
 class ITextCommand : public IModule
 {
 public:

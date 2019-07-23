@@ -239,7 +239,9 @@ void NetListenerMgr::Run()
 			{
 				FD_SET(netSockets.sockets[i].socket, &writFd);
 			}
+#ifdef LINUX
 			maxFd = max(maxFd, netSockets.sockets[i].socket);
+#endif
 		}
 #ifdef LINUX
 		maxFd++;
@@ -299,13 +301,12 @@ void NetListenerMgr::Run()
 
 			if (FD_ISSET(netSockets.sockets[i].socket, &readFd))
 			{
-				THREAD_LOG("Listen", "Listen socket:%d, type:%d", netSockets.sockets[i].socket, netSockets.sockets[i].type);
+				//THREAD_LOG("Listen", "Listen socket:%d, type:%d", netSockets.sockets[i].socket, netSockets.sockets[i].type);
 				if (netSockets.sockets[i].type == LISTENER)
 				{
 					NetSocket clientSocket;
 					while (true)
 					{
-						break;
 						if (!tools::AcceptSocket(netSockets.sockets[i].socket, stClient, clientSocket))
 						{
 #ifdef WIN32

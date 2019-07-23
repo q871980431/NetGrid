@@ -3,7 +3,7 @@
 #include "Game_tools.h"
 #include "MysqlBuilder.h"
 
-UnitTestRegister<MysqlTest> mysqlTest;
+//UnitTestRegister<MysqlTest> mysqlTest;
 void MysqlTest::StartTest(core::IKernel *kernel)
 {
 	core::IKernel *s_kernel = kernel;

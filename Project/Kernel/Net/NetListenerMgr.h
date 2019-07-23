@@ -17,7 +17,7 @@ class NetListenerMgr
 {
 	const static s32 LISTEN_SOCKET_SIZE = 64;
 	const static s32 SELECT_TIME_OUT = 10;
-	const static s32 CONNECT_TIME_OUT = 300;
+	const static s32 CONNECT_TIME_OUT = 10;
 	const static s32 CONNECT_TIME_OUT_SIZE = CONNECT_TIME_OUT * (1000 / (2*10));
 	struct ListenerNode 
 	{

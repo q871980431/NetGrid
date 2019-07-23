@@ -39,6 +39,7 @@ ENDIF(WIN32)
 
 IF(LINUX)
 	SET(THIRD_LIB_DEBUG	
+					optimized "${THIRD_LIBRARIES_DEBUG_DIR}/libprotobuf.a"
 	)
 	SET(THIRD_LIB_RELEASE	
 				optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libprotobuf.a"

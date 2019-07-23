@@ -12,11 +12,13 @@
 #include "ExceptionMgr.h"
 
 template<> Kernel * Singleton<Kernel>::_instance = nullptr;
+core::IKernel * G_KERNEL::g_kernel = nullptr;
 
 bool Kernel::Ready()
 {
 	_asyncQueueId = 1;
 	_mainQueue = nullptr;
+	G_KERNEL::g_kernel = this;
     return _logger.Ready()&&
            Configmgr::GetInstance()->Ready()&&
            NetService::GetInstance()->Ready()&&
@@ -62,12 +64,15 @@ void Kernel::Loop()
 	ExceptionMgr::Init();
     while (true)
     {
-		s32 execTime = 10 / _asyncQueues.size();
-		if (execTime == 0)
-			execTime = 1;
+		if (!_asyncQueues.empty())
+		{
+			s32 execTime = 10 / _asyncQueues.size();
+			if (execTime == 0)
+				execTime = 1;
 
-		for (auto &asyncQueue : _asyncQueues)
-			asyncQueue.second->Loop(execTime);
+			for (auto &asyncQueue : _asyncQueues)
+				asyncQueue.second->Loop(execTime);
+		}
 
 		NetService::GetInstance()->Process(this,10);
 		TimerMgr::GetInstance()->Process(10);
@@ -218,5 +223,6 @@ const char * Kernel::GetConfigFile()
 
 const char * Kernel::GetEnvirPath()
 {
+
     return Configmgr::GetInstance()->GetEnvirPath();
 }

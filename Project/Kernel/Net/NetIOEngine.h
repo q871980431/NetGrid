@@ -44,16 +44,18 @@ class IIODriver
 public:
 	IIODriver(TcpConnection *connection);
 	virtual ~IIODriver();
+	virtual bool SettingBuffSize(s32 recvSize, s32 sendSize) = 0;
 
 	NetSocket GetNetSocket() { return _connetion->GetNetSocket(); };
 	void OnEstablish() { _connetion->OnEstablish(); };
-	void OnClose() { _close = true; _connetion->OnTerminate(_recvFin); };
-	void SettingBuffSize(s32 recvSize, s32 sendSize);
+	void OnClose() { _close = true; _connetion->OnTerminate(_recvFin, _errorCode); };
 	inline bool HasClose() { return _close; }
 	inline void RecvFin() { _recvFin = true; }
 	inline CircluarBuffer * GetRecvBuff() { return _recvBuff; };
 	inline CircluarBuffer * GetSendBuff() { return _sendBuff; };
 	inline void ActiveClose() { _activeClose = true; };
+	inline s32  GetErrorCode() { return _errorCode; };
+
 protected:
 	TcpConnection *_connetion;
 
@@ -62,6 +64,7 @@ protected:
 	bool _close;
 	bool _recvFin;
 	bool _activeClose;
+	s32	 _errorCode;
 };
 
 class NetIOEngine

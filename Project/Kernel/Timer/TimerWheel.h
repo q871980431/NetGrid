@@ -84,7 +84,7 @@ public:
 	void AddTimer(TimerBase *timer, s64 delay);
 	void AddTimer(TimerBase *timer);
 	void Process( core::IKernel *kernel, s32 tick);
-    inline u32 GetJiffies(){ return _jiffies; };
+    inline JiffiesT GetJiffies(){ return _jiffies; };
 
 private:
 	s32 Cascade(TVEC_NODE *tvec, s32 index);

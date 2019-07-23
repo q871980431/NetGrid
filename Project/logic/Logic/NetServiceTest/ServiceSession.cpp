@@ -38,7 +38,7 @@ void EchoSession::OnRecv(const char *buff, s32 len)
 	if (head->messageId == 1102)	//服务器主动断开
 	{
 		TRACE_LOG("Recv Server close msg");
-		_connection->Close();
+		_connection->Close("recv close msg");
 	}
 	else
 	{
@@ -91,7 +91,7 @@ void EchoClientSession::SendContent()
 	if (_sendCount >= 5)
 	{
 		if (_clientClose)
-			_connection->Close();
+			_connection->Close("client close");
 		else
 		{
 			SendMsg(1102, nullptr, 0);

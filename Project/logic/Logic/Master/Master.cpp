@@ -49,7 +49,7 @@ bool Master::Destroy(IKernel *kernel)
     return true;
 }
 
-void Master::OnOpen(s32 type, s32 nodeId, const char *ip, s16 port)
+void Master::OnOpen(s8 type, s8 nodeId, const char *ip, s32 port)
 {
     tools::KEYINT64 key;
 	if (type == core::NODE_TYPE_SLAVE)
@@ -63,22 +63,22 @@ void Master::OnOpen(s32 type, s32 nodeId, const char *ip, s16 port)
 		return;
 	}
 
-    core::NODE_MSG_NODE_DISCOVER discover;
+    core::NODE_MSG_CLUSTER_ADHOC_NETWORK discover;
     discover.ipAddr = tools::GetIpV4Addr(ip);
     discover.port = port;
-
+	
     for (auto iter = s_nodeMap.begin(); iter != s_nodeMap.end(); iter++)
     {
         key.val = *iter;
         if (key.hVal > type)
         {
-            s_harbor->SendMessage(key.hVal, key.lVal, core::NODE_MSG_CONNECT_HARBOR, &discover, sizeof(discover));
+            s_harbor->SendMessage(key.hVal, key.lVal, core::NODE_MSG_ID_CLUSTER_ADHOC, &discover, sizeof(discover));
         }
         else
         {
             if (key.hVal == type && key.lVal > nodeId)
             {
-                s_harbor->SendMessage(key.hVal, key.lVal, core::NODE_MSG_CONNECT_HARBOR, &discover, sizeof(discover));
+                s_harbor->SendMessage(key.hVal, key.lVal, core::NODE_MSG_ID_CLUSTER_ADHOC, &discover, sizeof(discover));
             }
         }
     }
@@ -90,7 +90,7 @@ void Master::OnOpen(s32 type, s32 nodeId, const char *ip, s16 port)
 
 }
 
-void Master::OnClose(s32 type, s32 nodeId)
+void Master::OnClose(s8 type, s8 nodeId)
 {
 
 }

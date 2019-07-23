@@ -29,6 +29,7 @@ class IocpDriver : public IIODriver
 	};
 public:
 	IocpDriver(TcpConnection *connection, HANDLE complatPort);
+	virtual bool SettingBuffSize(s32 recvSize, s32 sendSize);
 
 	void OnError(IKernel *kernel, OVERLAPPED *perIoOperation);
 	void OnEvent(IKernel *kernel, OVERLAPPED *perIoOperation, s32 transferSize);
@@ -52,6 +53,7 @@ private:
 	std::mutex			_sendMutex;
 	bool				_sending;
 	bool				_recving;
+	CircluarBuffer		*_nextRecvBuff;
 };
 
 class IOEngineIocp : public IIOEngine

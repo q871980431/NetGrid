@@ -48,6 +48,15 @@ SET(OBJECT_LIB
 	optimized "${PROJECT_BINARY_DIR}/windows/Release/ObjectMgr.lib"
 )
 
+
+SET(KERNEL_LIBD
+	debug "${PROJECT_BINARY_DIR}/windows/debug/NetGrid"
+)
+
+SET(KERNEL_LIB
+	optimized "${PROJECT_BINARY_DIR}/windows/Release/NetGrid"
+)
+
 SET(NODEPROTO_LIBD
 	debug "${PROJECT_BINARY_DIR}/windows/debug/NodeProto.lib"
 	debug "${THIRD_LIBRARIES_DEBUG_DIR}/libprotobufd.lib"
@@ -75,13 +84,18 @@ SET(OBJECT_LIB
 	optimized "${PROJECT_BINARY_DIR}/linux/libObjectMgr.so"
 )
 
+SET(KERNEL_LIBD
+)
+SET(KERNEL_LIB
+)
+
 SET(NODEPROTO_LIBD
 	debug "${PROJECT_BINARY_DIR}/linux/libNodeProto.so"
-	debug "${THIRD_LIBRARIES_DEBUG_DIR}/libprotobuf.a"
+	#debug "${THIRD_LIBRARIES_DEBUG_DIR}/libprotobuf.a"
 )
 SET(NODEPROTO_LIB
 	optimized "${PROJECT_BINARY_DIR}/linux/libNodeProto.so"
-	optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libprotobuf.a"
+	#optimized "${THIRD_LIBRARIES_RELEASE_DIR}/libprotobuf.a"
 )
 
 

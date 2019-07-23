@@ -189,7 +189,7 @@ namespace tools{
 #ifdef LINUX
         SafeSprintf(filePath, sizeof(filePath), "%s/lib%s.so", path, dllName);
         void *handle = dlopen( filePath, global ? RTLD_LAZY | RTLD_GLOBAL :  RTLD_LAZY);
-        ASSERT(handle, "open %s error %d", filePath, errno);
+        ASSERT(handle, "open %s error %s", filePath, dlerror());
         fun = (FUN)dlsym(handle, funName);
         ASSERT(fun, "get function error");
 #endif
@@ -241,6 +241,19 @@ namespace tools{
 		return temp;
 	}
 
+	//Thread safe by C++11
+	template<typename T>
+	class Singleton
+	{
+	public:
+		static T & Instance()
+		{
+			static T singleton;
+			return singleton;
+		}
+	private:
+		Singleton() {};
+	};
 }
 
 #endif 
