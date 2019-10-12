@@ -9,189 +9,316 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-/// <summary>Holder for reflection information generated from test.proto</summary>
-public static partial class TestReflection {
+namespace Proto {
 
-  #region Descriptor
-  /// <summary>File descriptor for test.proto</summary>
-  public static pbr::FileDescriptor Descriptor {
-    get { return descriptor; }
-  }
-  private static pbr::FileDescriptor descriptor;
+  /// <summary>Holder for reflection information generated from test.proto</summary>
+  public static partial class TestReflection {
 
-  static TestReflection() {
-    byte[] descriptorData = global::System.Convert.FromBase64String(
-        string.Concat(
-          "Cgp0ZXN0LnByb3RvIjAKDVNlYXJjaFJlcXVlc3QSDQoFcXVlcnkYASABKAkS",
-          "EAoIcGFnZV9udW0YAiABKAViBnByb3RvMw=="));
-    descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-        new pbr::FileDescriptor[] { },
-        new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-          new pbr::GeneratedClrTypeInfo(typeof(global::SearchRequest), global::SearchRequest.Parser, new[]{ "Query", "PageNum" }, null, null, null)
-        }));
-  }
-  #endregion
-
-}
-#region Messages
-public sealed partial class SearchRequest : pb::IMessage<SearchRequest> {
-  private static readonly pb::MessageParser<SearchRequest> _parser = new pb::MessageParser<SearchRequest>(() => new SearchRequest());
-  private pb::UnknownFieldSet _unknownFields;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<SearchRequest> Parser { get { return _parser; } }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pbr::MessageDescriptor Descriptor {
-    get { return global::TestReflection.Descriptor.MessageTypes[0]; }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  pbr::MessageDescriptor pb::IMessage.Descriptor {
-    get { return Descriptor; }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public SearchRequest() {
-    OnConstruction();
-  }
-
-  partial void OnConstruction();
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public SearchRequest(SearchRequest other) : this() {
-    query_ = other.query_;
-    pageNum_ = other.pageNum_;
-    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public SearchRequest Clone() {
-    return new SearchRequest(this);
-  }
-
-  /// <summary>Field number for the "query" field.</summary>
-  public const int QueryFieldNumber = 1;
-  private string query_ = "";
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public string Query {
-    get { return query_; }
-    set {
-      query_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    #region Descriptor
+    /// <summary>File descriptor for test.proto</summary>
+    public static pbr::FileDescriptor Descriptor {
+      get { return descriptor; }
     }
-  }
+    private static pbr::FileDescriptor descriptor;
 
-  /// <summary>Field number for the "page_num" field.</summary>
-  public const int PageNumFieldNumber = 2;
-  private int pageNum_;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int PageNum {
-    get { return pageNum_; }
-    set {
-      pageNum_ = value;
+    static TestReflection() {
+      byte[] descriptorData = global::System.Convert.FromBase64String(
+          string.Concat(
+            "Cgp0ZXN0LnByb3RvEgVwcm90byIwCg1TZWFyY2hSZXF1ZXN0Eg0KBXF1ZXJ5",
+            "GAEgASgJEhAKCHBhZ2VfbnVtGAIgASgFIhoKC1Rlc3RNZXNzYWdlEgsKA2lk",
+            "cxgBIAMoBWIGcHJvdG8z"));
+      descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
+          new pbr::FileDescriptor[] { },
+          new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::Proto.SearchRequest), global::Proto.SearchRequest.Parser, new[]{ "Query", "PageNum" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Proto.TestMessage), global::Proto.TestMessage.Parser, new[]{ "Ids" }, null, null, null)
+          }));
     }
-  }
+    #endregion
 
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override bool Equals(object other) {
-    return Equals(other as SearchRequest);
   }
+  #region Messages
+  public sealed partial class SearchRequest : pb::IMessage<SearchRequest> {
+    private static readonly pb::MessageParser<SearchRequest> _parser = new pb::MessageParser<SearchRequest>(() => new SearchRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<SearchRequest> Parser { get { return _parser; } }
 
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(SearchRequest other) {
-    if (ReferenceEquals(other, null)) {
-      return false;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Proto.TestReflection.Descriptor.MessageTypes[0]; }
     }
-    if (ReferenceEquals(other, this)) {
-      return true;
-    }
-    if (Query != other.Query) return false;
-    if (PageNum != other.PageNum) return false;
-    return Equals(_unknownFields, other._unknownFields);
-  }
 
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override int GetHashCode() {
-    int hash = 1;
-    if (Query.Length != 0) hash ^= Query.GetHashCode();
-    if (PageNum != 0) hash ^= PageNum.GetHashCode();
-    if (_unknownFields != null) {
-      hash ^= _unknownFields.GetHashCode();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
     }
-    return hash;
-  }
 
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override string ToString() {
-    return pb::JsonFormatter.ToDiagnosticString(this);
-  }
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public SearchRequest() {
+      OnConstruction();
+    }
 
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void WriteTo(pb::CodedOutputStream output) {
-    if (Query.Length != 0) {
-      output.WriteRawTag(10);
-      output.WriteString(Query);
-    }
-    if (PageNum != 0) {
-      output.WriteRawTag(16);
-      output.WriteInt32(PageNum);
-    }
-    if (_unknownFields != null) {
-      _unknownFields.WriteTo(output);
-    }
-  }
+    partial void OnConstruction();
 
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int CalculateSize() {
-    int size = 0;
-    if (Query.Length != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeStringSize(Query);
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public SearchRequest(SearchRequest other) : this() {
+      query_ = other.query_;
+      pageNum_ = other.pageNum_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
-    if (PageNum != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeInt32Size(PageNum);
-    }
-    if (_unknownFields != null) {
-      size += _unknownFields.CalculateSize();
-    }
-    return size;
-  }
 
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(SearchRequest other) {
-    if (other == null) {
-      return;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public SearchRequest Clone() {
+      return new SearchRequest(this);
     }
-    if (other.Query.Length != 0) {
-      Query = other.Query;
-    }
-    if (other.PageNum != 0) {
-      PageNum = other.PageNum;
-    }
-    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-  }
 
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(pb::CodedInputStream input) {
-    uint tag;
-    while ((tag = input.ReadTag()) != 0) {
-      switch(tag) {
-        default:
-          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-          break;
-        case 10: {
-          Query = input.ReadString();
-          break;
-        }
-        case 16: {
-          PageNum = input.ReadInt32();
-          break;
+    /// <summary>Field number for the "query" field.</summary>
+    public const int QueryFieldNumber = 1;
+    private string query_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Query {
+      get { return query_; }
+      set {
+        query_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "page_num" field.</summary>
+    public const int PageNumFieldNumber = 2;
+    private int pageNum_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int PageNum {
+      get { return pageNum_; }
+      set {
+        pageNum_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as SearchRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(SearchRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Query != other.Query) return false;
+      if (PageNum != other.PageNum) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Query.Length != 0) hash ^= Query.GetHashCode();
+      if (PageNum != 0) hash ^= PageNum.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Query.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Query);
+      }
+      if (PageNum != 0) {
+        output.WriteRawTag(16);
+        output.WriteInt32(PageNum);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Query.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Query);
+      }
+      if (PageNum != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(PageNum);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(SearchRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Query.Length != 0) {
+        Query = other.Query;
+      }
+      if (other.PageNum != 0) {
+        PageNum = other.PageNum;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Query = input.ReadString();
+            break;
+          }
+          case 16: {
+            PageNum = input.ReadInt32();
+            break;
+          }
         }
       }
     }
+
   }
 
+  public sealed partial class TestMessage : pb::IMessage<TestMessage> {
+    private static readonly pb::MessageParser<TestMessage> _parser = new pb::MessageParser<TestMessage>(() => new TestMessage());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<TestMessage> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Proto.TestReflection.Descriptor.MessageTypes[1]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TestMessage() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TestMessage(TestMessage other) : this() {
+      ids_ = other.ids_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TestMessage Clone() {
+      return new TestMessage(this);
+    }
+
+    /// <summary>Field number for the "ids" field.</summary>
+    public const int IdsFieldNumber = 1;
+    private static readonly pb::FieldCodec<int> _repeated_ids_codec
+        = pb::FieldCodec.ForInt32(10);
+    private readonly pbc::RepeatedField<int> ids_ = new pbc::RepeatedField<int>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<int> Ids {
+      get { return ids_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as TestMessage);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(TestMessage other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if(!ids_.Equals(other.ids_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      hash ^= ids_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      ids_.WriteTo(output, _repeated_ids_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      size += ids_.CalculateSize(_repeated_ids_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(TestMessage other) {
+      if (other == null) {
+        return;
+      }
+      ids_.Add(other.ids_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10:
+          case 8: {
+            ids_.AddEntriesFrom(input, _repeated_ids_codec);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  #endregion
+
 }
-
-#endregion
-
 
 #endregion Designer generated code

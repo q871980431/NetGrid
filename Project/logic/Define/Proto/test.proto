@@ -1,7 +1,14 @@
 syntax = "proto3";
 
+package proto;
+
 message SearchRequest
 {
 	string query = 1;
 	int32 page_num = 2;
+}
+
+message	TestMessage
+{	
+	repeated int32 ids = 1;
 }

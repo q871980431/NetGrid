@@ -1,0 +1,14 @@
+1 添加用户组
+	groupadd xuping
+
+2 添加用户
+	useradd -g xuping -d /home/xuping -s /bin/bash -m xuping
+
+3 设置密码
+	passwd xuping
+
+4 删除用户
+	userdel xuping
+
+5 查看用户信息
+	id xuping

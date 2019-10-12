@@ -14,6 +14,7 @@
 #include "TestRtree.h"
 #include "TestSort.h"
 #include "TestScriptEngine.h"
+#include "test.pb.h"
 
 Test * Test::s_self = nullptr;
 IKernel * Test::s_kernel = nullptr;
@@ -37,6 +38,7 @@ void MyTimer::OnTerminate(IKernel *kernel, s64 tick)
 }
 bool Test::Initialize(IKernel *kernel)
 {
+	TestPB();
     s_self = this;
     s_kernel = kernel;
     char buff[] = "xuping";
@@ -249,4 +251,19 @@ void Test::TestLamda(s32 &a)
 	f();
 	s32 b = a + 1;
 	return;
+}
+
+void Test::TestPB()
+{
+	proto::TestMessage testMessage;
+	for (size_t i = 0; i < 10; i++)
+	{
+		testMessage.add_ids(i);
+	}
+	size_t num = testMessage.ids_size();
+	for (size_t i = 0; i < num; i++)
+	{
+		int32_t val = testMessage.ids(i);
+		ECHO("Val[%zu] = %d", i, val);
+	}
 }

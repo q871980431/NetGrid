@@ -27,7 +27,7 @@ bool Cluster::Initialize(IKernel *kernel)
     s_self = this;
     s_kernel = kernel;
 	
-	SearchRequest searchRequest;
+	proto::SearchRequest searchRequest;
 	searchRequest.set_query("actor");
 	searchRequest.set_page_num(1);
 	std::string content;
@@ -36,7 +36,7 @@ bool Cluster::Initialize(IKernel *kernel)
 		ASSERT(false, "error");
 		return false;
 	}
-	SearchRequest temp;
+	proto::SearchRequest temp;
 	if (!temp.ParseFromArray(content.c_str(), content.size()))
 	{
 		ASSERT(false, "error");

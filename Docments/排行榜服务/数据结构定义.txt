@@ -1,0 +1,115 @@
+1,排行榜数据
+HashTable
+
+Key: table|rinf|version
+Filed 排行榜	
+名次		玩家ID
+1			 hostId
+
+2,玩家数据
+HashTable
+key: table|version|iHostId
+Fileds:
+@score@		进行排序的分值
+@rank@		排名值		在排行榜更新后设置
+@info@		业务自定义信息 序列化后的字符串
+
+
+
+集合 key crc16后  根据 小 中 大榜命中具体的集合?
+
+3,排行榜状态信息
+HashTable
+Key:	tableName
+Fileds:
+|now/old/last|
+version
+size		//接近精确
+minscore	//在合适进行刷新生成, 作为性能优化点
+state		//lock
+areaNum		//分片数
+flushTime	//刷新时间戳
+
+
+|now|version
+|old|version
+
+|now|size
+|old|size
+
+4,参与排序玩家集合(分片集合)
+Set
+Key:table|version|$areaId 
+Values:
+iHostId
+
+5,全局表锁
+String
+Key: tableName|lock
+
+
+
+将version的值的区间压缩, 节约key长度
+
+排行榜数据
+table|rinf|version|
+
+玩家数据
+table|hinf|
+
+玩家集合
+table|area|
+
+
+排行榜状态信息
+table|now/old/last|
+
+
+
+关键数据点的 全局锁的抢占问题?
+
+table 分割符 版本符  
+strVersion = version|
+
+
+
+设计实现:
+write
+
+
+
+配置信息:
+RankListServiceConfig
+name 
+字段
+分片
+刷新类型
+hour
+min
+TTL
+
+1->10
+10->20
+
+快照仅仅是代表一次
+
+快照的数据 采用固定的？
+
+版本值不能取0	 仔细确定下为何当初的想法 版本为一个固定值? 避免在某种清空下 snap版本和正常的版本数据冲突 采用不同的区间段可以避免
+
+
+快照 引入带来的影响
+1, 数据的移除		-支持
+2, 数据的查询支持	-支持
+
+
+生成了 排行数据信息
+更新排行榜数据信息
+
+
+采用固定数据块 + 变更数据集	= 最终数据集
+
+动态采样,
+
+
+

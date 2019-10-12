@@ -230,7 +230,7 @@ int ScriptEngine::Log(lua_State *state)
 bool ScriptEngine::ExecGlobalFunction(const char *func, s8 argc, const IDataCallBackFuncType callback)
 {
 	IKernel *kernel = s_kernel;
-    lua_getglobal(s_luaState, func);				//½«func º¯ÊýÑ¹ÈëÕ»ÖÐ
+    lua_getglobal(s_luaState, func);				//å°†func å‡½æ•°åŽ‹å…¥æ ˆä¸­
     if (!lua_isfunction(s_luaState, -1))
     {
         ASSERT(false, "error, don't find function: %s", func);
@@ -240,7 +240,7 @@ bool ScriptEngine::ExecGlobalFunction(const char *func, s8 argc, const IDataCall
 	TRACE_LOG("************Exe ExecGlobalFunction**************");
 	PrintLuaStack();
     if (argc > 0)
-        lua_insert(s_luaState, -(argc + 1));		//½«func ÒÆ¶¯µ½ ¾àÀëÕ»¶¥ argc+1µÄÎ»ÖÃ
+        lua_insert(s_luaState, -(argc + 1));		//å°†func ç§»åŠ¨åˆ° è·ç¦»æ ˆé¡¶ argc+1çš„ä½ç½®
 	TRACE_LOG("************Exe ExecGlobalFunction Insert**************");
 	PrintLuaStack();
     return ExecFunction(argc, callback);
@@ -250,15 +250,13 @@ void ScriptEngine::PrintLuaStack()
 {
 	IKernel *kernel = s_kernel;
 	lua_State* pLuaState = s_luaState;
-	s32 stackTop = lua_gettop(pLuaState);//»ñÈ¡Õ»¶¥µÄË÷ÒýÖµ
-	s32 nIdx = 0;
-	int nType; 
+	s32 stackTop = lua_gettop(pLuaState);//èŽ·å–æ ˆé¡¶çš„ç´¢å¼•å€¼
 	TRACE_LOG(" element count: %d", stackTop); 
-	TRACE_LOG("--Õ»¶¥(v)(%d)--", stackTop);
-	//ÏÔÊ¾Õ»ÖÐµÄÔªËØ	
-	for(nIdx = stackTop; nIdx > 0; --nIdx)
+	TRACE_LOG("--æ ˆé¡¶(v)(%d)--", stackTop);
+	//æ˜¾ç¤ºæ ˆä¸­çš„å…ƒç´ 	
+	for(s32 nIdx = stackTop; nIdx > 0; --nIdx)
 	{		
-		nType = lua_type(pLuaState, nIdx);
+		s32 nType = lua_type(pLuaState, nIdx);
 		switch (nType)
 		{
 		case LUA_TBOOLEAN:
@@ -279,7 +277,7 @@ void ScriptEngine::PrintLuaStack()
 			TRACE_LOG("(i:%d) %s(%s)", nIdx, lua_typename(pLuaState, nType), lua_tostring(pLuaState, nIdx));
 		}
 	} 
-	TRACE_LOG("--Õ»µ×--");
+	TRACE_LOG("--æ ˆåº•--");
 }
 
 bool ScriptEngine::ExecFunction(s8 argc, const IDataCallBackFuncType callback)

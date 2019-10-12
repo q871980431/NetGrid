@@ -29,3 +29,18 @@ bool Gate::Destroy(IKernel *kernel)
 }
 
 
+void Gate::OnClientEnter(ClientSession *client)
+{
+
+}
+
+void Gate::OnClientMsg()
+{
+
+}
+
+void Gate::OnClientLeave(ClientSession *client)
+{
+
+}
+

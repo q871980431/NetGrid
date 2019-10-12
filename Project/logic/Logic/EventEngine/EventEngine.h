@@ -56,6 +56,7 @@ public:
 	virtual bool RemoveEventLock(s64 eventid, s32 lockid);
 	virtual void AddJudgeListener(s32 eventid, JUDGE_CALL_BACK callback, const char *debug = nullptr);
 	virtual bool ActiveJudge(s32 eventid, const void *context, s32 size, void *userdata);
+
 protected:
 private:
     static EventEngine     * s_self;

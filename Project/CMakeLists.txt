@@ -129,6 +129,7 @@ SET(PUBLIC
 	"${PUBLIC_DIR}/TDynArray.h"
 	"${PUBLIC_DIR}/TList.h"
 	"${PUBLIC_DIR}/TDynPool.h"
+	"${PUBLIC_DIR}/TIndexPool.h"	
 	"${PUBLIC_DIR}/XmlReader.cpp"
 	"${PUBLIC_DIR}/XmlReader.h"
     "${PUBLIC_DIR}/Convert.h"
@@ -142,7 +143,7 @@ SET(PUBLIC
     "${PUBLIC_DIR}/Tools_Net.cpp"
     "${PUBLIC_DIR}/MysqlBuilder.h"
     "${PUBLIC_DIR}/MysqlBuilder.cpp"
-	"${PUBLIC_DIR}/AtomicIntrusiveLinkedList.h"			
+	"${PUBLIC_DIR}/AtomicIntrusiveLinkedList.h"	
 )
 SET(TINYXML_DIR
 	"${PUBLIC_DIR}/tinyxml2"
