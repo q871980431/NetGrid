@@ -10,9 +10,12 @@
 #include "AsyncQueue.h"
 #include "XmlReader.h"
 #include "ExceptionMgr.h"
+#include "ProfileMgr.h"
 
 template<> Kernel * Singleton<Kernel>::_instance = nullptr;
 core::IKernel * G_KERNEL::g_kernel = nullptr;
+
+const char ProcessNameSplit = '_';
 
 bool Kernel::Ready()
 {
@@ -22,12 +25,21 @@ bool Kernel::Ready()
     return _logger.Ready()&&
            Configmgr::GetInstance()->Ready()&&
            NetService::GetInstance()->Ready()&&
-		   TimerMgr::GetInstance()->Ready();
+		   TimerMgr::GetInstance()->Ready() && PROFILEMGR.Ready();
 }
 bool Kernel::Initialize(s32 argc, char **argv)
 {
     ParseCommand(argc, argv);
-
+	const char *name = GetCmdArg("name");
+	const char *id = GetCmdArg("id");
+	if (name == nullptr || id == nullptr)
+	{
+		ASSERT(false, "cmd args need have name and id");
+		return false;
+	}
+	_procName.append(name);
+	_procName.push_back(ProcessNameSplit);
+	_procName.append(id);
 
 	bool temp = _logger.Initialize() && Configmgr::GetInstance()->Initialize();
 	if (temp)
@@ -53,7 +65,7 @@ bool Kernel::Initialize(s32 argc, char **argv)
 
 		return         NetService::GetInstance()->Initialize()
 			&& TimerMgr::GetInstance()->Initialize()
-			&& Modulemgr::GetInstance()->Initialize();
+			&& Modulemgr::GetInstance()->Initialize() && PROFILEMGR.Initialize();
 	}
 
 	return temp;
@@ -77,6 +89,7 @@ void Kernel::Loop()
 		NetService::GetInstance()->Process(this,10);
 		TimerMgr::GetInstance()->Process(10);
 		FrameMgr::GetInstance()->Process(10);
+		PROFILEMGR.Process(1);
 		_logger.Process(10);
 		MSLEEP(5);
     }

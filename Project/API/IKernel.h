@@ -283,6 +283,7 @@ namespace core
         virtual const char* GetConfigFile() = 0;
         virtual const  char* GetEnvirPath() = 0;
         virtual const char * GetCmdArg(const char *name) = 0;
+		virtual const char * GetProcName() = 0;
     };
 }
 

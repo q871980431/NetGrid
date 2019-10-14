@@ -9,11 +9,11 @@ IScriptEngine * TestScriptEngine::s_scriptEngine = nullptr;
 void TestScriptEngine::Test(core::IKernel *kernel)
 {
 	s_kernel = kernel;
-	FIND_MODULE(s_scriptEngine, ScriptEngine);
-	s_scriptEngine->RegModuleFunc("Test", "Sub", MyMin, "test.sub");
-	s_scriptEngine->RegModuleFunc("Test", "CallSum", Sum, "test.CallSum");
+	//FIND_MODULE(s_scriptEngine, ScriptEngine);
+	//s_scriptEngine->RegModuleFunc("Test", "Sub", MyMin, "test.sub");
+	//s_scriptEngine->RegModuleFunc("Test", "CallSum", Sum, "test.CallSum");
 	//TestCallLuaFunc();
-	TestLoopCallFunc();
+	//TestLoopCallFunc();
 }
 
 void TestScriptEngine::TestCallLuaFunc()

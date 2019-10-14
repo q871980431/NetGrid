@@ -38,6 +38,8 @@ public:
     virtual const char* GetCoreFile();
     virtual const char* GetConfigFile();
     virtual const  char* GetEnvirPath();
+	virtual const char * GetProcName() { return _procName.c_str(); };
+
 protected:
 private:
     void ParseCommand(s32 argc, char **argv);
@@ -49,6 +51,7 @@ private:
 	s32											_asyncQueueId;
 	AsyncQueue								  * _mainQueue;
 	std::unordered_map<s32, AsyncQueue*>	    _asyncQueues;
+	std::string									_procName;
 };
 
 #define KERNEL ((Kernel * )(Kernel::GetInstancePtr()))

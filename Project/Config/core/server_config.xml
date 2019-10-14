@@ -1,6 +1,7 @@
 <root>
 	<env path="./envir"></env>
 	<net no_delay="true" rev_buff="65536" send_buff="65536"></net>
+	<profile mem_check="true" cpu_check="true" check_time="300"/>
 	<cluster master_ip="127.0.0.1" port="8001" >
 		<node name="gate" type="1"/>
 		<node name="logic" type="2"/>
