@@ -88,8 +88,6 @@ SETNX lock tick+lockTime
     2 2 2
 	3 	3
 	4
-	
-	/home/xuping/MfwAgent/mfwagent/
-	
+		
 
 目前 主线程的redis 频率过高。

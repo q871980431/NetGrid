@@ -1,1 +1,25 @@
 protobuf 为3.8的版本
+
+
+D
+
+BC = CD 2 + BD 2
+
+OH = R2 - h2
+OH/R-r = ()
+
+t = R - r
+
+R/X = h / (t-m)
+
+x = R(t-m)/h
+
+m = t-m
+
+
+sinx = h / R
+
+t-m/x=h/R
+t-m/x = sinx
+t-m = six*X
+m = t - sinx * X

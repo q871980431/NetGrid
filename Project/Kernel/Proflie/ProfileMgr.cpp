@@ -14,6 +14,7 @@ bool ProfileMgr::Ready()
 
 bool ProfileMgr::Initialize()
 {
+	_LoadConfig();
 #ifdef LINUX
 	if (!_LoadConfig())
 		return false;
@@ -60,6 +61,7 @@ void ProfileMgr::Process(s32 tick)
 	}
 	if (now - _config.lastCheckTime > _config.checkTime)
 	{
+		ECHO("************Enter Profiler Flush************");
 		if (_config.openCpuInfo)
 		{
 			ProfilerFlush();
