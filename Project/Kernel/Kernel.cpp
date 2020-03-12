@@ -14,6 +14,7 @@
 
 template<> Kernel * Singleton<Kernel>::_instance = nullptr;
 core::IKernel * G_KERNEL::g_kernel = nullptr;
+s32 G_KERNEL::g_logLvl = 0;
 
 const char ProcessNameSplit = '_';
 
@@ -22,6 +23,7 @@ bool Kernel::Ready()
 	_asyncQueueId = 1;
 	_mainQueue = nullptr;
 	G_KERNEL::g_kernel = this;
+	G_KERNEL::g_logLvl = LOG_LEVEL_DEBUG;
     return _logger.Ready()&&
            Configmgr::GetInstance()->Ready()&&
            NetService::GetInstance()->Ready()&&

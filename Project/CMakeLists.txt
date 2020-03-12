@@ -50,11 +50,11 @@ SET(OBJECT_LIB
 
 
 SET(KERNEL_LIBD
-	debug "${PROJECT_BINARY_DIR}/windows/debug/NetGrid"
+	debug "${PROJECT_BINARY_DIR}/windows/debug/NetGrid.lib"
 )
 
 SET(KERNEL_LIB
-	optimized "${PROJECT_BINARY_DIR}/windows/Release/NetGrid"
+	optimized "${PROJECT_BINARY_DIR}/windows/Release/NetGrid.lib"
 )
 
 SET(NODEPROTO_LIBD
@@ -129,7 +129,8 @@ SET(PUBLIC
 	"${PUBLIC_DIR}/TDynArray.h"
 	"${PUBLIC_DIR}/TList.h"
 	"${PUBLIC_DIR}/TDynPool.h"
-	"${PUBLIC_DIR}/TIndexPool.h"	
+	"${PUBLIC_DIR}/THeap.h"	
+	"${PUBLIC_DIR}/TIndexPool.h"
 	"${PUBLIC_DIR}/XmlReader.cpp"
 	"${PUBLIC_DIR}/XmlReader.h"
     "${PUBLIC_DIR}/Convert.h"

@@ -1,0 +1,4 @@
+ssh-copy-id xuping@10.94.28.21
+
+ssh-copy-id -i ~/.ssh/id_rsa xuping@10.94.28.21 //指定私钥名称
+

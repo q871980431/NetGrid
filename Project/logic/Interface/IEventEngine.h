@@ -9,6 +9,7 @@
 #define __IEventEngine_h__
 #include "IModule.h"
 #include <functional>
+
 class IEventEngine : public IModule
 {
 public:
@@ -21,6 +22,7 @@ public:
     
 	virtual void AddEventListener(s32 eventid, EVENT_CALL_BACK callback, const char *debug = nullptr) = 0;
 	virtual void ActiveEvent(s32 eventid, const void *context, s32 size) = 0;
+
 	virtual bool CreateEventLock(s64 eventid, UnLockCallFunction &callback) = 0;
 	virtual s32  GetEventLockId(s64 eventid) = 0;
 	virtual bool RemoveEventLock(s64 eventid, s32 lockid) = 0;

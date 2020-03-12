@@ -10,6 +10,7 @@ namespace core
 	const static s16 NODE_TYPE_MAX = 16;
 	const static s8	 NODE_ID_MAX = 16;
 	const static s32 INVALID = -1;
+	const s32 CLIENT_HEART_BEAT_TIME = 5 * 1000;
 
     enum NODE_MSG_ID
     {

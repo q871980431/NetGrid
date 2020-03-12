@@ -5,4 +5,6 @@
 	<mysql defultconnection="game" connectionnum = "2" perfiletime="60">
 		<connection name="game" hostip="127.0.0.1" port="3306" username="root" password="" databasename="gamepartner" characterset="utf8"/>
 	</mysql>
+	<gate ip="127.0.0.1" port="7001" heartbeat="5">
+	</gate>
 </root>

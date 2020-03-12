@@ -12,6 +12,9 @@
 #endif
 #include <random>
 
+#define SETBIT(x, y) ((x) |= (1<<(y)))
+#define CLRBIT(x, y) ((x) &= ~(1<<(y)))
+#define GETBIT(x, y) (((x) & (1<<(y))) ? true : false)
 
 namespace tools{
 

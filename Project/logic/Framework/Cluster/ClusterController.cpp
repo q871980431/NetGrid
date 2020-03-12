@@ -41,7 +41,7 @@ bool ClusterConntroller::InitCompelate()
 		if (!_clusterInfo->InitCompelate())
 			return false;
 	}
-	//REG_EVENT_LISTENER(_eventEngine, core::FRAMEWORK_EVENT_ID::FE_CLUSTERNODE_STATE_CHANGE, );
+	//REG_EVENT_LISTENER(_eventEngine, core::FRAMEWORK_EVENT_ID::FE_CLUSTERNODE_STATE_CHANGE, OnClusterNodesTypeChange);
 
 	return true;
 }

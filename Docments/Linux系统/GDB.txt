@@ -1,0 +1,4 @@
+1, 调试带参数的程序
+$gdb --args ./A V1 V2 V3
+$gdb ./A，进入gdb后  r V1 V2 V3
+$gdb ./A，进入gdb后  设置参数set args V1 V2 V3 再直接 r

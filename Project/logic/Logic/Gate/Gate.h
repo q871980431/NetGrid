@@ -8,8 +8,16 @@
 #ifndef __Gate_h__
 #define __Gate_h__
 #include "IGate.h"
-#include "ClientSession.h"
-#include "Client.h"
+
+
+struct GateConfigInfo 
+{
+	std::string hostIp;
+	s32 port;
+	s32 heartBeat;
+};
+
+class Client;
 class Gate : public IGate
 {
 public:
@@ -19,13 +27,18 @@ public:
     virtual bool Launched(IKernel *kernel);
     virtual bool Destroy(IKernel *kernel);
 	
-	static void OnClientEnter(ClientSession *client);
-	static void OnClientMsg();
-	static void OnClientLeave(ClientSession *client);
+public:
+	static void OnClientEnter(Client *client);
+	static void OnClientMsg(Client *client, const char *content, s32 len);
+	static void OnClientLeave(Client *client);
+
+private:
+	bool LoadConfig();
 
 protected:
 private:
     static Gate     * s_self;
     static IKernel  * s_kernel;
+	static GateConfigInfo s_configInfo;
 };
 #endif

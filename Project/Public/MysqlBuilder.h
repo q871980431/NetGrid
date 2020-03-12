@@ -230,16 +230,18 @@ class Update : public SQLCommand
 {
 public:
 	Update(void *context, s32 size, ESCAPE_STR_FUN fun, const char *table) : SQLCommand(context, size, fun, table){}
+	virtual const char * ToStr();
 
 	template<typename T>
 	struct SetFiled 
 	{
-		SetFiled(const char *name, T val)
+		SetFiled(const char *name, T &val)
 		{
-
+			_name = name;
+			_val = val;
 		}
 		const char *_name;
-		T val;
+		T _val;
 	};
 
 	//void Set()

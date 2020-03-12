@@ -35,7 +35,6 @@ public:
 			_connection->Send((const char *)buff, len);
 		}
 	}
-
 	void Close(const char *reason);
 
 public:

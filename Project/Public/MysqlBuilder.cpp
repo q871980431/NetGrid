@@ -31,3 +31,9 @@ const char * Query::ToStr()
 	}
 	return _final.c_str();
 }
+
+const char * Update::ToStr()
+{
+
+	return nullptr;
+}

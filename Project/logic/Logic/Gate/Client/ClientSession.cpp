@@ -1,7 +1,9 @@
 #include "ClientSession.h"
+#include "../Gate.h"
+#include "ClientMgr.h"
 
-s32 ClientSession::s_sendBuffSize = 0;
-s32 ClientSession::s_recvBuffSIze = 0;
+s32 ClientSession::s_sendBuffSize = 64 * 1024;
+s32 ClientSession::s_recvBuffSIze = 64 * 1024;
 
 void ClientSession::OnEstablish()
 {
@@ -10,17 +12,18 @@ void ClientSession::OnEstablish()
 	if (_connection)
 	{
 		_connection->SettingBuffSize(s_recvBuffSIze, s_sendBuffSize);
+		Gate::OnClientEnter(_client);
 	}
 }
 
 void ClientSession::OnRecv(const char *buff, s32 len)
 {
-
+	Gate::OnClientMsg(_client, buff, len);
 }
 
 void ClientSession::OnError(s32 moduleErr, s32 sysErr)
 {
-
+	TRACE_LOG("client session error, module error:%d, sys error:%d", moduleErr, sysErr);
 }
 
 s32 ClientSession::OnParsePacket(CircluarBuffer *recvBuff)
@@ -40,16 +43,12 @@ s32 ClientSession::OnParsePacket(CircluarBuffer *recvBuff)
 
 void ClientSession::OnRelease()
 {
-
+	Gate::OnClientLeave(_client);
+	CLIENTMGR.RecoverClient(_client);
 }
 
 void ClientSession::Close(const char *reason)
 {
-	if (_client)
-	{
-
-		_client = nullptr;
-	}
 	if (_connection)
 		_connection->Close(reason);
 }

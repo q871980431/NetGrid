@@ -33,7 +33,7 @@
 
 #define DEBUG_LOG(format, ...)\
 {\
-	if(  core::LOG_LEVEL_DEBUG >= core::G_KERNEL::g_kernel->GetLogLevel())\
+	if(  core::LOG_LEVEL_DEBUG >= core::G_KERNEL::g_logLvl)\
 	{\
 		char log[LOG_BUFF_SIZE] = { 0 }; \
 		SafeSprintf(log, sizeof(log), "[DEBUG]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
@@ -43,7 +43,7 @@
 
 #define TRACE_LOG(format, ...)\
 {\
-	if(  core::LOG_LEVEL_TRACE >= core::G_KERNEL::g_kernel->GetLogLevel())\
+	if(  core::LOG_LEVEL_TRACE >= core::G_KERNEL::g_logLvl)\
 	{\
 		char log[LOG_BUFF_SIZE] = { 0 }; \
 		SafeSprintf(log, sizeof(log), "[TRACE]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
@@ -54,7 +54,7 @@
 
 #define ERROR_LOG(format, ...)\
 {\
-	if(  core::LOG_LEVEL_DEBUG >= core::G_KERNEL::g_kernel->GetLogLevel())\
+	if(  core::LOG_LEVEL_ERROR >= core::G_KERNEL::g_logLvl)\
 	{\
 		char log[LOG_BUFF_SIZE] = { 0 }; \
 		SafeSprintf(log, sizeof(log), "[ERROR]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
@@ -131,6 +131,7 @@ namespace core
 	struct KERNEL_API G_KERNEL
 	{
 		static IKernel *g_kernel;
+		static s32 g_logLvl;
 	};
 
 	enum LOG_LEVEL

@@ -50,4 +50,15 @@ s32 __SafeSprintf(char *buf, s32 size, const char *fromat, ...)
 	return ret;
 }
 
+//constexpr const char *get_basename(const char *filename, const int t)
+//{
+//	if (t < 0)
+//		return filename;
+//	else if (filename[t] == '/' || filename[t] == '\\')
+//		return filename + t + 1;
+//	else
+//		return get_basename(filename, t - 1);
+//}
+
+
 #endif
