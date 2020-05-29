@@ -48,13 +48,5 @@ private:
 	OnFailedFun _failedFun;
 };
 
-inline s32 MysqlEscapeStrFun(const void *context, s32 len, const char* pszSrc, int nSize, char* pszDest)
-{
-	ASSERT(len == sizeof(IEscapeStringHandler*), "error");
-	IEscapeStringHandler *escapeHandler = *(IEscapeStringHandler**)context;
-	return escapeHandler->EscapeString(pszSrc, nSize, pszDest);
-}
-
-#define MYSQL_QUERY(query, escapeHandler, table)	Query query(&escapeHandler, sizeof(escapeHandler), MysqlEscapeStrFun, table)
 
 #endif

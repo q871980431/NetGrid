@@ -1,4 +1,4 @@
-/*
+﻿/*
  * File:	ScriptEngine.h
  * Author:	xuping
  * 
@@ -29,6 +29,7 @@ public:
     virtual void RegModuleFunc(const char *module, const char *func, const IDataInterchangeFuncType &f, const char *debug);
 	virtual void CallScriptFunc(const char *module, const char *func, const IDataOutputFuncType &outPutFunc, const IDataCallBackFuncType &callBackFun);
 	virtual void PrintLuaStack();
+	void ReloadScript(const char *module);
 
 	s32 CallLuaFuncAdd(s32 a, s32 b);
 public:
@@ -46,6 +47,10 @@ private:
     static void TestAdd(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out);
 	static void TestFunc(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out);
 	static void TestNest(IKernel *kernel, IDataInputStream &input, IDataOutputStream &out);
+
+private:
+	void CallPtfMod(const std::string &modName);
+
 private:
     static ScriptEngine     * s_self;
     static IKernel  * s_kernel;

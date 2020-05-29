@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<async threadcount="4"/>
+	<!--defultconnection 默认的连接名称, connectionnum 每种连接的连接数, 连接数最大值为 async中threadcount+1 -->
+	<profile mem_check="true" cpu_check="true" check_time="300"/>
+	<mysql defultconnection="game" connectionnum = "2" perfiletime="60">
+		<connection name="game" hostip="127.0.0.1" port="3306" username="root" password="" databasename="gamepartner" characterset="utf8"/>
+	</mysql>
+</root>

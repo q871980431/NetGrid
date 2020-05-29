@@ -52,6 +52,17 @@ namespace tools
 #ifdef __cplusplus
     }
 #endif
+	template<typename T = std::chrono::milliseconds>
+	class StopWatch
+	{
+	public:
+		StopWatch() { Reset(); }
+		inline void Reset() { _tick = std::chrono::duration_cast<T>(std::chrono::steady_clock::now().time_since_epoch()).count(); }
+		inline int64_t  Interval() { return std::chrono::duration_cast<T>(std::chrono::steady_clock::now().time_since_epoch()).count() - _tick; }
+	protected:
+	private:
+		int64_t _tick;
+	};
 }
 
 #endif

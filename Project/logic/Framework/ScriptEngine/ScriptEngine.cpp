@@ -27,9 +27,9 @@ bool ScriptEngine::Initialize(IKernel *kernel)
     SafeSprintf(scriptPath, sizeof(scriptPath), "%s/script", envi);
 	ECHO("LUA PATH:%s", scriptPath);
     SetSearchPath(scriptPath);
+	ReplacePrint();
     ExecScriptFile(LINK_FILE_NAME);
 
-    ReplacePrint();
     //lua_getglobal(s_luaState, LUA_TRACE_NAME);
 
 
@@ -69,6 +69,16 @@ bool ScriptEngine::Launched(IKernel *kernel)
 		input.ReadInt32(ret);
 	};
 	CallScriptFunc("npc.xuping", "testNest", f, callFun);
+	if (ret == 6)
+	{
+		TRACE_LOG("test Nest OK");
+	}
+	CallPtfMod("npc.xuping");
+	CallLuaFuncAdd(1, 2);
+	ReloadScript("npc.xuping");
+	TRACE_LOG("reload end");
+	CallLuaFuncAdd(1, 2);
+	CallPtfMod("npc.xuping");
 
     return true;
 }
@@ -155,6 +165,7 @@ s32 ScriptEngine::CallLuaFuncAdd(s32 a, s32 b)
 		input.ReadInt32(ret);
 	};
 	ExecGlobalFunction(CALL_FUNCTION, 4, func);
+	TRACE_LOG("A:%d + B:%d = %d", a, b, ret);
 	return ret;
 }
 
@@ -184,7 +195,14 @@ bool ScriptEngine::ExecScriptFile(const char *file)
 {
     char buff[512];
     SafeSprintf(buff, sizeof(buff), "return require \"%s\"", file);
-    luaL_loadstring(s_luaState, buff);
+    int32_t loaded = luaL_loadstring(s_luaState, buff);
+	if (LUA_OK == loaded)
+	{
+		TRACE_LOG("loaded ok");
+	}
+	else {
+		TRACE_LOG("loaded error:%d", loaded);
+	}
 
     return ExecFunction(0, nullptr);
 }
@@ -279,6 +297,20 @@ void ScriptEngine::PrintLuaStack()
 	} 
 	TRACE_LOG("--栈底--");
 }
+
+void ScriptEngine::ReloadScript(const char *module)
+{
+	lua_pushstring(s_luaState, module);
+	s32 ret = 0;
+	auto func = [&ret](IKernel *kernel, IDataInputStream &input)
+	{
+		input.ReadInt32(ret);
+	};
+	ExecGlobalFunction("reload", 1, nullptr);
+	TRACE_LOG("Reload Mod:%s", module);
+
+}
+
 
 bool ScriptEngine::ExecFunction(s8 argc, const IDataCallBackFuncType callback)
 {
@@ -392,4 +424,17 @@ void ScriptEngine::TestNest(IKernel *kernel, IDataInputStream &input, IDataOutpu
 	s_self->CallScriptFunc("npc.xuping", "testNest", f, callFun);
 
 	out.WriteInt32(ret);
+}
+
+void ScriptEngine::CallPtfMod(const std::string &modName)
+{
+	lua_pushstring(s_luaState, modName.c_str());
+	s32 ret = 0;
+	auto func = [&ret](IKernel *kernel, IDataInputStream &input)
+	{
+		input.ReadInt32(ret);
+	};
+	ExecGlobalFunction("ptfmod", 1, nullptr);
+	TRACE_LOG("CallPtf Mod:%s", modName.c_str());
+	return ;
 }

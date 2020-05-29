@@ -1,0 +1,6 @@
+<root path="./">
+	<module name="EventEngine"/>		
+	<module	name="UnitTest"/>	
+	<module	name="MysqlMgr"/>
+	<module	name="Harbor"/>
+</root>

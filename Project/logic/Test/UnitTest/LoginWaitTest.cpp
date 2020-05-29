@@ -12,6 +12,7 @@ bool LoginWaitTest::s_add = true;
 
 void LoginWaitTest::StartTest(core::IKernel *kernel)
 {
+	return;
 	core::IKernel *s_kernel = kernel;
 	FIND_MODULE(s_loginControl, LoginControl);
 	StartUpdateQueueNumTimer(kernel);

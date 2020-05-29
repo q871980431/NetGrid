@@ -18,7 +18,7 @@ end
 
 function testAdd(x)
 	local tmp = x + 1;
-	print("OnStart"..tmp);
+	print("TestAdd"..tmp);
 	--local c = test.TestAdd(1, 2);
 	--print("Add complete:"..c);
 	return tmp;
@@ -31,6 +31,17 @@ function testNest(x)
 	end
 	local tmp = test.TestNest(x-1);
 	return tmp + x;
+end
+
+function Add(a, b)
+	local tmp = a + b;
+	print("Add12"..a.." + "..b);
+	newTest();
+	return tmp;
+end
+
+function newTest()
+	print("this is new test");
 end
 
 return _ENV

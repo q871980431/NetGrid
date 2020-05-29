@@ -26,17 +26,19 @@
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \
     SafeSprintf(log, sizeof(log), "[LUA]: %s", (content)); \
+	printf("%s\n", log);\
     core::G_KERNEL::g_kernel->AsyncLog(log);\
 }
 
 #ifdef WIN32
-
 #define DEBUG_LOG(format, ...)\
 {\
 	if(  core::LOG_LEVEL_DEBUG >= core::G_KERNEL::g_logLvl)\
 	{\
+		constexpr static const char * name = getFileName(__FILE__, sizeof(__FILE__) - 1);\
 		char log[LOG_BUFF_SIZE] = { 0 }; \
-		SafeSprintf(log, sizeof(log), "[DEBUG]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+		SafeSprintf(log, sizeof(log), "[DEBUG]: %s:%d:%s | "#format, name, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+		printf("%s\n", log);\
 		core::G_KERNEL::g_kernel->AsyncLog(log);\
 	}\
 }
@@ -45,8 +47,9 @@
 {\
 	if(  core::LOG_LEVEL_TRACE >= core::G_KERNEL::g_logLvl)\
 	{\
+		constexpr static const char * name = getFileName(__FILE__, sizeof(__FILE__) - 1);\
 		char log[LOG_BUFF_SIZE] = { 0 }; \
-		SafeSprintf(log, sizeof(log), "[TRACE]: %s:%d:%s | "#format, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+		SafeSprintf(log, sizeof(log), "[TRACE]: %s:%d:%s | "#format, name, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
 		printf("%s\n", log);\
 		core::G_KERNEL::g_kernel->AsyncLog(log); \
 	}\

@@ -17,11 +17,16 @@ core::IKernel * G_KERNEL::g_kernel = nullptr;
 s32 G_KERNEL::g_logLvl = 0;
 
 const char ProcessNameSplit = '_';
+const s32 FRAME_NUM_UNLIMIT = -1;
+const s32 MODULE_EXPENDS_TIME = 10;
+const s32 KERNEL_SLEEP_TIME = 10;
+const s32 KERNEL_LOAD_PRF_TIME = 1000;
 
 bool Kernel::Ready()
 {
 	_asyncQueueId = 1;
 	_mainQueue = nullptr;
+	_frameNum = FRAME_NUM_UNLIMIT;
 	G_KERNEL::g_kernel = this;
 	G_KERNEL::g_logLvl = LOG_LEVEL_DEBUG;
     return _logger.Ready()&&
@@ -38,6 +43,15 @@ bool Kernel::Initialize(s32 argc, char **argv)
 	{
 		ASSERT(false, "cmd args need have name and id");
 		return false;
+	}
+	const char *framNum = GetCmdArg("frame");
+	if (framNum != nullptr)
+	{
+		int32_t iNum = std::atoi(framNum);
+		if (iNum > 0)
+		{
+			_frameNum = iNum;
+		}
 	}
 	_procName.append(name);
 	_procName.push_back(ProcessNameSplit);
@@ -73,27 +87,57 @@ bool Kernel::Initialize(s32 argc, char **argv)
 	return temp;
 }
 
+#define TRACE_LOG_STOP_WATCH(stopWatch, Time, Content)\
+{\
+	int64_t costTime = stopWatch.Interval();\
+	if (costTime > (Time))\
+		TRACE_LOG(Content expends time:%ld, costTime);\
+	stopWatch.Reset();\
+}
+
 void Kernel::Loop()
 {
 	ExceptionMgr::Init();
+	s64 iLastTime = tools::GetTimeMillisecond();
+	s64 iNowTime = iLastTime;
+	s32	iCpuTime = 0;
+	tools::StopWatch<> stopWatch;
+	tools::StopWatch<> loadWatch;
+	tools::StopWatch<> cpuWatch;
     while (true)
     {
+		iNowTime = tools::GetTimeMillisecond();
+		stopWatch.Reset();
+		cpuWatch.Reset();
 		if (!_asyncQueues.empty())
 		{
-			s32 execTime = 10 / _asyncQueues.size();
+			s32 execTime = MODULE_EXPENDS_TIME / _asyncQueues.size();
 			if (execTime == 0)
 				execTime = 1;
 
 			for (auto &asyncQueue : _asyncQueues)
 				asyncQueue.second->Loop(execTime);
 		}
-
-		NetService::GetInstance()->Process(this,10);
-		TimerMgr::GetInstance()->Process(10);
-		FrameMgr::GetInstance()->Process(10);
-		PROFILEMGR.Process(1);
-		_logger.Process(10);
-		MSLEEP(5);
+		TRACE_LOG_STOP_WATCH(stopWatch, 0, async queue);
+		NetService::GetInstance()->Process(this, MODULE_EXPENDS_TIME);
+		TRACE_LOG_STOP_WATCH(stopWatch, MODULE_EXPENDS_TIME, "net service");
+		TimerMgr::GetInstance()->Process(MODULE_EXPENDS_TIME);
+		TRACE_LOG_STOP_WATCH(stopWatch, MODULE_EXPENDS_TIME, "timer manager");
+		FrameMgr::GetInstance()->Process(MODULE_EXPENDS_TIME);
+		TRACE_LOG_STOP_WATCH(stopWatch, MODULE_EXPENDS_TIME, "frame manager");
+		PROFILEMGR.Process(MODULE_EXPENDS_TIME);
+		TRACE_LOG_STOP_WATCH(stopWatch, MODULE_EXPENDS_TIME, "profile manager");
+		_logger.Process(MODULE_EXPENDS_TIME);
+		TRACE_LOG_STOP_WATCH(stopWatch, MODULE_EXPENDS_TIME, "log manager");
+		iCpuTime += cpuWatch.Interval();
+		MSLEEP(KERNEL_SLEEP_TIME);
+		s64 interval = loadWatch.Interval();
+		if (loadWatch.Interval() > KERNEL_LOAD_PRF_TIME)
+		{
+			TRACE_LOG("runtime:%ld ms, cpu time:%ld ms, load val:%.2f%%", interval, iCpuTime, (iCpuTime * 100.f) / interval);
+			loadWatch.Reset();
+			iCpuTime = 0;
+		}
     }
 }
 void Kernel::Destroy()

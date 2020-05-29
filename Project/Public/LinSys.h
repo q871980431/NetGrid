@@ -30,6 +30,9 @@ typedef int64_t s64;
 using std::max;
 using std::min;
 
+
+inline constexpr const char *getFileName(const char *filePath, const int len) { return len < 0 ? filePath : (filePath[len] == '/') ? filePath + len + 1 : getFileName(filePath, len - 1); }
+
 #define ECHO(format, ...)\
 {\
     char log[LOG_BUFF_SIZE] = { 0 }; \

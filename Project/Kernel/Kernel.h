@@ -52,6 +52,7 @@ private:
 	AsyncQueue								  * _mainQueue;
 	std::unordered_map<s32, AsyncQueue*>	    _asyncQueues;
 	std::string									_procName;
+	s32											_frameNum;
 };
 
 #define KERNEL ((Kernel * )(Kernel::GetInstancePtr()))
